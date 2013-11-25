@@ -1,14 +1,17 @@
 package com.srain.sdk.file;
 
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.os.Environment;
 
 public class FileUtil {
@@ -45,7 +48,6 @@ public class FileUtil {
 	}
 
 	public static boolean write(String filePath, String content) {
-
 		File file = new File(filePath);
 		if (!file.getParentFile().exists())
 			file.getParentFile().mkdirs();
@@ -70,18 +72,45 @@ public class FileUtil {
 		return false;
 	}
 
-	public static String read(String fileName) {
+	/**
+	 * 
+	 * @param context
+	 * @param filePath
+	 *            file path relative to assets, like request_init1/search_index.json
+	 * 
+	 * @return
+	 */
+	public static String readAssert(Context context, String filePath) {
+		try {
+			AssetManager assetManager = context.getAssets();
+			InputStream inputStream = assetManager.open(filePath);
+			DataInputStream stream = new DataInputStream(inputStream);
+			int length = stream.available();
+			byte[] buffer = new byte[length];
+			stream.readFully(buffer);
+			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+			byteArrayOutputStream.write(buffer);
+			return byteArrayOutputStream.toString();
+		} catch (Exception e) {
+		}
+		return "";
+	}
+
+	public static String read(String filePath) {
+		File file = new File(filePath);
+		if (!file.exists())
+			return null;
+
 		FileInputStream fileInput = null;
 		FileChannel channel = null;
 		try {
-			fileInput = new FileInputStream(fileName);
+			fileInput = new FileInputStream(filePath);
 			channel = fileInput.getChannel();
 			ByteBuffer buffer = ByteBuffer.allocate((int) channel.size());
 			channel.read(buffer);
 
 			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 			byteArrayOutputStream.write(buffer.array());
-
 			return byteArrayOutputStream.toString();
 		} catch (Exception e) {
 		} finally {
@@ -102,7 +131,6 @@ public class FileUtil {
 				}
 			}
 		}
-
 		return null;
 	}
 }
