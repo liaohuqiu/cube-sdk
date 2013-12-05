@@ -8,7 +8,7 @@ package com.srain.sdk.request;
 /*
  * TODO: request parameters / request method
  */
-public class Request {
+public class Request implements IRequest {
 
 	private RequestOnSuccHandler mOnSuccHandler;
 	private RequestPreHandler mBeforeRequestHandler;
@@ -39,12 +39,29 @@ public class Request {
 		return this;
 	}
 
+	/**
+	 * Implements interface {@link IRequest}
+	 */
 	public String getRequestUrl() {
 		return mUrl;
 	}
 
+	/**
+	 * Implements interface {@link IRequest}
+	 */
 	public void onRequestSucc(JsonData jsonData) {
+		sendRequestSucc(jsonData);
+	}
+
+	protected void sendRequestSucc(JsonData jsonData) {
 		mOnSuccHandler.onRequestSucc(jsonData);
+	}
+
+	/**
+	 * Override this method to process the data from data srouce.
+	 */
+	public JsonData processOriginData(JsonData rawData) {
+		return rawData;
 	}
 
 	public byte[] getPostData() {

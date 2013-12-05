@@ -3,9 +3,9 @@ package com.srain.sdk.request;
 public interface CacheableRequestOnSuccHandler extends RequestOnSuccHandler {
 
 	/**
-	 * the data from cache and which is out of date
+	 * the data from cache, outoufDate detective if the data is out of date.
 	 * 
-	 * @param previousJsonData
+	 * @param cacheData
 	 */
-	public void onCachedPreviousData(JsonData previousJsonData);
+	public void onCacheData(JsonData cacheData, boolean outoufDate);
 }

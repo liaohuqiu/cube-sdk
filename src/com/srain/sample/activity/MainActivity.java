@@ -30,8 +30,8 @@ public class MainActivity extends Activity {
 			}
 
 			@Override
-			public void onCachedPreviousData(JsonData previousJsonData) {
-				Log.i("test", String.format("prev data: %s", previousJsonData));
+			public void onCacheData(JsonData cacheData, boolean outoufDate) {
+				Log.i("test", String.format("prev data: %s", cacheData));
 			}
 		});
 	}

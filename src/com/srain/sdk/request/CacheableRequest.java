@@ -5,9 +5,11 @@ import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import com.srain.sdk.request.RequestCache.Cacheable;
+import android.util.Log;
 
-public class CacheableRequest extends Request implements Cacheable {
+import com.srain.sdk.request.RequestCache.ICacheable;
+
+public class CacheableRequest extends Request implements ICacheable {
 
 	private CacheableRequestOnSuccHandler mCacheableRequestHandler;
 	private CacheableRequestPreHandler mCacheableRequestPreHandler;
@@ -34,11 +36,17 @@ public class CacheableRequest extends Request implements Cacheable {
 	@Override
 	public void onRequestSucc(JsonData jsonData) {
 		super.onRequestSucc(jsonData);
-		RequestCache.getInstance().cacheRequest(this, jsonData);
+
+		// cache the data
+		if (jsonData != null && jsonData.getRawData() != null && jsonData.length() > 0) {
+			RequestCache.getInstance().cacheRequest(this, jsonData);
+		} else {
+			Log.d("cube_request", "after request, data may be empty, not set to cache");
+		}
 	}
 
 	// ===========================================================
-	// Implements Interface @Cacheable
+	// Implements Interface @ICacheable
 	// ===========================================================
 	@Override
 	public void onNoCacheDataAvailable() {
@@ -46,9 +54,11 @@ public class CacheableRequest extends Request implements Cacheable {
 	}
 
 	@Override
-	public void onCachedPreviousData(JsonData previousJsonData) {
-		mCacheableRequestHandler.onCachedPreviousData(previousJsonData);
-		doQuery();
+	public void onCacheData(JsonData previousJsonData, boolean outoufDate) {
+		mCacheableRequestHandler.onCacheData(previousJsonData, outoufDate);
+		if (outoufDate) {
+			doQuery();
+		}
 	}
 
 	@Override
@@ -99,12 +109,12 @@ public class CacheableRequest extends Request implements Cacheable {
 	}
 
 	@Override
-	public void onCacheData(JsonData cacheJsonData) {
-		mCacheableRequestHandler.onRequestSucc(cacheJsonData);
+	public String getAssertInitDataPath() {
+		return mCacheableRequestPreHandler.getInitFileAssertPath();
 	}
 
 	@Override
-	public String getAssertInitDataPath() {
-		return mCacheableRequestPreHandler.getInitFileAssertPath();
+	public JsonData processDataFromAssert(JsonData jsonData) {
+		return processOriginData(jsonData);
 	}
 }

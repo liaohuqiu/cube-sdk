@@ -1,5 +1,6 @@
 package com.srain.sdk.request;
 
+import java.util.Iterator;
 import java.util.Map;
 
 import org.json.JSONArray;
@@ -102,6 +103,11 @@ public class JsonData {
 			return ((JSONObject) mJson).length();
 		}
 		return 0;
+	}
+
+	@SuppressWarnings("unchecked")
+	public Iterator<String> keys() {
+		return optMapOrNew().keys();
 	}
 
 	public String toString() {
