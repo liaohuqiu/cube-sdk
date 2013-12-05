@@ -7,8 +7,21 @@ import java.security.NoSuchAlgorithmException;
 
 import android.util.Log;
 
-import com.srain.sdk.request.RequestCache.ICacheable;
+import com.srain.sdk.request.RequestCacheManager.ICacheable;
 
+/**
+ * <p>
+ * A request whose data can be cached, if it has cache data, you can use the cache data to draw the UI at once.
+ * 
+ * After the request is accomlished, you can update the UI.
+ * </p>
+ * <p>
+ * I belive this will make a better user experience.
+ * </p>
+ * <p>
+ * If the cache data is no expired, this request will not be sent out.
+ * </p>
+ */
 public class CacheableRequest extends Request implements ICacheable {
 
 	private CacheableRequestOnSuccHandler mCacheableRequestHandler;
@@ -26,7 +39,7 @@ public class CacheableRequest extends Request implements ICacheable {
 	@Override
 	public Request send() {
 		prepare();
-		RequestCache.getInstance().requestCache(this);
+		RequestCacheManager.getInstance().requestCache(this);
 		return this;
 	}
 
@@ -39,7 +52,7 @@ public class CacheableRequest extends Request implements ICacheable {
 
 		// cache the data
 		if (jsonData != null && jsonData.getRawData() != null && jsonData.length() > 0) {
-			RequestCache.getInstance().cacheRequest(this, jsonData);
+			RequestCacheManager.getInstance().cacheRequest(this, jsonData);
 		} else {
 			Log.d("cube_request", "after request, data may be empty, not set to cache");
 		}

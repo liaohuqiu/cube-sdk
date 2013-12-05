@@ -1,5 +1,8 @@
 package com.srain.sdk.request;
 
+/**
+ * This interface indicates that you can do something when the cache data if found.
+ */
 public interface CacheableRequestOnSuccHandler extends RequestOnSuccHandler {
 
 	/**

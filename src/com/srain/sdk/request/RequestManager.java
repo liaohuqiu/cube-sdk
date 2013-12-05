@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Message;
 
 /**
+ * Perform the network call and call the callback interface after request is done.
  * 
  * @author huqiu.lhq
  */

@@ -5,6 +5,7 @@ import com.srain.sdk.Cube;
 import com.srain.sdk.R;
 import com.srain.sdk.request.CacheableRequestOnSuccHandler;
 import com.srain.sdk.request.JsonData;
+import com.srain.sdk.request.RequestOnSuccHandler;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -18,20 +19,29 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		Cube.init(getApplication());
-		testFileUtil();
+		testRequest();
 	}
 
-	private void testFileUtil() {
-		SampleData.getSampleData(new CacheableRequestOnSuccHandler() {
+	private void testRequest() {
+		String msg = "Hello.";
+
+		SampleData.getRequestSampleData(msg, new RequestOnSuccHandler() {
 
 			@Override
 			public void onRequestSucc(JsonData jsonData) {
-				Log.i("test", String.format("onRequestSucc data: %s", jsonData));
+				Log.i("test", String.format("Request onRequestSucc data: %s", jsonData));
+			}
+		});
+		SampleData.getCacheableRequestSampleData(msg, new CacheableRequestOnSuccHandler() {
+
+			@Override
+			public void onRequestSucc(JsonData jsonData) {
+				Log.i("test", String.format("CacheableRequest onRequestSucc data: %s", jsonData));
 			}
 
 			@Override
 			public void onCacheData(JsonData cacheData, boolean outoufDate) {
-				Log.i("test", String.format("prev data: %s", cacheData));
+				Log.i("test", String.format("CacheableRequest onCacheData data: %s", cacheData));
 			}
 		});
 	}

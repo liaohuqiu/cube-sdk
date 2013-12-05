@@ -14,12 +14,22 @@ import com.srain.sdk.Cube;
 import com.srain.sdk.file.FileUtil;
 
 /**
+ * <ul>
+ * <li>
+ * Try to find cache data in runtime hashtable, cache file, init data file in assert.</li>
+ * 
+ * <li>If cache data is exist, onCacheData will be called,
+ * 
+ * with a parameter expired which indicates wheathe the data is expired.</li>
+ * 
+ * <li>If the data is cached and is no expired, not request will be sent out.</li>
+ * </ul>
  * 
  * @author huqiu.lhq
  */
-public class RequestCache {
+public class RequestCacheManager {
 
-	private static RequestCache mInstance;
+	private static RequestCacheManager mInstance;
 
 	private String mCacheDir;
 
@@ -30,10 +40,19 @@ public class RequestCache {
 
 	public interface ICacheable {
 
+		/**
+		 * Indicates how long the data will be expired. In seconds.
+		 */
 		public int getCacheTime();
 
+		/**
+		 * Indicates the key by which the data is cached.
+		 */
 		public String getCacheKey();
 
+		/**
+		 * Specify the path of the initial data file.
+		 */
 		public String getAssertInitDataPath();
 
 		/**
@@ -43,24 +62,39 @@ public class RequestCache {
 		 */
 		public JsonData processDataFromAssert(JsonData jsonData);
 
+		/**
+		 * When no data in file cache, neither initial data in assert file.
+		 */
 		public void onNoCacheDataAvailable();
 
-		public void onCacheData(JsonData previousJsonData, boolean outofDate);
+		/**
+		 * When cache data read from file cache or assert file.
+		 * 
+		 * @param cacheData
+		 * @param outofDate
+		 *            indicates whether the data is expired.
+		 */
+		public void onCacheData(JsonData cacheData, boolean outofDate);
 	}
 
-	private RequestCache() {
+	private RequestCacheManager() {
 		String specifiedPathInSDCard = Cube.getInstance().getRootDirNameInSDCard();
 		mCacheDir = FileUtil.wantFilesPath(Cube.getInstance().getContext(), true, specifiedPathInSDCard) + "/request";
 		mCacheList = new HashMap<String, JsonData>();
 		showStatus(String.format("init, cache dir::%s", mCacheDir));
 	}
 
-	public static RequestCache getInstance() {
+	public static RequestCacheManager getInstance() {
 		if (null == mInstance)
-			mInstance = new RequestCache();
+			mInstance = new RequestCacheManager();
 		return mInstance;
 	}
 
+	/**
+	 * Try to find out if there is any cache data. If cache data is exist, onCacheData method will be called.
+	 * 
+	 * Or else onNoCacheDataAvailable.
+	 */
 	public void requestCache(ICacheable cacheable) {
 
 		String cacheKey = cacheable.getCacheKey();
@@ -91,6 +125,11 @@ public class RequestCache {
 		processCacheData(null, cacheable);
 	}
 
+	/**
+	 * Cache a cacheable request, store it's data in a runtime Hashtable,
+	 * 
+	 * and write the persistent data to file, whose filename is the cache key.
+	 */
 	public void cacheRequest(final ICacheable cacheable, final JsonData data) {
 		showStatus(String.format("cacheRequest, key:%s", cacheable.getCacheKey()));
 		new Thread(new Runnable() {
@@ -104,6 +143,16 @@ public class RequestCache {
 		}, "Request-Cache").start();
 	}
 
+	/**
+	 * Invalidate the cache data by the given out key.
+	 */
+	public void invalidateCache(String key) {
+		showStatus(String.format("invalidateCache, key:%s", key));
+		String filePath = mCacheDir + "/ " + key;
+		new File(filePath).delete();
+		mCacheList.remove(key);
+	}
+
 	private JsonData makeCacheFormatJsonData(JsonData data, int time) {
 		JSONObject jsonObject = new JSONObject();
 		if (time == 0)
@@ -114,13 +163,6 @@ public class RequestCache {
 		} catch (Exception e) {
 		}
 		return JsonData.create(jsonObject);
-	}
-
-	public void invalidateCache(String key) {
-		showStatus(String.format("invalidateCache, key:%s", key));
-		String filePath = mCacheDir + "/ " + key;
-		new File(filePath).delete();
-		mCacheList.remove(key);
 	}
 
 	private void queryFromCacheFile(final ICacheable cacheable) {

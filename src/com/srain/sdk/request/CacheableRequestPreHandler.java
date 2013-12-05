@@ -1,5 +1,12 @@
 package com.srain.sdk.request;
 
+/**
+ * 
+ * Define what should be done before send a cacheable request.
+ * 
+ * @author huqiu.lhq
+ * 
+ */
 public interface CacheableRequestPreHandler extends RequestPreHandler {
 
 	/**
@@ -9,12 +16,13 @@ public interface CacheableRequestPreHandler extends RequestPreHandler {
 	 */
 	public String getSpecificCacheKey();
 
+	/**
+	 * Specify the path of the initial data file.
+	 */
 	public String getInitFileAssertPath();
 
 	/**
-	 * Indicate how long the data should be cached
-	 * 
-	 * @return
+	 * Indicates how long the data should be cached
 	 */
 	public int getCacheTime();
 }

@@ -1,7 +1,7 @@
 package com.srain.sdk.request;
 
 /**
- * 请求封装
+ * A web request, after request
  * 
  * @author huqiu.lhq
  */
@@ -20,6 +20,9 @@ public class Request implements IRequest {
 		mOnSuccHandler = succHandler;
 	}
 
+	/**
+	 * Execute query
+	 */
 	public Request send() {
 		prepare();
 		doQuery();
@@ -30,10 +33,16 @@ public class Request implements IRequest {
 		RequestManager.sendRequest(this);
 	}
 
+	/**
+	 * Prepare for excute query, add parameters, build request
+	 */
 	public void prepare() {
 		mBeforeRequestHandler.beforeRequest(this);
 	}
 
+	/**
+	 * Set the url of the request
+	 */
 	public Request setRequestUrl(String url) {
 		mUrl = url;
 		return this;
