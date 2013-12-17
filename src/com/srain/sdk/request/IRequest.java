@@ -5,7 +5,7 @@ package com.srain.sdk.request;
  * 
  * @author huqiu.lhq
  */
-public interface IRequest {
+public interface IRequest<T> {
 
 	/**
 	 * detective the url
@@ -15,7 +15,7 @@ public interface IRequest {
 	/**
 	 * 
 	 */
-	public void onRequestSucc(JsonData jsonData);
+	public void onRequestSucc(T jsonData);
 
 	/**
 	 * Filter the origin data or convert its structure.

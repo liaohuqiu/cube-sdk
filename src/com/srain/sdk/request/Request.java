@@ -8,7 +8,7 @@ package com.srain.sdk.request;
 /*
  * TODO: request parameters / request method
  */
-public class Request implements IRequest {
+public class Request implements IRequest<JsonData> {
 
 	private RequestOnSuccHandler mOnSuccHandler;
 	private RequestPreHandler mBeforeRequestHandler;

@@ -15,14 +15,14 @@ public class RequestManager {
 
 	private final static int REQUEST_SUCC = 0x01;
 
-	public static void sendRequest(final Request request) {
+	public static <T> void sendRequest(final IRequest<T> request) {
 
 		final Handler handler = new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
 				switch (msg.what) {
 				case REQUEST_SUCC:
-					request.onRequestSucc((JsonData) msg.obj);
+					request.onRequestSucc((T) msg.obj);
 					break;
 
 				default:

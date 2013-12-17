@@ -2,12 +2,11 @@ package com.srain.sdk.request;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 import android.util.Log;
 
 import com.srain.sdk.request.RequestCacheManager.ICacheable;
+import com.srain.sdk.util.Encrypt;
 
 /**
  * <p>
@@ -97,28 +96,7 @@ public class CacheableRequest extends Request implements ICacheable {
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
-		return md5(url);
-	}
-
-	public static final String md5(final String s) {
-		try {
-			MessageDigest digest = java.security.MessageDigest.getInstance("MD5");
-			digest.update(s.getBytes());
-			byte messageDigest[] = digest.digest();
-
-			StringBuffer hexString = new StringBuffer();
-			for (int i = 0; i < messageDigest.length; i++) {
-				String h = Integer.toHexString(0xFF & messageDigest[i]);
-				while (h.length() < 2)
-					h = "0" + h;
-				hexString.append(h);
-			}
-			return hexString.toString();
-
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
-		return "";
+		return Encrypt.md5(url);
 	}
 
 	@Override
