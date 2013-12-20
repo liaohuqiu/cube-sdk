@@ -1,11 +1,11 @@
 package com.srain.sample.data;
 
-import com.srain.sdk.request.CacheableRequest;
-import com.srain.sdk.request.CacheableRequestOnSuccHandler;
-import com.srain.sdk.request.CacheableRequestPreHandler;
-import com.srain.sdk.request.Request;
-import com.srain.sdk.request.RequestOnSuccHandler;
-import com.srain.sdk.request.RequestPreHandler;
+import com.srain.cube.request.CacheableRequest;
+import com.srain.cube.request.CacheableRequestOnSuccHandler;
+import com.srain.cube.request.Request;
+import com.srain.cube.request.RequestOnSuccHandler;
+import com.srain.cube.request.RequestPreHandler;
+import com.srain.cube.request.CacheableRequestPreHandler;
 
 /**
  * <p>

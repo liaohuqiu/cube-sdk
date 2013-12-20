@@ -6,7 +6,7 @@ import com.srain.sample.ui.fragment.ImageListFragment;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 
-public class ImageActivity extends XActivity {
+public class ImageActivity2 extends XActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

@@ -1,28 +1,27 @@
 package com.srain.sample.activity;
 
-import com.srain.sample.data.SampleData;
-import com.srain.sdk.Cube;
-import com.srain.sdk.R;
-import com.srain.sdk.request.CacheableRequestOnSuccHandler;
-import com.srain.sdk.request.JsonData;
-import com.srain.sdk.request.RequestOnSuccHandler;
-
-import android.os.Bundle;
-import android.app.Activity;
 import android.content.Intent;
-import android.util.Log;
+import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 
-public class MainActivity extends Activity {
+import com.srain.cube.app.XActivity;
+import com.srain.cube.app.lifecycle.LifeCycleComponentManager;
+import com.srain.cube.image.DefautImageLoader;
+import com.srain.sample.data.Images;
+import com.srain.sdk.R;
+
+public class MainActivity extends XActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		Cube.init(getApplication());
-		testRequest();
+
+		DefautImageLoader imageLoader = DefautImageLoader.create(this, "thumbs");
+		LifeCycleComponentManager.tryAddComponentToContainer(imageLoader, this);
+		imageLoader.preLoadImages(Images.imageUrls);
 
 		findViewById(R.id.btn_test).setOnClickListener(new OnClickListener() {
 
@@ -33,28 +32,14 @@ public class MainActivity extends Activity {
 				startActivity(intent);
 			}
 		});
-	}
 
-	private void testRequest() {
-		String msg = "Hello.";
-
-		SampleData.getRequestSampleData(msg, new RequestOnSuccHandler() {
+		findViewById(R.id.btn_test2).setOnClickListener(new OnClickListener() {
 
 			@Override
-			public void onRequestSucc(JsonData jsonData) {
-				Log.i("test", String.format("Request onRequestSucc data: %s", jsonData));
-			}
-		});
-		SampleData.getCacheableRequestSampleData(msg, new CacheableRequestOnSuccHandler() {
-
-			@Override
-			public void onRequestSucc(JsonData jsonData) {
-				Log.i("test", String.format("CacheableRequest onRequestSucc data: %s", jsonData));
-			}
-
-			@Override
-			public void onCacheData(JsonData cacheData, boolean outoufDate) {
-				Log.i("test", String.format("CacheableRequest onCacheData data: %s", cacheData));
+			public void onClick(View v) {
+				Intent intent = new Intent();
+				intent.setClass(MainActivity.this, ImageActivity2.class);
+				startActivity(intent);
 			}
 		});
 	}

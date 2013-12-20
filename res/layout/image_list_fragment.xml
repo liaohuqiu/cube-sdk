@@ -15,10 +15,9 @@
   limitations under the License.
 -->
 
-<resources>
+<ListView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/list_view"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
 
-    <dimen name="image_thumbnail_size">200dp</dimen>
-    <dimen name="image_thumbnail_spacing">1dp</dimen>
-    <dimen name="image_detail_pager_margin">80dp</dimen>
-
-</resources>
+</ListView>
