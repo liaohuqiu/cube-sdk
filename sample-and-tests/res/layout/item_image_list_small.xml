@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="50dp"
+    android:layout_height="50dp"
+    android:background="@drawable/bg_border_normal"
+    android:orientation="horizontal"
+    android:padding="0.5dp" >
+
+    <com.srain.cube.image.CubeImageView
+        android:id="@+id/tv_item_image_list_small"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:scaleType="fitCenter" />
+
+</LinearLayout>
