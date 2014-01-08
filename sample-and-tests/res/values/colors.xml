@@ -18,6 +18,7 @@
 <resources>
 
     <color name="base_background">#373737</color>
+    <color name="base_google_blue">#4d90fe</color>
     <color name="base_font">#007edf</color>
 
 </resources>

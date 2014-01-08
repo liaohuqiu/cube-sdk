@@ -16,10 +16,12 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.srain.cube.sample.R;
+import com.srain.cube.sample.activity.TitleBaseActivity;
 import com.srain.cube.sample.data.Images;
 import com.srain.cube.sample.ui.imagelist.ImageListViewManager;
 import com.srain.cube.sample.ui.imagelist.ImageListViewManager.IImageListView;
 import com.srain.cube.sample.ui.imagelist.ImageListViewManager.ListViewType;
+import com.srain.cube.sample.ui.views.header.TitleHeaderBar;
 
 public class ImageListFragment extends Fragment {
 
@@ -45,8 +47,9 @@ public class ImageListFragment extends Fragment {
 		final TextView textView = (TextView) v.findViewById(R.id.tv_image_list_fragment_change);
 
 		textView.setText("next: " + mImageListViewManager.getCurrentListViewType().next());
-		Button button = (Button) v.findViewById(R.id.btn_image_list_fragment_change);
-		button.setOnClickListener(new OnClickListener() {
+		TitleHeaderBar bar = ((TitleBaseActivity) (getActivity())).getTitleHeaderBar();
+		bar.getRightTextView().setText("change layout");
+		bar.getRigthViewContainer().setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 
@@ -56,22 +59,6 @@ public class ImageListFragment extends Fragment {
 			}
 		});
 		mImageListViewManager.showImageList(Images.imageUrls);
-
-		v.findViewById(R.id.btn_image_list_fragment_start_trace).setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				Debug.startMethodTracing("1");
-			}
-		});
-
-		v.findViewById(R.id.btn_image_list_fragment_stop_trace).setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				Debug.stopMethodTracing();
-			}
-		});
 		return v;
 	}
 

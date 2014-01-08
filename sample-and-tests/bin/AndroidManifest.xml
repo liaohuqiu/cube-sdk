@@ -19,7 +19,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme.NoTitleBar" >
         <activity
-            android:name="com.srain.cube.sample.activity.MainActivity"
+            android:name="com.srain.cube.sample.activity.HomeActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

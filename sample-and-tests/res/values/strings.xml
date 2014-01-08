@@ -24,7 +24,6 @@
     <string name="imageview_description">Image Thumbnail</string>
     <string name="no_network_connection_toast">No network connection found</string>
     <string name="image_list_change">change layout</string>
-    <string name="image_list_start_trace">start trace</string>
-    <string name="image_list_stop_trace">stop trace</string>
+    <string name="base_title_return">Back</string>
 
 </resources>

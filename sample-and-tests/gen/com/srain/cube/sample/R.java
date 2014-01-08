@@ -9,10 +9,23 @@ package com.srain.cube.sample;
 
 public final class R {
     public static final class attr {
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int scrollheaderframe_conent_container=0x7f010001;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int scrollheaderframe_footer=0x7f010002;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int scrollheaderframe_header=0x7f010000;
     }
     public static final class color {
         public static final int base_background=0x7f040000;
-        public static final int base_font=0x7f040001;
+        public static final int base_font=0x7f040002;
+        public static final int base_google_blue=0x7f040001;
     }
     public static final class dimen {
         public static final int image_detail_pager_margin=0x7f050002;
@@ -26,38 +39,40 @@ public final class R {
         public static final int ic_launcher=0x7f020003;
     }
     public static final class id {
-        public static final int btn_image_list_fragment_change=0x7f090007;
-        public static final int btn_image_list_fragment_start_trace=0x7f090009;
-        public static final int btn_image_list_fragment_stop_trace=0x7f09000a;
-        public static final int btn_test=0x7f090001;
-        public static final int clear_cache=0x7f090014;
-        public static final int fragment_container=0x7f090000;
-        public static final int iv_item_iamge_list_grid=0x7f090011;
-        public static final int iv_list_item=0x7f09000f;
-        public static final int ly_header_bar=0x7f090013;
-        public static final int ly_image_list_big=0x7f09000d;
-        public static final int ly_image_list_fragment_header=0x7f090006;
-        public static final int ly_image_list_grid=0x7f09000b;
-        public static final int ly_image_list_small=0x7f09000c;
-        public static final int ly_title_bar_left=0x7f090003;
-        public static final int top_bar=0x7f090002;
-        public static final int tv_image_list_fragment_change=0x7f090008;
-        public static final int tv_item_image_list_big=0x7f090010;
-        public static final int tv_item_image_list_small=0x7f090012;
-        public static final int tv_list_item=0x7f09000e;
-        public static final int tv_title_bar_title=0x7f090005;
-        public static final int tv_title_bar_title_left=0x7f090004;
+        public static final int clear_cache=0x7f090013;
+        public static final int fragment_container=0x7f090001;
+        public static final int iv_item_iamge_list_grid=0x7f090010;
+        public static final int ly_header_bar=0x7f090012;
+        public static final int ly_header_bar_title_wrap=0x7f090003;
+        public static final int ly_home_container=0x7f090000;
+        public static final int ly_image_list_big=0x7f09000e;
+        public static final int ly_image_list_fragment_header=0x7f09000a;
+        public static final int ly_image_list_grid=0x7f09000c;
+        public static final int ly_image_list_small=0x7f09000d;
+        public static final int ly_main_content_container=0x7f090002;
+        public static final int ly_title_bar_center=0x7f090005;
+        public static final int ly_title_bar_left=0x7f090004;
+        public static final int ly_title_bar_right=0x7f090006;
+        public static final int tv_image_list_fragment_change=0x7f09000b;
+        public static final int tv_item_image_list_big=0x7f09000f;
+        public static final int tv_item_image_list_small=0x7f090011;
+        public static final int tv_title_bar_left=0x7f090007;
+        public static final int tv_title_bar_right=0x7f090009;
+        public static final int tv_title_bar_title=0x7f090008;
     }
     public static final class layout {
-        public static final int activity_image_list=0x7f030000;
-        public static final int activity_main=0x7f030001;
-        public static final int base_title_bar=0x7f030002;
-        public static final int image_list_fragment=0x7f030003;
-        public static final int item_image_list=0x7f030004;
-        public static final int item_image_list_big=0x7f030005;
-        public static final int item_image_list_grid=0x7f030006;
-        public static final int item_image_list_small=0x7f030007;
-        public static final int views_header_bar=0x7f030008;
+        public static final int activity_home=0x7f030000;
+        public static final int activity_image_list=0x7f030001;
+        public static final int activity_title_base=0x7f030002;
+        public static final int base_header_bar_base=0x7f030003;
+        public static final int base_header_bar_title=0x7f030004;
+        public static final int colors=0x7f030005;
+        public static final int image_list_fragment=0x7f030006;
+        public static final int item_home=0x7f030007;
+        public static final int item_image_list_big=0x7f030008;
+        public static final int item_image_list_grid=0x7f030009;
+        public static final int item_image_list_small=0x7f03000a;
+        public static final int views_header_bar=0x7f03000b;
     }
     public static final class menu {
         public static final int main_menu=0x7f080000;
@@ -65,11 +80,10 @@ public final class R {
     public static final class string {
         public static final int app_description=0x7f060001;
         public static final int app_name=0x7f060000;
+        public static final int base_title_return=0x7f060007;
         public static final int clear_cache_complete_toast=0x7f060003;
         public static final int clear_cache_menu=0x7f060002;
         public static final int image_list_change=0x7f060006;
-        public static final int image_list_start_trace=0x7f060007;
-        public static final int image_list_stop_trace=0x7f060008;
         public static final int imageview_description=0x7f060004;
         public static final int no_network_connection_toast=0x7f060005;
     }
@@ -78,4 +92,53 @@ public final class R {
         public static final int AppTheme_FullScreen=0x7f070001;
         public static final int AppTheme_NoTitleBar=0x7f070002;
     }
+    public static final class styleable {
+        /** Attributes that can be used with a ScrollHeaderFrame.
+           <p>Includes the following attributes:</p>
+           <table>
+           <colgroup align="left" />
+           <colgroup align="left" />
+           <tr><th>Attribute</th><th>Description</th></tr>
+           <tr><td><code>{@link #ScrollHeaderFrame_scrollheaderframe_conent_container com.srain.cube.sample:scrollheaderframe_conent_container}</code></td><td></td></tr>
+           <tr><td><code>{@link #ScrollHeaderFrame_scrollheaderframe_footer com.srain.cube.sample:scrollheaderframe_footer}</code></td><td></td></tr>
+           <tr><td><code>{@link #ScrollHeaderFrame_scrollheaderframe_header com.srain.cube.sample:scrollheaderframe_header}</code></td><td></td></tr>
+           </table>
+           @see #ScrollHeaderFrame_scrollheaderframe_conent_container
+           @see #ScrollHeaderFrame_scrollheaderframe_footer
+           @see #ScrollHeaderFrame_scrollheaderframe_header
+         */
+        public static final int[] ScrollHeaderFrame = {
+            0x7f010000, 0x7f010001, 0x7f010002
+        };
+        /**
+          <p>This symbol is the offset where the {@link com.srain.cube.sample.R.attr#scrollheaderframe_conent_container}
+          attribute's value can be found in the {@link #ScrollHeaderFrame} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name com.srain.cube.sample:scrollheaderframe_conent_container
+        */
+        public static final int ScrollHeaderFrame_scrollheaderframe_conent_container = 1;
+        /**
+          <p>This symbol is the offset where the {@link com.srain.cube.sample.R.attr#scrollheaderframe_footer}
+          attribute's value can be found in the {@link #ScrollHeaderFrame} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name com.srain.cube.sample:scrollheaderframe_footer
+        */
+        public static final int ScrollHeaderFrame_scrollheaderframe_footer = 2;
+        /**
+          <p>This symbol is the offset where the {@link com.srain.cube.sample.R.attr#scrollheaderframe_header}
+          attribute's value can be found in the {@link #ScrollHeaderFrame} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name com.srain.cube.sample:scrollheaderframe_header
+        */
+        public static final int ScrollHeaderFrame_scrollheaderframe_header = 0;
+    };
 }

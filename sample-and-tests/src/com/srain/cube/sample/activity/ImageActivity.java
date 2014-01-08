@@ -11,15 +11,12 @@ public class ImageActivity extends TitleBaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		setContentView(R.layout.activity_image_list);
 		final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		ft.add(R.id.fragment_container, new ImageListFragment(), ImageListFragment.class.toString());
 		ft.commit();
-		mHeaderBar.setHeadTitle("Image List Demo");
-	}
 
-	@Override
-	protected int getLayouId() {
-		return R.layout.activity_image_list;
+		setHeaderTitle("Image List Demo");
 	}
-
 }

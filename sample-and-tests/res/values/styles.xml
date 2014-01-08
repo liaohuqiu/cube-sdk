@@ -22,7 +22,6 @@
     <style name="AppTheme.FullScreen" parent="@android:style/Theme.Black.NoTitleBar.Fullscreen" />
 
     <style name="AppTheme.NoTitleBar" parent="@android:style/Theme.Black.NoTitleBar">
-        <item name="android:background">#fff</item>
     </style>
 
 </resources>

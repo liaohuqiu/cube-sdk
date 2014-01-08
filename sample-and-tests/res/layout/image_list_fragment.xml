@@ -8,30 +8,13 @@
         android:id="@+id/ly_image_list_fragment_header"
         android:layout_width="fill_parent"
         android:layout_height="50dp"
+        android:gravity="center"
         android:orientation="horizontal" >
-
-        <Button
-            android:id="@+id/btn_image_list_fragment_change"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/image_list_change" />
 
         <TextView
             android:id="@+id/tv_image_list_fragment_change"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
-
-        <Button
-            android:id="@+id/btn_image_list_fragment_start_trace"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/image_list_start_trace" />
-
-        <Button
-            android:id="@+id/btn_image_list_fragment_stop_trace"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/image_list_stop_trace" />
     </LinearLayout>
 
     <LinearLayout

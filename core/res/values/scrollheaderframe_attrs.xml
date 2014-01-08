@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="ScrollHeaderFrame">
+        <attr name="scrollheaderframe_header" format="reference" />
+        <attr name="scrollheaderframe_conent_container" format="reference" />
+        <attr name="scrollheaderframe_footer" format="reference" />
+    </declare-styleable>
+
+</resources>
