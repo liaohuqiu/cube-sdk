@@ -11,6 +11,8 @@ int drawable base_img_placeholder 0x7f020000
 int drawable bg_border_normal 0x7f020001
 int drawable empty_photo 0x7f020002
 int drawable ic_launcher 0x7f020003
+int drawable selector_border 0x7f020004
+int drawable selector_border_normal 0x7f020005
 int id clear_cache 0x7f090013
 int id fragment_container 0x7f090001
 int id iv_item_home 0x7f09000d

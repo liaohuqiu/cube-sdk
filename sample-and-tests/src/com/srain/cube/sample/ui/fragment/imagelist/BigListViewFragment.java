@@ -9,8 +9,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AbsListView.LayoutParams;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.srain.cube.image.CubeImageView;
@@ -35,7 +34,7 @@ public class BigListViewFragment extends Fragment {
 		mImageLoader = SampleImageLoader.create(getActivity());
 		final View v = inflater.inflate(R.layout.fragment_image_list_big, container, false);
 
-		ListView gridListView = (ListView) v.findViewById(R.id.ly_image_list_big);
+		ListView listView = (ListView) v.findViewById(R.id.ly_image_list_big);
 
 		ListViewDataAdpter<String> adpter = new ListViewDataAdpter<String>(new ViewHolderCreator<String>() {
 			@Override
@@ -43,7 +42,7 @@ public class BigListViewFragment extends Fragment {
 				return new ViewHodler();
 			}
 		});
-		gridListView.setAdapter(adpter);
+		listView.setAdapter(adpter);
 		adpter.getDataList().addAll(Arrays.asList(Images.imageUrls));
 		adpter.notifyDataSetChanged();
 		return v;
@@ -58,15 +57,15 @@ public class BigListViewFragment extends Fragment {
 			View view = inflater.inflate(R.layout.item_image_list_big, null);
 			mImageView = (CubeImageView) view.findViewById(R.id.tv_item_image_list_big);
 
-			AbsListView.LayoutParams lyp = new LayoutParams(sBigImageSize, sBigImageSize);
-			view.setLayoutParams(lyp);
+			LinearLayout.LayoutParams lyp = new LinearLayout.LayoutParams(sBigImageSize, sBigImageSize);
+			mImageView.setLayoutParams(lyp);
 
 			return view;
 		}
 
 		@Override
 		public void showData(String itemData) {
-			mImageView.loadImage(mImageLoader, itemData);
+			//mImageView.loadImage(mImageLoader, itemData);
 		}
 	}
 }

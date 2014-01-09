@@ -29,7 +29,7 @@ public class HomeActivity extends TitleBaseActivity {
 
 		setHeaderTitle("Cube Demo");
 
-		mItemInfos.add(new ItemInfo("Grid Image List", "#373737", new OnClickListener() {
+		mItemInfos.add(new ItemInfo("Grid Image List", "#b8ebf7", new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
