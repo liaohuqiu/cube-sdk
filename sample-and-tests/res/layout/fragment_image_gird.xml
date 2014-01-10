@@ -10,11 +10,11 @@
         android:layout_height="match_parent"
         android:fadingEdge="none"
         android:focusable="false"
-        android:horizontalSpacing="5dp"
+        android:horizontalSpacing="10dp"
+        android:listSelector="@android:color/transparent"
         android:numColumns="2"
         android:padding="10dp"
-        android:scrollbarStyle="outsideInset"
-        android:stretchMode="columnWidth"
-        android:verticalSpacing="5dp" />
+        android:scrollbarStyle="outsideOverlay"
+        android:stretchMode="columnWidth" />
 
 </LinearLayout>

@@ -1,15 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="50dp"
-    android:layout_height="50dp"
-    android:background="@drawable/bg_border_normal"
-    android:orientation="horizontal"
-    android:padding="0.5dp" >
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
 
-    <com.srain.cube.image.CubeImageView
-        android:id="@+id/tv_item_image_list_small"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:scaleType="fitCenter" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/bg_border_normal" >
 
-</LinearLayout>
+        <com.srain.cube.image.CubeImageView
+            android:id="@+id/tv_item_image_list_small"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:scaleType="fitCenter" />
+    </FrameLayout>
+
+</FrameLayout>

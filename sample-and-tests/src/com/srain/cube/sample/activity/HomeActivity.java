@@ -29,22 +29,23 @@ public class HomeActivity extends TitleBaseActivity {
 
 		setHeaderTitle("Cube Demo");
 
-		mItemInfos.add(new ItemInfo("Grid Image List", "#b8ebf7", new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent();
-				intent.putExtra("type", "grid");
-				intent.setClass(HomeActivity.this, ImageActivity.class);
-				startActivity(intent);
-			}
-		}));
 		mItemInfos.add(new ItemInfo("Big Image List", "#4d90fe", new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent();
 				intent.putExtra("type", "big");
+				intent.setClass(HomeActivity.this, ImageActivity.class);
+				startActivity(intent);
+			}
+		}));
+
+		mItemInfos.add(new ItemInfo("Grid Image List", "#b8ebf7", new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent();
+				intent.putExtra("type", "grid");
 				intent.setClass(HomeActivity.this, ImageActivity.class);
 				startActivity(intent);
 			}

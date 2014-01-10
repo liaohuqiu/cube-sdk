@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<com.srain.cube.sample.ui.views.HeaderBar xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/ly_header_bar"
-    android:layout_width="match_parent"
-    android:layout_height="44dp" />

@@ -8,7 +8,9 @@
         android:id="@+id/ly_image_list_small"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:divider="@null"
         android:fadingEdge="none"
+        android:listSelector="@android:color/transparent"
         android:padding="10dp"
         android:scrollbarStyle="outsideOverlay" />
 

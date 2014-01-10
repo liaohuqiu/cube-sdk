@@ -1,7 +1,0 @@
-int attr scrollheaderframe_conent_container 0x7f010001
-int attr scrollheaderframe_footer 0x7f010002
-int attr scrollheaderframe_header 0x7f010000
-int[] styleable ScrollHeaderFrame { 0x7f010000, 0x7f010001, 0x7f010002 }
-int styleable ScrollHeaderFrame_scrollheaderframe_conent_container 1
-int styleable ScrollHeaderFrame_scrollheaderframe_footer 2
-int styleable ScrollHeaderFrame_scrollheaderframe_header 0

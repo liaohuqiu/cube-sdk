@@ -65,7 +65,7 @@ public class BigListViewFragment extends Fragment {
 
 		@Override
 		public void showData(String itemData) {
-			//mImageView.loadImage(mImageLoader, itemData);
+			mImageView.loadImage(mImageLoader, itemData);
 		}
 	}
 }

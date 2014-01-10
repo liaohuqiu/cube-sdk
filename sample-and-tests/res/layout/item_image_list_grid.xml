@@ -2,14 +2,21 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_border_normal"
     android:orientation="vertical"
-    android:padding="0.5dp" >
+    android:paddingBottom="15dp" >
 
-    <com.srain.cube.image.CubeImageView
-        android:id="@+id/iv_item_iamge_list_grid"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="fitCenter" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_border_normal"
+        android:orientation="horizontal"
+        android:padding="1dp" >
+
+        <com.srain.cube.image.CubeImageView
+            android:id="@+id/iv_item_iamge_list_grid"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter" />
+    </LinearLayout>
 
 </LinearLayout>

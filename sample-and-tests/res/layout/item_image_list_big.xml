@@ -8,8 +8,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="15dp"
+        android:background="@drawable/bg_border_normal"
         android:orientation="horizontal"
-        android:padding="5.5dp" >
+        android:padding="1dp" >
 
         <com.srain.cube.image.CubeImageView
             android:id="@+id/tv_item_image_list_big"

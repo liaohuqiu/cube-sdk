@@ -9,9 +9,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AbsListView.LayoutParams;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 
 import com.srain.cube.image.CubeImageView;
 import com.srain.cube.sample.R;
@@ -24,7 +23,7 @@ import com.srain.cube.views.list.ViewHolderCreator;
 
 public class GridListViewFragment extends Fragment {
 
-	private static final int sGirdImageSize = (LocalDisplay.SCREEN_WIDTH_PIXELS - LocalDisplay.dp2px(10 + 10 + 2)) / 2;
+	private static final int sGirdImageSize = (LocalDisplay.SCREEN_WIDTH_PIXELS - LocalDisplay.dp2px(10 + 10 + 10)) / 2;
 	private SampleImageLoader mImageLoader;
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -57,9 +56,8 @@ public class GridListViewFragment extends Fragment {
 			View view = LayoutInflater.from(getActivity()).inflate(R.layout.item_image_list_grid, null);
 			mImageView = (CubeImageView) view.findViewById(R.id.iv_item_iamge_list_grid);
 
-			AbsListView.LayoutParams lyp = new LayoutParams(sGirdImageSize, sGirdImageSize);
-			view.setLayoutParams(lyp);
-
+			LinearLayout.LayoutParams lyp = new LinearLayout.LayoutParams(sGirdImageSize, sGirdImageSize);
+			mImageView.setLayoutParams(lyp);
 			return view;
 		}
 
