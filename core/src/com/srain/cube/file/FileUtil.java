@@ -10,15 +10,136 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Environment;
+import android.os.StatFs;
+
+import com.srain.cube.util.Version;
 
 public class FileUtil {
 
+	/**
+	 * Get a usable cache directory (external if available, internal otherwise).
+	 * 
+	 * @param context
+	 *            The context to use
+	 * @param uniqueName
+	 *            A unique folder name to append to the cache folder
+	 * @return The cache folder
+	 */
+	public static File getDiskCacheDir(Context context, String uniqueName, int requireSpace) {
+		// Check if media is mounted or storage is built-in, if so, try and use external cache folder
+		// otherwise use internal cache folder
+		File sdPath = null;
+		File internalPath = null;
+		File cacheFile = null;
+		Long sdCardFree = 0L;
+		Long internalFree = 0L;
+		if (hasSDCardMounted()) {
+			sdPath = getExternalCacheDir(context);
+			sdCardFree = getUsableSpace(sdPath);
+		}
+		if (sdPath == null || sdCardFree < requireSpace) {
+			internalPath = context.getCacheDir();
+			internalFree = getUsableSpace(internalPath);
+
+			if (internalFree < requireSpace) {
+
+				cacheFile = internalFree > sdCardFree ? internalPath : sdPath;
+
+			} else {
+				cacheFile = internalPath;
+			}
+
+		} else {
+			cacheFile = sdPath;
+		}
+
+		String cachePath = cacheFile.getPath();
+		return new File(cachePath + File.separator + uniqueName);
+	}
+
+	public static void test(Context context) {
+	}
+
+	/**
+	 * Get the external application cache directory.
+	 * 
+	 * @param context
+	 *            The context to use
+	 * @return The external cache folder : /storage/sdcard0/Android/data/com.srain.sdk/cache
+	 */
+	@TargetApi(VERSION_CODES.FROYO)
+	public static File getExternalCacheDir(Context context) {
+		if (Version.hasFroyo()) {
+			File path = context.getExternalCacheDir();
+
+			// In some case, even the sd card is mounted, getExternalCacheDir will return null, may be it is nearly full.
+			if (path != null) {
+				return path;
+			}
+		}
+
+		// Before Froyo or the path is null, we need to construct the external cache folder ourselves
+		final String cacheDir = "/Android/data/" + context.getPackageName() + "/cache/";
+		return new File(Environment.getExternalStorageDirectory().getPath() + cacheDir);
+	}
+
+	/**
+	 * Check how much usable space is available at a given path.
+	 * 
+	 * @param path
+	 *            The path to check
+	 * @return The space available in bytes by user, not by root, -1 means path is null, 0 means path is not exist.
+	 */
+	@SuppressWarnings("deprecation")
+	@TargetApi(VERSION_CODES.GINGERBREAD)
+	public static long getUsableSpace(File path) {
+		if (path == null) {
+			return -1;
+		}
+		if (Version.hasGingerbread()) {
+			return path.getUsableSpace();
+		} else {
+			if (!path.exists()) {
+				return 0;
+			} else {
+				final StatFs stats = new StatFs(path.getPath());
+				return (long) stats.getBlockSize() * (long) stats.getAvailableBlocks();
+			}
+		}
+	}
+
+	/**
+	 * 
+	 * @param path
+	 * @return -1 means path is null, 0 means path is not exist.
+	 */
+	@SuppressWarnings("deprecation")
+	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
+	public static long getTotalSpace(File path) {
+		if (path == null) {
+			return -1;
+		}
+		if (Version.hasGingerbread()) {
+			return path.getTotalSpace();
+		} else {
+			if (!path.exists()) {
+				return 0;
+			} else {
+				final StatFs stats = new StatFs(path.getPath());
+				return (long) stats.getBlockSize() * (long) stats.getBlockCount();
+			}
+		}
+	}
+
 	public static boolean hasSDCardMounted() {
-		String state = android.os.Environment.getExternalStorageState();
-		if (state != null && state.equals(android.os.Environment.MEDIA_MOUNTED)) {
+		String state = Environment.getExternalStorageState();
+		if (state != null && state.equals(Environment.MEDIA_MOUNTED)) {
 			return true;
 		} else {
 			return false;

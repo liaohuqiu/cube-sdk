@@ -68,7 +68,7 @@ public class ImageProvider {
 	}
 
 	/**
-	 * Create a BitmapDrawable which can be managered in ImageProvider
+	 * Create a BitmapDrawable which can be managed in ImageProvider
 	 * 
 	 * @param resources
 	 * @param bitmap

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
+import com.srain.cube.file.FileUtil;
 import com.srain.cube.image.imple.LruImageFileCache;
 import com.srain.cube.util.LocalDisplay;
 import com.srain.cube.util.SystemWather;
@@ -24,6 +25,8 @@ public class CubeApplication extends Application {
 		WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
 		wm.getDefaultDisplay().getMetrics(dm);
 		LocalDisplay.init(dm);
+		
+		FileUtil.test(this);
 	}
 
 	@Override
