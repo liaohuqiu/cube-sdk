@@ -1,6 +1,7 @@
 package com.srain.cube.util;
 
 import android.util.DisplayMetrics;
+import android.view.View;
 
 public class LocalDisplay {
 
@@ -24,33 +25,14 @@ public class LocalDisplay {
 		return (int) (dp * scale + 0.5f);
 	}
 
-	public static int getScaledWidthDPByDP(int desingDP) {
-		double v = desingDP / 320f * SCREEN_WIDTH_DP;
-		return (int) v;
+	public static int designedDP2px(float desingDP) {
+		if (SCREEN_WIDTH_DP != 320) {
+			desingDP = desingDP * SCREEN_WIDTH_DP / 320f;
+		}
+		return dp2px(desingDP);
 	}
 
-	public static double getScaledWidthDPByDP(double desingDP) {
-		double v = desingDP / 320f * SCREEN_WIDTH_DP;
-		return v;
-	}
-
-	public static int getScaledWidthPixelsByDP(int desingDP) {
-		double v = desingDP / 320f * SCREEN_WIDTH_PIXELS;
-		return (int) v;
-	}
-
-	public static double getScaledWidthPixelsByDP(double desingDP) {
-		double v = desingDP / 320f * SCREEN_WIDTH_PIXELS;
-		return v;
-	}
-
-	public static int getScaledWidthPixelsByDesignDP(int designDP) {
-		double v = getScaledWidthPixelsByDP(getScaledWidthDPByDP(designDP));
-		return (int) v;
-	}
-
-	public static double getScaledWidthPixelsByDesignDP(double designDP) {
-		double v = getScaledWidthPixelsByDP(getScaledWidthDPByDP(designDP));
-		return v;
+	public static void setPadding(final View view, float left, float top, float right, float bottom) {
+		view.setPadding(designedDP2px(left), dp2px(top), designedDP2px(right), dp2px(bottom));
 	}
 }

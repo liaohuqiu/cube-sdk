@@ -111,7 +111,7 @@ public final class DiskLruCache implements Closeable {
     private static final Charset UTF_8 = Charset.forName("UTF-8");
     private static final int IO_BUFFER_SIZE = 8 * 1024;
 
-    /*
+    /**
      * This cache uses a journal file named "journal". A typical journal file
      * looks like this:
      *     libcore.io.DiskLruCache
@@ -150,7 +150,6 @@ public final class DiskLruCache implements Closeable {
      * "journal.tmp" will be used during compaction; that file should be deleted if
      * it exists when the cache is opened.
      */
-
     private final File directory;
     private final File journalFile;
     private final File journalFileTmp;

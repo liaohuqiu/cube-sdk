@@ -12,6 +12,7 @@ import org.json.JSONTokener;
 public class JsonData {
 
 	private Object mJson;
+	private static final String EMPTY_STRING = "";
 
 	public static JsonData create(String str) {
 		Object object = null;
@@ -125,7 +126,7 @@ public class JsonData {
 		} else if (mJson instanceof JSONObject) {
 			return ((JSONObject) mJson).toString();
 		}
-		return null;
+		return EMPTY_STRING;
 	}
 
 	public ArrayList<JsonData> toArrayList() {

@@ -63,9 +63,6 @@ public class FileUtil {
 		return new File(cachePath + File.separator + uniqueName);
 	}
 
-	public static void test(Context context) {
-	}
-
 	/**
 	 * Get the external application cache directory.
 	 * 

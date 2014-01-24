@@ -2,19 +2,19 @@ package com.srain.cube.image;
 
 public class ImageReuseInfo {
 
-	private int mIndentitySize;
-	private int[] mResuzeSzie;
+	private String mIndentitySize;
+	private String[] mResuzeSzie;
 
-	public ImageReuseInfo(int indentitySize, int[] reuseSize) {
+	public ImageReuseInfo(String indentitySize, String[] reuseSize) {
 		mIndentitySize = indentitySize;
 		mResuzeSzie = reuseSize;
 	}
 
-	public int getIndentitySize() {
+	public String getIndentitySize() {
 		return mIndentitySize;
 	}
 
-	public int[] getResuzeSize() {
+	public String[] getResuzeSize() {
 		return mResuzeSzie;
 	}
 }

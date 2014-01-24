@@ -7,12 +7,12 @@ import java.security.NoSuchAlgorithmException;
 
 import com.srain.cube.request.RequestCache.ICacheable;
 
-public abstract class CacheableRequestBase extends SimpleRequestBase implements ICacheable {
+public class SimpleCacheableRequest<T> extends SimpleRequest<T> implements ICacheable<T> {
 
-	private CacheableRequestOnSuccHandler mCacheableRequestHandler;
+	private CacheableRequestSuccHandler<T> mCacheableRequestHandler;
 	private CacheableRequestPreHandler mCacheableRequestPreHandler;
 
-	public CacheableRequestBase(CacheableRequestPreHandler cacheableRequestPreHandler, CacheableRequestOnSuccHandler cacheableRequestHandler) {
+	public SimpleCacheableRequest(CacheableRequestPreHandler cacheableRequestPreHandler, CacheableRequestSuccHandler<T> cacheableRequestHandler) {
 		super(cacheableRequestPreHandler, cacheableRequestHandler);
 		mCacheableRequestPreHandler = cacheableRequestPreHandler;
 		mCacheableRequestHandler = cacheableRequestHandler;
@@ -21,19 +21,6 @@ public abstract class CacheableRequestBase extends SimpleRequestBase implements 
 	public void send() {
 		setBeforeRequest();
 		RequestCache.getInstance().requestCache(this);
-	}
-
-	/**
-	 * cache data after request
-	 */
-	@Override
-	public void onRequestSucc(JsonData jsonData) {
-		super.onRequestSucc(jsonData);
-
-		// cache the data
-		if (jsonData != null && jsonData.getRawData() != null && jsonData.length() > 0) {
-			RequestCache.getInstance().cacheRequest(this, jsonData);
-		}
 	}
 
 	// ===========================================================
@@ -45,8 +32,8 @@ public abstract class CacheableRequestBase extends SimpleRequestBase implements 
 	}
 
 	@Override
-	public void onCacheData(JsonData previousJsonData, boolean outoufDate) {
-		mCacheableRequestHandler.onCacheData(previousJsonData, outoufDate);
+	public void onCacheData(T data, boolean outoufDate) {
+		mCacheableRequestHandler.onCacheData(data, outoufDate);
 		if (outoufDate) {
 			doQuery();
 		}
@@ -105,8 +92,17 @@ public abstract class CacheableRequestBase extends SimpleRequestBase implements 
 	}
 
 	@Override
-	public JsonData processDataFromAssert(JsonData jsonData) {
-		return processOriginData(jsonData);
+	public T processOriginData(JsonData rawData) {
+		// cache the data
+		if (rawData != null && rawData.getRawData() != null && rawData.length() > 0) {
+			RequestCache.getInstance().cacheRequest(this, rawData);
+		}
+		return super.processOriginData(rawData);
+	}
+
+	@Override
+	public T processRawDataFromCache(JsonData jsonData) {
+		return super.processOriginData(jsonData);
 	}
 
 }

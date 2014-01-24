@@ -1,7 +1,7 @@
 package com.srain.cube.sample.data;
 
-import com.srain.cube.request.CacheableRequestOnSuccHandler;
-import com.srain.cube.request.RequestOnSuccHandler;
+import com.srain.cube.request.JsonCacheableRequestSuccHandler;
+import com.srain.cube.request.JsonRequestSuccHandler;
 
 /**
  * <p>
@@ -25,7 +25,7 @@ public class SampleData {
 	/**
 	 * Show how to encapsulate the calling of a web api by Request
 	 */
-	public static void getRequestSampleData(final String msg, final RequestOnSuccHandler handler) {
+	public static void getRequestSampleData(final String msg, final JsonRequestSuccHandler handler) {
 		// new SimpleRequest(new RequestPreHandler() {
 		//
 		// @Override
@@ -46,32 +46,32 @@ public class SampleData {
 	/**
 	 * Show how to encapsulate the calling of a web api by CacheableRequest
 	 */
-	public static void getCacheableRequestSampleData(final String msg, final CacheableRequestOnSuccHandler handler) {
+	public static void getCacheableRequestSampleData(final String msg, final JsonCacheableRequestSuccHandler handler) {
 
-//		new CacheableRequest(new CacheableRequestPreHandler() {
-//
-//			@Override
-//			public void beforeRequest(SimpleRequestBase request) {
-//				String url = "http://cube-server.liaohuqiu.net/api_demo/request.php";
-//				url += "?msg=" + msg;
-//				request.setRequestUrl(url);
-//			}
-//
-//			@Override
-//			public String getSpecificCacheKey() {
-//				return "sample_data";
-//			}
-//
-//			@Override
-//			public int getCacheTime() {
-//				return 100;
-//			}
-//
-//			@Override
-//			public String getInitFileAssertPath() {
-//				return "request_init/sample_data.json";
-//			}
-//
-//		}, handler).send();
+		// new CacheableRequest(new CacheableRequestPreHandler() {
+		//
+		// @Override
+		// public void beforeRequest(SimpleRequestBase request) {
+		// String url = "http://cube-server.liaohuqiu.net/api_demo/request.php";
+		// url += "?msg=" + msg;
+		// request.setRequestUrl(url);
+		// }
+		//
+		// @Override
+		// public String getSpecificCacheKey() {
+		// return "sample_data";
+		// }
+		//
+		// @Override
+		// public int getCacheTime() {
+		// return 100;
+		// }
+		//
+		// @Override
+		// public String getInitFileAssertPath() {
+		// return "request_init/sample_data.json";
+		// }
+		//
+		// }, handler).send();
 	}
 }

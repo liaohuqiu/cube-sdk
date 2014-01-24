@@ -14,14 +14,15 @@ import android.util.Log;
 import com.srain.cube.concurrent.SimpleTask;
 import com.srain.cube.image.iface.ImageLoadHandler;
 import com.srain.cube.image.iface.ImageResizer;
+import com.srain.cube.image.imple.DefaultExecutor;
 import com.srain.cube.image.imple.DefaultImageLoadHandler;
 import com.srain.cube.image.imple.DefaultResizer;
-import com.srain.cube.image.imple.DefaultExecutor;
 import com.srain.cube.util.CLog;
 
 public class ImageLoader {
 
-	private static final String MSG_BEGIN_PROCESS = "%s processImageTaskInner";
+	private static final String MSG_DUPLICATED = "%s duplicated";
+	private static final String MSG_BEGIN_PROCESS = "%s processImageTaskInner %s";
 	private static final String MSG_HAS_PRE_TASK = "%s reused, disconnect from previous one.";
 	private static final String MSG_ATTACK_TO_RUNNING_TASK = "%s attach to running: %s";
 
@@ -78,6 +79,10 @@ public class ImageLoader {
 		return new ImageLoader(context, ImageProvider.getDefault(context), DefaultExecutor.getInstance(), DefaultResizer.getInstance(), imageLoadHandler);
 	}
 
+	public void setImageLoadHandler(ImageLoadHandler imageLoadHandler) {
+		mImageLoadHandler = imageLoadHandler;
+	}
+
 	/**
 	 * Load the image in advance.
 	 */
@@ -112,15 +117,15 @@ public class ImageLoader {
 
 		ImageTask hodingImageTask = imageView.getHoldingImageTask();
 
-		if (DEBUG) {
-			Log.d(Log_TAG, String.format(MSG_BEGIN_PROCESS, hodingImageTask));
-		}
 		// 1. Check the previous ImageTask related to this ImageView
 		if (hodingImageTask != null) {
 
 			// duplicated ImageTask, return directly.
 			if (hodingImageTask.equals(imageTask)) {
 				if (imageView.getDrawable() != null) {
+					if (DEBUG) {
+						Log.d(Log_TAG, String.format(MSG_DUPLICATED, hodingImageTask));
+					}
 					return;
 				}
 			}
@@ -142,6 +147,10 @@ public class ImageLoader {
 					}
 				}
 			}
+		}
+
+		if (DEBUG) {
+			Log.d(Log_TAG, String.format(MSG_BEGIN_PROCESS, imageTask, hodingImageTask));
 		}
 
 		// 2. Let the ImageView hold this ImageTask. When ImageView is reused next time, check it in step 1.
@@ -237,6 +246,7 @@ public class ImageLoader {
 				return;
 			}
 			mLoadWorkList.remove(mImageTask.getIdentityKey());
+
 			if (!isCancelled() && !mExitTasksEarly) {
 				mImageTask.onLoadFinish(mDrawable, mImageLoadHandler);
 			}
@@ -287,19 +297,27 @@ public class ImageLoader {
 	 * Recover the from the work list
 	 */
 	public void recoverWork() {
+		if (DEBUG) {
+			Log.d(Log_TAG, String.format("work_status: recoverWork %s", this));
+		}
 		mExitTasksEarly = false;
 		setPause(false);
 		Iterator<Entry<String, LoadImageTask>> it = (Iterator<Entry<String, LoadImageTask>>) mLoadWorkList.entrySet().iterator();
 		while (it.hasNext()) {
 			Entry<String, LoadImageTask> item = it.next();
-			mLoadImgageExcutor.execute(item.getValue());
+			LoadImageTask task = item.getValue();
+			task.restart();
+			mLoadImgageExcutor.execute(task);
 		}
 	}
 
 	/**
-	 * Drop all the work, and leave it in the wok list.
+	 * Drop all the work, and leave it in the work list.
 	 */
 	public void stopWork() {
+		if (DEBUG) {
+			Log.d(Log_TAG, String.format("work_status: stopWork %s", this));
+		}
 		mExitTasksEarly = true;
 		setPause(false);
 	}
@@ -310,15 +328,18 @@ public class ImageLoader {
 	public void destory() {
 		mExitTasksEarly = true;
 		setPause(false);
+
 		Iterator<Entry<String, LoadImageTask>> it = (Iterator<Entry<String, LoadImageTask>>) mLoadWorkList.entrySet().iterator();
 		while (it.hasNext()) {
 			Entry<String, LoadImageTask> item = it.next();
 			final LoadImageTask task = item.getValue();
+			it.remove();
 			if (task != null) {
 				task.cancel(true);
 			}
 		}
 		mLoadWorkList.clear();
+
 	}
 
 	public ImageProvider getImageProvider() {

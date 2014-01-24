@@ -17,7 +17,7 @@ import com.srain.cube.sample.R;
 import com.srain.cube.sample.data.Images;
 import com.srain.cube.sample.image.SampleImageLoader;
 import com.srain.cube.util.LocalDisplay;
-import com.srain.cube.views.list.ListViewDataAdpter;
+import com.srain.cube.views.list.ListViewDataAdapter;
 import com.srain.cube.views.list.ViewHolderBase;
 import com.srain.cube.views.list.ViewHolderCreator;
 
@@ -35,7 +35,7 @@ public class GridListViewFragment extends Fragment {
 		final View v = inflater.inflate(R.layout.fragment_image_gird, container, false);
 		GridView gridListView = (GridView) v.findViewById(R.id.ly_image_list_grid);
 
-		ListViewDataAdpter<String> adpter = new ListViewDataAdpter<String>(new ViewHolderCreator<String>() {
+		ListViewDataAdapter<String> adpter = new ListViewDataAdapter<String>(new ViewHolderCreator<String>() {
 			@Override
 			public ViewHolderBase<String> createViewHodler() {
 				return new ViewHolder();
@@ -62,7 +62,7 @@ public class GridListViewFragment extends Fragment {
 		}
 
 		@Override
-		public void showData(String itemData) {
+		public void showData(int position, String itemData) {
 			mImageView.loadImage(mImageLoader, itemData);
 		}
 	}

@@ -5,14 +5,14 @@ package com.srain.cube.request;
  * 
  *         TODO: request parameters / request method
  */
-public abstract class SimpleRequestBase implements IRequest<JsonData> {
+public class SimpleRequest<T> implements IRequest<T> {
 
-	private RequestOnSuccHandler mOnSuccHandler;
-	private RequestPreHandler mBeforeRequestHandler;
+	private RequestSuccHandler<T> mOnSuccHandler;
+	private BeforeRequestHandler mBeforeRequestHandler;
 
 	private String mUrl;
 
-	public SimpleRequestBase(RequestPreHandler beforeRequestHandler, RequestOnSuccHandler succHandler) {
+	public SimpleRequest(BeforeRequestHandler beforeRequestHandler, RequestSuccHandler<T> succHandler) {
 		mBeforeRequestHandler = beforeRequestHandler;
 		mOnSuccHandler = succHandler;
 	}
@@ -25,11 +25,12 @@ public abstract class SimpleRequestBase implements IRequest<JsonData> {
 	/**
 	 * Use a request Manger to send this SimpleRequestBase
 	 */
-	public abstract void doQuery();
+	protected void doQuery() {
+		SimpleRequestManager.sendRequest(this);
+	}
 
-	public SimpleRequestBase setRequestUrl(String url) {
+	public void setRequestUrl(String url) {
 		mUrl = url;
-		return this;
 	}
 
 	/**
@@ -44,13 +45,9 @@ public abstract class SimpleRequestBase implements IRequest<JsonData> {
 	 * Implements interface {@link IRequest}
 	 */
 	@Override
-	public void onRequestSucc(JsonData jsonData) {
-		sendRequestSucc(jsonData);
-	}
-
-	protected void sendRequestSucc(JsonData jsonData) {
+	public void onRequestSucc(T data) {
 		if (null != mOnSuccHandler) {
-			mOnSuccHandler.onRequestSucc(jsonData);
+			mOnSuccHandler.onRequestFinish(data);
 		}
 	}
 
@@ -61,13 +58,16 @@ public abstract class SimpleRequestBase implements IRequest<JsonData> {
 	}
 
 	/**
-	 * Override this method to process the data from data srouce.
+	 * Override this method to process the data from data source.
 	 * 
 	 * Implements interface {@link IRequest}
 	 */
 	@Override
-	public JsonData processOriginData(JsonData rawData) {
-		return rawData;
+	public T processOriginData(JsonData rawData) {
+		if (null != mOnSuccHandler) {
+			return mOnSuccHandler.processOriginData(rawData);
+		}
+		return null;
 	}
 
 	public byte[] getPostData() {

@@ -1,6 +1,5 @@
 package com.srain.cube.image;
 
-import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -14,10 +13,8 @@ import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build.VERSION_CODES;
-import android.os.Environment;
-import android.os.StatFs;
+import android.text.TextUtils;
 import android.util.Log;
-import android.util.SparseArray;
 
 import com.srain.cube.file.DiskLruCache;
 import com.srain.cube.image.iface.ImageMemoryCache;
@@ -32,7 +29,7 @@ import com.srain.cube.util.Version;
  * 
  * This class handles disk and memory caching of bitmaps.
  * 
- * Most of the code is taken from the Android best pratice of displaying Bitmaps <a href="http://developer.android.com/training/displaying-bitmaps/index.html">Displaying Bitmaps Efficiently</a>.
+ * Most of the code is taken from the Android best practice of displaying Bitmaps <a href="http://developer.android.com/training/displaying-bitmaps/index.html">Displaying Bitmaps Efficiently</a>.
  * 
  * @author huqiu.lhq
  */
@@ -42,11 +39,11 @@ public class ImageProvider {
 
 	protected static final String TAG = "image_provider";
 
-	private static final String MSG_FETCH_BEGIN = "%s fetchBitmapData, %s";
+	private static final String MSG_FETCH_BEGIN = "%s fetchBitmapData, %s, size:%s";
 	private static final String MSG_FETCH_TRY_REUSE = "%s Disk Cache not hit. Try to reuse, %s";
 	private static final String MSG_FETCH_HIT_DISK_CACHE = "%s Disk Cache hit %s";
 	private static final String MSG_FETCH_REUSE_SUCC = "%s reuse size: %s";
-	private static final String MSG_FETCH_REUSE_FAIL = "%s reuse fail: %s";
+	private static final String MSG_FETCH_REUSE_FAIL = "%s reuse fail: %s, %s";
 	private static final String MSG_FETCH_DOWNLOAD = "%s not found in cache, downloading: %s";
 	private static final String MSG_DECODE = "%s decode: %sx%s inSampleSize:%s";
 
@@ -82,7 +79,7 @@ public class ImageProvider {
 		if (bitmap != null) {
 			if (Version.hasHoneycomb()) {
 				// Running on Honeycomb or newer, so wrap in a standard BitmapDrawable
-				drawable = new BitmapDrawable(resources, bitmap);
+				drawable = new CubeBitmapDrawable(resources, bitmap);
 			} else {
 				// Running on Gingerbread or older, so wrap in a RecyclingBitmapDrawable
 				// which will recycle automagically
@@ -123,31 +120,6 @@ public class ImageProvider {
 		}
 	}
 
-	private static String pringSparseArray(SparseArray<?> array) {
-		if (array.size() <= 0) {
-			return "{}";
-		}
-
-		StringBuilder buffer = new StringBuilder(array.size() * 28);
-		buffer.append('{');
-		for (int i = 0; i < array.size(); i++) {
-			if (i > 0) {
-				buffer.append(", ");
-			}
-			int key = array.keyAt(i);
-			buffer.append(key);
-			buffer.append('=');
-			Object value = array.valueAt(i);
-			if (value != array) {
-				buffer.append(value);
-			} else {
-				buffer.append("(this Map)");
-			}
-		}
-		buffer.append('}');
-		return buffer.toString();
-	}
-
 	/**
 	 * Get Bitmap
 	 */
@@ -157,36 +129,51 @@ public class ImageProvider {
 			InputStream inputStream = null;
 
 			String cacheKey = null;
-			cacheKey = imageTask.getFileCacheKey();
+			String indentitySizeKey = null;
+
+			ImageReuseInfo reuseInfo = imageTask.getImageReuseInfo();
+			if (reuseInfo != null) {
+				indentitySizeKey = reuseInfo.getIndentitySize();
+			}
+
+			cacheKey = imageTask.genFileCacheKey(indentitySizeKey);
 			if (DEBUG) {
-				Log.d(TAG, String.format(MSG_FETCH_BEGIN, imageTask, cacheKey));
+				Log.d(TAG, String.format(MSG_FETCH_BEGIN, imageTask, cacheKey, indentitySizeKey));
 			}
 
 			inputStream = mFileCache.read(cacheKey);
 
 			// try to reuse
-			if (inputStream == null) {
+			if (inputStream == null && reuseInfo != null && reuseInfo.getResuzeSize() != null) {
 				if (DEBUG) {
 					Log.d(TAG, String.format(MSG_FETCH_TRY_REUSE, imageTask, cacheKey));
 				}
-				SparseArray<String> reuseInfos = imageTask.getReuseCacheKeys();
-				for (int i = 0; i < reuseInfos.size(); i++) {
-					int size = reuseInfos.keyAt(i);
-					final String key = reuseInfos.valueAt(i);
 
-					inputStream = mFileCache.read(cacheKey);
-					if (inputStream != null) {
-						cacheKey = key;
-						if (DEBUG) {
-							Log.d(TAG, String.format(MSG_FETCH_REUSE_SUCC, imageTask, size));
-						}
-						break;
+				final String[] sizeKeyList = reuseInfo.getResuzeSize();
+
+				boolean canBeReused = false;
+				for (int i = 0; i < sizeKeyList.length; i++) {
+					String size = sizeKeyList[i];
+
+					if (indentitySizeKey.equals(size)) {
+						canBeReused = true;
+						continue;
 					}
-				}
 
-				if (inputStream == null) {
-					if (DEBUG) {
-						Log.d(TAG, String.format(MSG_FETCH_REUSE_FAIL, imageTask, pringSparseArray(reuseInfos)));
+					if (!TextUtils.isEmpty(size) && canBeReused) {
+						final String key = imageTask.genFileCacheKey(size);
+						inputStream = mFileCache.read(key);
+						if (inputStream != null) {
+							cacheKey = key;
+							if (DEBUG) {
+								Log.d(TAG, String.format(MSG_FETCH_REUSE_SUCC, imageTask, size));
+							}
+							break;
+						} else {
+							if (DEBUG) {
+								Log.d(TAG, String.format(MSG_FETCH_REUSE_FAIL, imageTask, size, key));
+							}
+						}
 					}
 				}
 			} else {
@@ -214,6 +201,7 @@ public class ImageProvider {
 				if (inputStream != null) {
 					FileDescriptor fd = ((FileInputStream) inputStream).getFD();
 					bitmap = decodeSampledBitmapFromDescriptor(fd, imageTask, imageResizer);
+
 				} else {
 					Log.e(TAG, imageTask + " fetch bitmap fail.");
 				}
@@ -270,29 +258,6 @@ public class ImageProvider {
 	}
 
 	/**
-	 * @param candidate
-	 *            - Bitmap to check
-	 * @param targetOptions
-	 *            - Options that have the out* value populated
-	 * @return true if <code>candidate</code> can be used for inBitmap re-use with <code>targetOptions</code>
-	 */
-	@TargetApi(VERSION_CODES.KITKAT)
-	private static boolean canUseForInBitmap(Bitmap candidate, BitmapFactory.Options targetOptions) {
-
-		if (!Version.hasKitKat()) {
-			// On earlier versions, the dimensions must match exactly and the inSampleSize must be 1
-			return candidate.getWidth() == targetOptions.outWidth && candidate.getHeight() == targetOptions.outHeight && targetOptions.inSampleSize == 1;
-		}
-
-		// From Android 4.4 (KitKat) onward we can re-use if the byte size of the new bitmap
-		// is smaller than the reusable bitmap candidate allocation byte count.
-		int width = targetOptions.outWidth / targetOptions.inSampleSize;
-		int height = targetOptions.outHeight / targetOptions.inSampleSize;
-		int byteCount = width * height * getBytesPerPixel(candidate.getConfig());
-		return byteCount <= candidate.getAllocationByteCount();
-	}
-
-	/**
 	 * Return the byte usage per pixel of a bitmap based on its configuration.
 	 * 
 	 * @param config
@@ -310,27 +275,6 @@ public class ImageProvider {
 			return 1;
 		}
 		return 1;
-	}
-
-	/**
-	 * Get a usable cache directory (external if available, internal otherwise).
-	 * 
-	 * @param context
-	 *            The context to use
-	 * @param uniqueName
-	 *            A unique directory name to append to the cache dir
-	 * @return The cache dir
-	 */
-	public static File getDiskCacheDir(Context context, String uniqueName) {
-		// Check if media is mounted or storage is built-in, if so, try and use external cache dir
-		// otherwise use internal cache dir
-		String cachePath = null;
-		if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-			cachePath = getExternalCacheDir(context).getPath();
-		} else {
-			cachePath = context.getCacheDir().getPath();
-		}
-		return new File(cachePath + File.separator + uniqueName);
 	}
 
 	/**
@@ -355,41 +299,5 @@ public class ImageProvider {
 
 		// Pre HC-MR1
 		return bitmap.getRowBytes() * bitmap.getHeight();
-	}
-
-	/**
-	 * Get the external app cache directory.
-	 * 
-	 * @param context
-	 *            The context to use
-	 * @return The external cache dir : /storage/sdcard0/Android/data/com.srain.sdk/cache
-	 */
-	@TargetApi(VERSION_CODES.FROYO)
-	public static File getExternalCacheDir(Context context) {
-		if (Version.hasFroyo()) {
-			File path = context.getExternalCacheDir();
-			return path;
-		}
-
-		// Before Froyo we need to construct the external cache dir ourselves
-		final String cacheDir = "/Android/data/" + context.getPackageName() + "/cache/";
-		return new File(Environment.getExternalStorageDirectory().getPath() + cacheDir);
-	}
-
-	/**
-	 * Check how much usable space is available at a given path.
-	 * 
-	 * @param path
-	 *            The path to check
-	 * @return The space available in bytes
-	 */
-	@SuppressWarnings("deprecation")
-	@TargetApi(VERSION_CODES.GINGERBREAD)
-	public static long getUsableSpace(File path) {
-		if (Version.hasGingerbread()) {
-			return path.getUsableSpace();
-		}
-		final StatFs stats = new StatFs(path.getPath());
-		return (long) stats.getBlockSize() * (long) stats.getAvailableBlocks();
 	}
 }

@@ -15,7 +15,7 @@ import android.widget.ImageView;
  * automatically notifies the drawable when it is being displayed.
  * </ul>
  * 
- * Most of the code is taken from the Android best pratice of displaying Bitmaps
+ * Most of the code is taken from the Android best practice of displaying Bitmaps
  * 
  * <a href="http://developer.android.com/training/displaying-bitmaps/index.html">Displaying Bitmaps Efficiently</a>.
  */

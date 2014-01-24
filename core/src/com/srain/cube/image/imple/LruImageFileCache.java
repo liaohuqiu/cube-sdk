@@ -5,13 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
-import android.os.Build.VERSION_CODES;
-import android.os.Environment;
-import android.os.StatFs;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
 
@@ -19,15 +15,15 @@ import com.srain.cube.concurrent.SimpleExcutor;
 import com.srain.cube.concurrent.SimpleTask;
 import com.srain.cube.file.DiskLruCache;
 import com.srain.cube.file.DiskLruCache.Editor;
+import com.srain.cube.file.FileUtil;
 import com.srain.cube.image.iface.ImageFileCache;
 import com.srain.cube.util.CLog;
-import com.srain.cube.util.Version;
 
 /**
  * 
  * This class handles disk and memory caching of bitmaps.
  * 
- * Most of the code is taken from the Android best pratice of displaying Bitmaps <a href="http://developer.android.com/training/displaying-bitmaps/index.html">Displaying Bitmaps Efficiently</a>.
+ * Most of the code is taken from the Android best practice of displaying Bitmaps <a href="http://developer.android.com/training/displaying-bitmaps/index.html">Displaying Bitmaps Efficiently</a>.
  * 
  * @author huqiu.lhq
  */
@@ -53,6 +49,8 @@ public class LruImageFileCache {
 	private File mDiskCacheDir;
 	private int mDiskCacheSize;
 
+	private long mLastFlushTime = 0;
+
 	protected enum FileCacheTaskType {
 		init_cache, close_cache, flush_cache
 	}
@@ -70,7 +68,7 @@ public class LruImageFileCache {
 
 	public static LruImageFileCache getDefault(Context context) {
 		if (null == sDefault) {
-			sDefault = new LruImageFileCache(DEFAULT_CACHE_SIZE, getDiskCacheDir(context, DEFAULT_CACHE_DIR));
+			sDefault = new LruImageFileCache(DEFAULT_CACHE_SIZE, FileUtil.getDiskCacheDir(context, DEFAULT_CACHE_DIR, DEFAULT_CACHE_SIZE));
 			sDefault.initDiskCacheAsync();
 		}
 		return sDefault;
@@ -90,21 +88,17 @@ public class LruImageFileCache {
 					if (!mDiskCacheDir.exists()) {
 						mDiskCacheDir.mkdirs();
 					}
-					if (getUsableSpace(mDiskCacheDir) > mDiskCacheSize) {
+					if (FileUtil.getUsableSpace(mDiskCacheDir) > mDiskCacheSize) {
 						try {
 							mDiskLruCache = DiskLruCache.open(mDiskCacheDir, 1, 1, mDiskCacheSize);
 							if (DEBUG) {
 								Log.d(TAG, "Disk cache initialized " + this);
 							}
 						} catch (final IOException e) {
-							if (DEBUG) {
-								Log.e(TAG, "initDiskCache - " + e);
-							}
+							Log.e(TAG, "initDiskCache - " + e);
 						}
 					} else {
-						if (DEBUG) {
-							Log.e(TAG, String.format("no enough space for initDiskCache %s %s", getUsableSpace(mDiskCacheDir), mDiskCacheSize));
-						}
+						Log.e(TAG, String.format("no enough space for initDiskCache %s %s", FileUtil.getUsableSpace(mDiskCacheDir), mDiskCacheSize));
 					}
 				}
 			}
@@ -232,6 +226,11 @@ public class LruImageFileCache {
 	 */
 	public void flushDishCache() {
 		synchronized (mDiskCacheLock) {
+			long now = System.currentTimeMillis();
+			if (now - 1000 < mLastFlushTime) {
+				return;
+			}
+			mLastFlushTime = now;
 			if (mDiskLruCache != null) {
 				try {
 					mDiskLruCache.flush();
@@ -267,64 +266,7 @@ public class LruImageFileCache {
 	}
 
 	/**
-	 * Get a usable cache directory (external if available, internal otherwise).
-	 * 
-	 * @param context
-	 *            The context to use
-	 * @param uniqueName
-	 *            A unique directory name to append to the cache dir
-	 * @return The cache dir
-	 */
-	public static File getDiskCacheDir(Context context, String uniqueName) {
-		// Check if media is mounted or storage is built-in, if so, try and use external cache dir
-		// otherwise use internal cache dir
-		String cachePath = null;
-		if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-			cachePath = getExternalCacheDir(context).getPath();
-		} else {
-			cachePath = context.getCacheDir().getPath();
-		}
-		return new File(cachePath + File.separator + uniqueName);
-	}
-
-	/**
-	 * Get the external app cache directory.
-	 * 
-	 * @param context
-	 *            The context to use
-	 * @return The external cache dir : /storage/sdcard0/Android/data/com.srain.sdk/cache
-	 */
-	@TargetApi(VERSION_CODES.FROYO)
-	public static File getExternalCacheDir(Context context) {
-		if (Version.hasFroyo()) {
-			File path = context.getExternalCacheDir();
-			return path;
-		}
-
-		// Before Froyo we need to construct the external cache dir ourselves
-		final String cacheDir = "/Android/data/" + context.getPackageName() + "/cache/";
-		return new File(Environment.getExternalStorageDirectory().getPath() + cacheDir);
-	}
-
-	/**
-	 * Check how much usable space is available at a given path.
-	 * 
-	 * @param path
-	 *            The path to check
-	 * @return The space available in bytes
-	 */
-	@SuppressWarnings("deprecation")
-	@TargetApi(VERSION_CODES.GINGERBREAD)
-	public static long getUsableSpace(File path) {
-		if (Version.hasGingerbread()) {
-			return path.getUsableSpace();
-		}
-		final StatFs stats = new StatFs(path.getPath());
-		return (long) stats.getBlockSize() * (long) stats.getAvailableBlocks();
-	}
-
-	/**
-	 * A helper class to encapsulate the operate into a Work which will be excuted by the Worker.
+	 * A helper class to encapsulate the operate into a Work which will be executed by the Worker.
 	 * 
 	 * @author huqiu.lhq
 	 * 

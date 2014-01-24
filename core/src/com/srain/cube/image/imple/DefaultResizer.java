@@ -6,7 +6,7 @@ import com.srain.cube.image.ImageTask;
 import com.srain.cube.image.iface.ImageResizer;
 
 /**
- * A default implemetions of {@link ImageResizer}
+ * A default implementation of {@link ImageResizer}
  * 
  * @author huqiu.lhq
  * 

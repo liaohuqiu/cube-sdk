@@ -61,6 +61,7 @@ public class NetworkStatusManager {
 	private ConnectivityBroadcastReceiver mReceiver;
 
 	private class ConnectivityBroadcastReceiver extends BroadcastReceiver {
+		@SuppressWarnings("deprecation")
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			String action = intent.getAction();
@@ -174,7 +175,7 @@ public class NetworkStatusManager {
 	/**
 	 * Returns true if the most recent event was for an attempt to switch over to a new network following loss of connectivity on another network.
 	 * 
-	 * @return {@code true} if this was a failover attempt, {@code false} otherwise.
+	 * @return {@code true} if this was a fail over attempt, {@code false} otherwise.
 	 */
 	public boolean isFailover() {
 		return mIsFailover;

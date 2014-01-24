@@ -3,12 +3,10 @@ package com.srain.cube.util;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.MemoryInfo;
 import android.content.Context;
-import android.os.Build;
 import android.util.Log;
 
 /**

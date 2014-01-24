@@ -19,22 +19,23 @@ import android.view.View;
  */
 public abstract class ViewHolderBase<ItemDataType> {
 
-	protected ItemDataType mItemData;
-	protected ItemDataType mLastItemData;
-	
+	protected int mLastPosition;
+	protected int mPosition = -1;
+
 	/**
-	 * create a view from resource xml file, and hold the view that may be used in displaying data.
+	 * create a view from resource Xml file, and hold the view that may be used in displaying data.
 	 */
-	public abstract View createView(LayoutInflater inflater);
+	public abstract View createView(LayoutInflater layoutInflater);
 
 	/**
 	 * using the holed views to display data
 	 */
-	public abstract void showData(ItemDataType itemData);
+	public abstract void showData(int position, ItemDataType itemData);
 
-	public void setItemData(ItemDataType itemData) {
-		mItemData = mLastItemData;
-		mLastItemData = itemData;
+	public void setItemData(int position) {
+
+		mLastPosition = mPosition;
+		mPosition = position;
 	}
 
 	/**
@@ -48,16 +49,6 @@ public abstract class ViewHolderBase<ItemDataType> {
 	 * 
 	 */
 	public boolean stillHoldLastItemData() {
-		return mItemData != null && mLastItemData != null && mLastItemData == mItemData;
+		return mLastPosition == mPosition;
 	}
-
-	/**
-	 * return the data assigned currently
-	 * 
-	 * @return
-	 */
-	public ItemDataType getItemData() {
-		return mItemData;
-	}
-
 }

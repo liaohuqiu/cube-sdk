@@ -7,7 +7,7 @@ import com.srain.cube.app.lifecycle.LifeCycleComponentManager;
 import android.support.v4.app.FragmentActivity;
 
 /**
- * 1. manager the components when move from a lifttime to anthoer
+ * 1. manager the components when move from a lifetime to another
  * 
  * @author huqiu.lhq
  */

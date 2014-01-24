@@ -1,7 +1,5 @@
 package com.srain.cube.views;
 
-import com.srain.cube.R;
-
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
@@ -12,8 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
-import android.widget.AbsListView;
 import android.widget.RelativeLayout;
+
+import com.srain.cube.R;
 
 /**
  * 

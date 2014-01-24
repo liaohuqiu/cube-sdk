@@ -1,7 +1,5 @@
 package com.srain.cube.image.iface;
 
-import java.lang.ref.WeakReference;
-
 import android.graphics.drawable.BitmapDrawable;
 
 import com.srain.cube.image.CubeImageView;
@@ -23,10 +21,10 @@ public interface ImageLoadHandler {
 	/**
 	 * When begin to load the image from disk or network.
 	 */
-	public void onLoading(ImageTask imageTask, WeakReference<CubeImageView> imageViewReference);
+	public void onLoading(ImageTask imageTask, CubeImageView cubeImageView);
 
 	/**
 	 * After image is loaded.
 	 */
-	public void onLoadFinish(ImageTask imageTask, WeakReference<CubeImageView> imageViewReference, BitmapDrawable drawable);
+	public void onLoadFinish(ImageTask imageTask, CubeImageView cubeImageView, BitmapDrawable drawable);
 }

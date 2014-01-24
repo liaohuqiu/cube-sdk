@@ -2,7 +2,6 @@ package com.srain.cube.image;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
 
 /**
@@ -10,9 +9,9 @@ import android.util.Log;
  * 
  * When the drawable is no longer being displayed or cached, {@link Bitmap#recycle() recycle()} will be called on this drawable's bitmap.
  * 
- * Most of the code is taken from the Android best pratice of displaying Bitmaps <a href="http://developer.android.com/training/displaying-bitmaps/index.html">Displaying Bitmaps Efficiently</a>.
+ * Most of the code is taken from the Android best practice of displaying Bitmaps <a href="http://developer.android.com/training/displaying-bitmaps/index.html">Displaying Bitmaps Efficiently</a>.
  */
-public class RecyclingBitmapDrawable extends BitmapDrawable {
+public class RecyclingBitmapDrawable extends CubeBitmapDrawable {
 
 	static final String LOG_TAG = "cube_image";
 	static final boolean DEBUG = false;

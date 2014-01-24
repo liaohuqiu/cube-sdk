@@ -1,7 +1,5 @@
 package com.srain.cube.image.imple;
 
-import java.lang.ref.WeakReference;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,8 +8,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.util.Log;
-import android.widget.ImageView;
 
+import com.srain.cube.image.CubeBitmapDrawable;
 import com.srain.cube.image.CubeImageView;
 import com.srain.cube.image.ImageTask;
 import com.srain.cube.image.iface.ImageLoadHandler;
@@ -21,7 +19,7 @@ import com.srain.cube.util.Version;
 /**
  * A simple implementation of {@link ImageLoadHandler}.
  * 
- * This loader will put a backgound to imageview when the image is loading.
+ * This loader will put a background to ImageView when the image is loading.
  * 
  * @author huqiu.lhq
  */
@@ -30,11 +28,12 @@ public class DefaultImageLoadHandler implements ImageLoadHandler {
 	private final static boolean DEBUG = CLog.DEBUG;
 	private final static String Log_TAG = "cube_image";
 	private final static String MSG_LOADING = "%s onLoading";
-	private final static String MSG_LOAD_FINISH = "%s onLoadFinish";
+	private final static String MSG_LOAD_FINISH = "%s onLoadFinish %s";
 
 	private Context mContext;
 	private boolean mFadeInBitmap = false;
 	private BitmapDrawable mLoadingBitmapDrawable;
+	private boolean mResizeImageViewAfterLoad = false;
 
 	public DefaultImageLoadHandler(Context context) {
 		mContext = context;
@@ -47,25 +46,28 @@ public class DefaultImageLoadHandler implements ImageLoadHandler {
 		mFadeInBitmap = fadeIn;
 	}
 
+	public void setReszieImageViewAfterLoad(boolean resize) {
+		mResizeImageViewAfterLoad = resize;
+	}
+
 	/**
-	 * set the placeholer bitmap
+	 * set the placeholder bitmap
 	 */
 	public void setLoadingBitmap(Bitmap loadingBitmap) {
 		if (Version.hasHoneycomb()) {
-			mLoadingBitmapDrawable = new BitmapDrawable(mContext.getResources(), loadingBitmap);
+			mLoadingBitmapDrawable = new CubeBitmapDrawable(mContext.getResources(), loadingBitmap);
 		}
 	}
 
 	/**
-	 * set the placeholer bitmap
+	 * set the placeholder bitmap
 	 */
 	public void setLoadingBitmap(int loadingBitmap) {
 		setLoadingBitmap(BitmapFactory.decodeResource(mContext.getResources(), loadingBitmap));
 	}
 
 	@Override
-	public void onLoading(ImageTask imageTask, WeakReference<CubeImageView> imageViewReference) {
-		ImageView imageView = imageViewReference.get();
+	public void onLoading(ImageTask imageTask, CubeImageView imageView) {
 		if (DEBUG) {
 			Log.d(Log_TAG, String.format(MSG_LOADING, imageTask));
 		}
@@ -79,18 +81,33 @@ public class DefaultImageLoadHandler implements ImageLoadHandler {
 	}
 
 	@Override
-	public void onLoadFinish(ImageTask imageTask, WeakReference<CubeImageView> imageViewReference, BitmapDrawable drawable) {
-		final ImageView imageView = imageViewReference.get();
+	public void onLoadFinish(ImageTask imageTask, CubeImageView imageView, BitmapDrawable drawable) {
 		if (DEBUG) {
-			Log.d(Log_TAG, String.format(MSG_LOAD_FINISH, imageTask));
+			Log.d(Log_TAG, String.format(MSG_LOAD_FINISH, imageTask, drawable));
 		}
 
-		if (imageView != null && drawable != null) {
+		if (drawable != null) {
+
+			if (mResizeImageViewAfterLoad) {
+				int w = drawable.getIntrinsicWidth();
+				int h = drawable.getIntrinsicHeight();
+				if (w > 0 && h > 0) {
+					imageView.getLayoutParams().width = w;
+					imageView.getLayoutParams().height = h;
+				}
+			}
 			if (mFadeInBitmap) {
 				final TransitionDrawable td = new TransitionDrawable(new Drawable[] { new ColorDrawable(android.R.color.transparent), drawable });
 				imageView.setImageDrawable(td);
 				td.startTransition(200);
 			} else {
+
+				Drawable d = imageView.getDrawable();
+				if (d != null) {
+					int w = d.getIntrinsicWidth();
+					int h = d.getIntrinsicHeight();
+					Log.d(Log_TAG, String.format("onLoadFinish %s %s %s %s", w, h, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight()));
+				}
 				imageView.setImageDrawable(drawable);
 			}
 		}

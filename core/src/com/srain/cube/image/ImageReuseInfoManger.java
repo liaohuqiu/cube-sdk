@@ -2,13 +2,13 @@ package com.srain.cube.image;
 
 public class ImageReuseInfoManger {
 
-	private int[] mSize;
+	private String[] mSize;
 
-	public ImageReuseInfoManger(int[] size) {
+	public ImageReuseInfoManger(String[] size) {
 		mSize = size;
 	}
 
-	public ImageReuseInfo create(int thisSize) {
+	public ImageReuseInfo create(String thisSize) {
 		return new ImageReuseInfo(thisSize, mSize);
 	}
 }

@@ -6,16 +6,16 @@ import android.os.Handler;
 import android.os.Message;
 
 /**
- * A class which encapsulate a task that can excute in background thread and can be cancelled.
+ * A class which encapsulate a task that can execute in background thread and can be cancelled.
  * 
  * @author huqiu.lhq
  */
 public abstract class SimpleTask implements Runnable {
 
-	private static final int STATE_NEW = 0x0001;
-	private static final int STATE_RUNNING = 0x0010;
-	private static final int STATE_COMPLETING = 0x0100;
-	private static final int STATE_CANCELLED = 0x0101;
+	private static final int STATE_NEW = 0x01;
+	private static final int STATE_RUNNING = 0x02;
+	private static final int STATE_COMPLETING = 0x04;
+	private static final int STATE_CANCELLED = 0x08;
 
 	private static final int TASK_DONE = 0x01;
 	private static InternalHandler sHandler = new InternalHandler();
@@ -23,7 +23,7 @@ public abstract class SimpleTask implements Runnable {
 	private AtomicInteger mState = new AtomicInteger(STATE_NEW);
 
 	/**
-	 * A woker will excute this method in a background thead
+	 * A worker will execute this method in a background thread
 	 */
 	public abstract void doInBackground();
 
@@ -36,6 +36,13 @@ public abstract class SimpleTask implements Runnable {
 	 * When the Task is Cancelled.
 	 */
 	protected void onCancel() {
+	}
+
+	/**
+	 * Restart the task, just set the state to {@link STATE_NEW}
+	 */
+	public void restart() {
+		mState.set(STATE_NEW);
 	}
 
 	@Override

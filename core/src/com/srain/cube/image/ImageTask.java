@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
+import android.text.TextUtils;
 import android.util.SparseArray;
 
 import com.srain.cube.image.iface.ImageLoadHandler;
@@ -39,9 +40,6 @@ public class ImageTask {
 	private String mIndentityKey;
 
 	protected ImageReuseInfo mImageReuseInfo;
-	protected int mIndentitySize = 0;
-
-	private String mFileCacheKey;
 
 	public ImageTask(String url, int requestWidth, int requestHeight, ImageReuseInfo imageReuseInfo) {
 
@@ -51,13 +49,8 @@ public class ImageTask {
 		mRelatedImageViewList = new HashMap<String, WeakReference<CubeImageView>>();
 		if (imageReuseInfo != null) {
 			mImageReuseInfo = imageReuseInfo;
-			mIndentitySize = imageReuseInfo.getIndentitySize();
 		}
-		setRequestSize(requestWidth, requestHeight);
-	}
-
-	protected void setRequestSize(int w, int h) {
-		mRequestSize = new Point(w, h);
+		mRequestSize = new Point(requestWidth, requestHeight);
 		mIndentityKey = genSizeKey(mUrl, mRequestSize.x, mRequestSize.y);
 	}
 
@@ -81,7 +74,7 @@ public class ImageTask {
 			final WeakReference<CubeImageView> imageWeakRef = new WeakReference<CubeImageView>(imageView);
 			mRelatedImageViewList.put(imageView.toString(), imageWeakRef);
 			if (mIsLoading && handler != null) {
-				handler.onLoading(this, imageWeakRef);
+				handler.onLoading(this, imageView);
 			}
 		}
 	}
@@ -113,7 +106,10 @@ public class ImageTask {
 			synchronized (mRelatedImageViewList) {
 				for (Iterator<Entry<String, WeakReference<CubeImageView>>> it = mRelatedImageViewList.entrySet().iterator(); it.hasNext();) {
 					Entry<String, WeakReference<CubeImageView>> item = it.next();
-					handler.onLoading(this, item.getValue());
+					CubeImageView imageView = item.getValue().get();
+					if (imageView != null) {
+						handler.onLoading(this, imageView);
+					}
 				}
 			}
 		}
@@ -131,7 +127,10 @@ public class ImageTask {
 			synchronized (mRelatedImageViewList) {
 				for (Iterator<Entry<String, WeakReference<CubeImageView>>> it = mRelatedImageViewList.entrySet().iterator(); it.hasNext();) {
 					Entry<String, WeakReference<CubeImageView>> item = it.next();
-					handler.onLoadFinish(this, item.getValue(), drawable);
+					CubeImageView imageView = item.getValue().get();
+					if (imageView != null) {
+						handler.onLoadFinish(this, imageView, drawable);
+					}
 				}
 			}
 		}
@@ -172,31 +171,16 @@ public class ImageTask {
 		return key;
 	}
 
-	public String getFileCacheKey() {
-		if (mFileCacheKey == null) {
-			mFileCacheKey = Encrypt.md5(genSizeKey(mUrl, mIndentitySize, mIndentitySize));
+	public String genFileCacheKey(String sizeTag) {
+		if (TextUtils.isEmpty(sizeTag)) {
+			return Encrypt.md5(mUrl);
+		} else {
+			return Encrypt.md5(new StringBuilder(mUrl).append(SIZE_SP).append(sizeTag).toString());
 		}
-		return mFileCacheKey;
 	}
 
-	public SparseArray<String> getReuseCacheKeys() {
-		if (null == mReuseCacheKeys) {
-			mReuseCacheKeys = new SparseArray<String>();
-			if (0 != mIndentitySize) {
-				mReuseCacheKeys.put(0, Encrypt.md5(genSizeKey(mUrl, 0, 0)));
-			}
-
-			int[] sizeList = mImageReuseInfo.getResuzeSize();
-			if (null != mImageReuseInfo && null != sizeList) {
-				for (int i = 0; i < sizeList.length; i++) {
-					final Integer size = sizeList[i];
-					if (size > mIndentitySize) {
-						mReuseCacheKeys.put(size, Encrypt.md5(genSizeKey(mUrl, size, size)));
-					}
-				}
-			}
-		}
-		return mReuseCacheKeys;
+	public ImageReuseInfo getImageReuseInfo() {
+		return mImageReuseInfo;
 	}
 
 	public boolean equals(Object object) {

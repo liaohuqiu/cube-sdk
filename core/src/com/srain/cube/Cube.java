@@ -1,7 +1,12 @@
 package com.srain.cube;
 
+import com.srain.cube.util.LocalDisplay;
+import com.srain.cube.util.NetworkStatusManager;
+
 import android.app.Application;
 import android.content.Context;
+import android.util.DisplayMetrics;
+import android.view.WindowManager;
 
 public class Cube {
 
@@ -15,6 +20,13 @@ public class Cube {
 
 	private Cube(Application application) {
 		mApplication = application;
+
+		DisplayMetrics dm = new DisplayMetrics();
+		WindowManager wm = (WindowManager) application.getSystemService(Context.WINDOW_SERVICE);
+		wm.getDefaultDisplay().getMetrics(dm);
+		LocalDisplay.init(dm);
+
+		NetworkStatusManager.init(application);
 	}
 
 	public static Cube getInstance() {

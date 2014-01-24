@@ -10,6 +10,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 
+import com.srain.cube.concurrent.SimpleExcutor;
 import com.srain.cube.file.FileUtil;
 
 /**
@@ -19,16 +20,22 @@ import com.srain.cube.file.FileUtil;
 public class RequestCache {
 
 	private static RequestCache mInstance;
-
 	private String mCacheDir;
 
 	private HashMap<String, JsonData> mCacheList;
 
-	private static final int REQUEST_CACHE_SUCC = 0x01;
-	private static final int REQUEST_ASSERT_CACHE_SUCC = 0x02;
-	private Context mContext;
+	private static final int AFTER_READ_FROM_FILE = 0x01;
+	private static final int AFTER_READ_FROM_ASSERT = 0x02;
+	private static final int AFTER_CONVERT = 0x04;
 
-	public interface ICacheable {
+	private static final int DO_READ_FROM_FILE = 0x01;
+	private static final int DO_READ_FROM_ASSERT = 0x02;
+	private static final int DO_CONVERT = 0x04;
+
+	private Context mContext;
+	private static Handler sHandler;
+
+	public interface ICacheable<T> {
 
 		public int getCacheTime();
 
@@ -39,16 +46,40 @@ public class RequestCache {
 		/**
 		 * We need to process the data from data source, do some filter of convert the structure.
 		 * 
-		 * As the "Assert Data" is a special data souce, we also need to do the same work.
+		 * As the "Assert Data" is a special data source, we also need to do the same work.
 		 */
-		public JsonData processDataFromAssert(JsonData jsonData);
+		public T processRawDataFromCache(JsonData jsonData);
 
 		public void onNoCacheDataAvailable();
 
-		public void onCacheData(JsonData previousJsonData, boolean outofDate);
+		public void onCacheData(T previousJsonData, boolean outofDate);
 	}
 
+	@SuppressLint("HandlerLeak")
 	private RequestCache() {
+
+		sHandler = new Handler() {
+
+			@Override
+			public void handleMessage(Message msg) {
+				ReadCacheTask<?> task = null;
+				switch (msg.what) {
+				case AFTER_READ_FROM_FILE:
+				case AFTER_READ_FROM_ASSERT:
+					task = (ReadCacheTask<?>) msg.obj;
+					task.processRawCacheData();
+					break;
+
+				case AFTER_CONVERT:
+					task = (ReadCacheTask<?>) msg.obj;
+					task.done();
+					break;
+
+				default:
+					break;
+				}
+			}
+		};
 	}
 
 	public void init(Context content, String cacheDir) {
@@ -64,37 +95,12 @@ public class RequestCache {
 		return mInstance;
 	}
 
-	public void requestCache(ICacheable cacheable) {
-
-		String cacheKey = cacheable.getCacheKey();
-
-		// try to find in runtime cache
-		if (mCacheList.containsKey(cacheKey)) {
-			showStatus(String.format("exsit in list, key:%s", cacheable.getCacheKey()));
-			processCacheData(mCacheList.get(cacheKey), cacheable);
-			return;
-		}
-
-		// try read from cache data
-		String filePath = mCacheDir + "/ " + cacheable.getCacheKey();
-		File file = new File(filePath);
-		if (file.exists()) {
-			queryFromCacheFile(cacheable);
-			return;
-		}
-
-		// try to read from asser cache file
-		String assertInitDataPath = cacheable.getAssertInitDataPath();
-		if (assertInitDataPath != null && assertInitDataPath.length() > 0) {
-			queryFromAssertCacheFile(cacheable);
-			return;
-		}
-
-		showStatus(String.format("cache file not exist, key:%s", cacheable.getCacheKey()));
-		processCacheData(null, cacheable);
+	public <T> void requestCache(ICacheable<T> cacheable) {
+		ReadCacheTask<T> task = new ReadCacheTask<T>(cacheable);
+		task.query();
 	}
 
-	public void cacheRequest(final ICacheable cacheable, final JsonData data) {
+	public <T> void cacheRequest(final ICacheable<T> cacheable, final JsonData data) {
 		showStatus(String.format("cacheRequest, key:%s", cacheable.getCacheKey()));
 		new Thread(new Runnable() {
 			@Override
@@ -126,90 +132,133 @@ public class RequestCache {
 		mCacheList.remove(key);
 	}
 
-	@SuppressLint("HandlerLeak")
-	private void queryFromCacheFile(final ICacheable cacheable) {
+	private class ReadCacheTask<T1> implements Runnable {
 
-		// no in main thread, will no cause HandlerLeak
-		final Handler handler = new Handler() {
-			@Override
-			public void handleMessage(Message msg) {
-				switch (msg.what) {
-				case REQUEST_CACHE_SUCC:
-					JsonData cacheData = (JsonData) msg.obj;
-					setCacheData(cacheable.getCacheKey(), cacheData);
-					processCacheData(cacheData, cacheable);
-					break;
+		private ICacheable<T1> mCacheable;
 
-				default:
-					break;
-				}
+		private JsonData mRawData;
+		private T1 mResult;
+		private int mWorkType = 0;
+
+		public ReadCacheTask(ICacheable<T1> cacheable) {
+			mCacheable = cacheable;
+		}
+
+		void query() {
+			String cacheKey = mCacheable.getCacheKey();
+
+			// try to find in runtime cache
+			if (mCacheList.containsKey(cacheKey)) {
+				showStatus(String.format("exsit in list, key:%s", mCacheable.getCacheKey()));
+				mRawData = mCacheList.get(cacheKey);
+				processRawCacheData();
+				return;
 			}
-		};
 
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				showStatus(String.format("try read cache data from file, key:%s", cacheable.getCacheKey()));
-				String filePath = mCacheDir + "/ " + cacheable.getCacheKey();
-				String cacheContent = FileUtil.read(filePath);
-				JsonData cacheData = JsonData.create(cacheContent);
-
-				Message msg = Message.obtain();
-				msg.what = REQUEST_CACHE_SUCC;
-				msg.obj = cacheData;
-				handler.sendMessage(msg);
+			// try read from cache data
+			String filePath = mCacheDir + "/ " + mCacheable.getCacheKey();
+			File file = new File(filePath);
+			if (file.exists()) {
+				queryFromCacheFile();
+				return;
 			}
-		}, "SimpleRequestBase-Cache").start();
-	}
 
-	@SuppressLint("HandlerLeak")
-	private void queryFromAssertCacheFile(final ICacheable cacheable) {
-
-		// no in main thread, will no cause HandlerLeak
-		final Handler handler = new Handler() {
-			@Override
-			public void handleMessage(Message msg) {
-				switch (msg.what) {
-				case REQUEST_ASSERT_CACHE_SUCC:
-					JsonData data = (JsonData) msg.obj;
-					JsonData cacheData = makeCacheFormatJsonData(data, -2);
-					setCacheData(cacheable.getCacheKey(), cacheData);
-					processCacheData(cacheData, cacheable);
-					break;
-
-				default:
-					break;
-				}
+			// try to read from assert cache file
+			String assertInitDataPath = mCacheable.getAssertInitDataPath();
+			if (assertInitDataPath != null && assertInitDataPath.length() > 0) {
+				queryFromAssertCacheFile();
+				return;
 			}
-		};
 
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				showStatus(String.format("try read cache data from assert file: %s", cacheable.getCacheKey()));
-				String cacheContent = FileUtil.readAssert(mContext, cacheable.getAssertInitDataPath());
-				JsonData cacheData = JsonData.create(cacheContent);
-				cacheData = cacheable.processDataFromAssert(cacheData);
+			showStatus(String.format("cache file not exist, key:%s", mCacheable.getCacheKey()));
+			mCacheable.onNoCacheDataAvailable();
+		}
 
-				Message msg = Message.obtain();
-				msg.what = REQUEST_ASSERT_CACHE_SUCC;
-				msg.obj = cacheData;
-				handler.sendMessage(msg);
+		@Override
+		public void run() {
+
+			switch (mWorkType) {
+
+			case DO_READ_FROM_FILE:
+				doQueryFromCacheFileInBackground();
+				break;
+
+			case DO_READ_FROM_ASSERT:
+				queryFromAssertCacheFileInBackground();
+				break;
+
+			case DO_CONVERT:
+				doConvertInBackground();
+				break;
+
+			default:
+				break;
 			}
-		}, "SimpleRequestBase-Cache").start();
-	}
+		}
 
-	private void processCacheData(JsonData cacheData, ICacheable cacheable) {
+		private void queryFromCacheFile() {
+			mWorkType = DO_READ_FROM_FILE;
+			SimpleExcutor.getInstance().execute(this);
+		}
 
-		if (null != cacheData && cacheData.has("data")) {
-			int lastTime = cacheData.optInt("time");
-			JsonData data = cacheData.optJson("data");
-			boolean outofDate = System.currentTimeMillis() / 1000 - lastTime > cacheable.getCacheTime();
-			cacheable.onCacheData(data, outofDate);
-		} else {
+		private void doQueryFromCacheFileInBackground() {
 
-			showStatus(String.format("onNoCacheDataAvailable, key:%s", cacheable.getCacheKey()));
-			cacheable.onNoCacheDataAvailable();
+			showStatus(String.format("try read cache data from file, key:%s", mCacheable.getCacheKey()));
+			String filePath = mCacheDir + "/ " + mCacheable.getCacheKey();
+			String cacheContent = FileUtil.read(filePath);
+			mRawData = JsonData.create(cacheContent);
+
+			Message msg = Message.obtain();
+			msg.what = AFTER_READ_FROM_FILE;
+			msg.obj = this;
+			sHandler.sendMessage(msg);
+		}
+
+		private void queryFromAssertCacheFile() {
+			mWorkType = DO_READ_FROM_ASSERT;
+			SimpleExcutor.getInstance().execute(this);
+		}
+
+		private void queryFromAssertCacheFileInBackground() {
+			showStatus(String.format("try read cache data from assert file: %s", mCacheable.getCacheKey()));
+
+			String cacheContent = FileUtil.readAssert(mContext, mCacheable.getAssertInitDataPath());
+			JsonData rawData = JsonData.create(cacheContent);
+			mRawData = makeCacheFormatJsonData(rawData, -2);
+			setCacheData(mCacheable.getCacheKey(), mRawData);
+
+			Message msg = Message.obtain();
+			msg.what = AFTER_READ_FROM_ASSERT;
+			msg.obj = this;
+			sHandler.sendMessage(msg);
+		}
+
+		void doConvertInBackground() {
+
+			JsonData data = mRawData.optJson("data");
+			mResult = mCacheable.processRawDataFromCache(data);
+
+			Message msg = Message.obtain();
+			msg.what = AFTER_CONVERT;
+			msg.obj = this;
+			sHandler.sendMessage(msg);
+		}
+
+		private void processRawCacheData() {
+			if (null != mRawData && mRawData.has("data")) {
+				mWorkType = DO_CONVERT;
+				new Thread(this).start();
+			} else {
+				showStatus(String.format("onNoCacheDataAvailable, key:%s", mCacheable.getCacheKey()));
+				mCacheable.onNoCacheDataAvailable();
+			}
+		}
+
+		void done() {
+
+			int lastTime = mRawData.optInt("time");
+			boolean outOfDate = System.currentTimeMillis() / 1000 - lastTime > mCacheable.getCacheTime();
+			mCacheable.onCacheData(mResult, outOfDate);
 		}
 	}
 

@@ -1,6 +1,6 @@
 package com.srain.cube.request;
 
-public interface CacheableRequestPreHandler extends RequestPreHandler {
+public interface CacheableRequestPreHandler extends BeforeRequestHandler {
 
 	/**
 	 * Once the cache key is sepified, the data will be cached by using this key,

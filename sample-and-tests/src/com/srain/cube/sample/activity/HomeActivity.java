@@ -2,12 +2,9 @@ package com.srain.cube.sample.activity;
 
 import java.util.ArrayList;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Environment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -64,23 +61,15 @@ public class HomeActivity extends TitleBaseActivity {
 				startActivity(intent);
 			}
 		}));
+
+		mItemInfos.add(new ItemInfo("Shop List", "#4d90fe", new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+			}
+		}));
+
 		setupList();
-
-		Log.d("test", String.format("Context.getExternalCacheDir: %s", getExternalCacheDir()));
-		Log.d("test", String.format("Context.getExternalCacheDirs: %s", getExternalFilesDir("")));
-		Log.d("test", String.format("Context.getExternalCacheDirs: %s", getExternalFilesDir(Environment.DIRECTORY_MUSIC)));
-
-		Log.d("test", String.format("Context.getDir: %s", getDir("aaaa", MODE_PRIVATE)));
-		Log.d("test", String.format("Context.getDir: %s", getDir("aaaa1", MODE_WORLD_READABLE)));
-		Log.d("test", String.format("Context.getCacheDir: %s", getCacheDir()));
-		Log.d("test", String.format("Context.getFilesDir: %s", getFilesDir()));
-		Log.d("test", String.format("Context.getFileStreamPath: %s", getFileStreamPath("")));
-
-		Log.d("test", String.format("Environment.getDataDirectory: %s", Environment.getDataDirectory()));
-		Log.d("test", String.format("Environment.getExternalStorageDirectory: %s", Environment.getExternalStorageDirectory()));
-
-		Log.d("test", String.format("Environment.getExternalStoragePublicDirectory: %s", Environment.getExternalStoragePublicDirectory("")));
-		Log.d("test", String.format("Environment.getExternalStoragePublicDirectory: %s", Environment.getExternalStoragePublicDirectory("ccc")));
 	}
 
 	public void setupList() {
