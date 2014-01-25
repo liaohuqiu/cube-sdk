@@ -25,7 +25,7 @@ import com.srain.cube.util.Version;
  */
 public class DefaultImageLoadHandler implements ImageLoadHandler {
 
-	private final static boolean DEBUG = CLog.DEBUG;
+	private final static boolean DEBUG = CLog.DEBUG_IMAGE;
 	private final static String Log_TAG = "cube_image";
 	private final static String MSG_LOADING = "%s onLoading";
 	private final static String MSG_LOAD_FINISH = "%s onLoadFinish %s";

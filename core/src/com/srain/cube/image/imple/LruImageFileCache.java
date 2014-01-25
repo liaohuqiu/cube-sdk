@@ -29,7 +29,7 @@ import com.srain.cube.util.CLog;
  */
 public class LruImageFileCache {
 
-	protected static final boolean DEBUG = CLog.DEBUG;
+	protected static final boolean DEBUG = CLog.DEBUG_IMAGE;
 
 	protected static final String TAG = "image_provider";
 

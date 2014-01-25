@@ -30,7 +30,7 @@ public class ImageLoader {
 	private static final String MSG_TASK_FINISH = "%s onFinish";
 	private static final String MSG_TASK_CANCEL = "%s onCancel";
 
-	protected static final boolean DEBUG = CLog.DEBUG;
+	protected static final boolean DEBUG = CLog.DEBUG_IMAGE;
 	protected static final String Log_TAG = "cube_image";
 
 	protected Executor mLoadImgageExcutor;

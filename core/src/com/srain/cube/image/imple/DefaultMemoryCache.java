@@ -11,7 +11,7 @@ import com.srain.cube.util.CLog;
 
 public class DefaultMemoryCache implements ImageMemoryCache {
 
-	protected static final boolean DEBUG = CLog.DEBUG;
+	protected static final boolean DEBUG = CLog.DEBUG_IMAGE;
 	protected static final String TAG = "image_provider";
 	private LruCache<String, BitmapDrawable> mMemoryCache;
 

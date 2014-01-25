@@ -35,7 +35,7 @@ import com.srain.cube.util.Version;
  */
 public class ImageProvider {
 
-	protected static final boolean DEBUG = CLog.DEBUG;
+	protected static final boolean DEBUG = CLog.DEBUG_IMAGE;
 
 	protected static final String TAG = "image_provider";
 

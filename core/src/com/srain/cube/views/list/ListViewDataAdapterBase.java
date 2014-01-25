@@ -1,9 +1,14 @@
 package com.srain.cube.views.list;
 
+import java.util.HashSet;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+
+import com.srain.cube.util.CLog;
 
 /**
  * A adapter using View Holder to display the item of a list view;
@@ -14,7 +19,11 @@ import android.widget.BaseAdapter;
  */
 public abstract class ListViewDataAdapterBase<ItemDataType> extends BaseAdapter {
 
+	private static String LOG_TAG = "cube_list";
+
 	protected ViewHolderCreator<ItemDataType> mViewHolderCreator;
+	protected HashSet<Integer> mCreatedTag = new HashSet<Integer>();
+	private boolean mEnableCreateViewForMeasure = true;
 
 	/**
 	 * 
@@ -25,9 +34,19 @@ public abstract class ListViewDataAdapterBase<ItemDataType> extends BaseAdapter 
 		mViewHolderCreator = viewHolderCreator;
 	}
 
+	public void setEnableCreateViewForMeasure(boolean enable) {
+		mEnableCreateViewForMeasure = enable;
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
+		if (mEnableCreateViewForMeasure && convertView == null) {
+
+		}
+		if (CLog.DEBUG_LIST) {
+			Log.d(LOG_TAG, String.format("getView %s", position));
+		}
 		ItemDataType itemData = getItem(position);
 		if (convertView == null) {
 			LayoutInflater inflater = LayoutInflater.from(parent.getContext());
@@ -41,7 +60,6 @@ public abstract class ListViewDataAdapterBase<ItemDataType> extends BaseAdapter 
 					convertView.setTag(holderBase);
 				}
 			}
-
 		} else {
 			ViewHolderBase<ItemDataType> holderBase = (ViewHolderBase<ItemDataType>) convertView.getTag();
 			if (holderBase != null) {

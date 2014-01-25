@@ -6,6 +6,7 @@ import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,6 +57,7 @@ public class GridListViewFragment extends Fragment {
 			View view = LayoutInflater.from(getActivity()).inflate(R.layout.item_image_list_grid, null);
 			mImageView = (CubeImageView) view.findViewById(R.id.iv_item_iamge_list_grid);
 
+			Log.d("test", String.format("", mImageView.getScaleType()));
 			LinearLayout.LayoutParams lyp = new LinearLayout.LayoutParams(sGirdImageSize, sGirdImageSize);
 			mImageView.setLayoutParams(lyp);
 			return view;
@@ -63,6 +65,12 @@ public class GridListViewFragment extends Fragment {
 
 		@Override
 		public void showData(int position, String itemData) {
+			if (position == 0) {
+				int a = 0;
+				if (a == 0) {
+
+				}
+			}
 			mImageView.loadImage(mImageLoader, itemData);
 		}
 	}
