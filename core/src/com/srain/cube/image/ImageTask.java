@@ -1,9 +1,6 @@
 package com.srain.cube.image;
 
 import java.lang.ref.WeakReference;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map.Entry;
 
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
@@ -26,7 +23,6 @@ public class ImageTask {
 	private static final String SIZE_SP = "_";
 
 	protected String mUrl;
-	protected HashMap<String, WeakReference<CubeImageView>> mRelatedImageViewList;
 
 	protected Point mOriginSize = new Point();
 	private Point mRequestSize = new Point();
@@ -41,12 +37,13 @@ public class ImageTask {
 
 	protected ImageReuseInfo mImageReuseInfo;
 
+	private ImageViewHolder mImageViewHolder;
+
 	public ImageTask(String url, int requestWidth, int requestHeight, ImageReuseInfo imageReuseInfo) {
 
 		mId = ++sId;
 
 		mUrl = url;
-		mRelatedImageViewList = new HashMap<String, WeakReference<CubeImageView>>();
 		if (imageReuseInfo != null) {
 			mImageReuseInfo = imageReuseInfo;
 		}
@@ -66,53 +63,77 @@ public class ImageTask {
 		return mIsDoneOrAborted;
 	}
 
-	public void addRelatedImageView(CubeImageView imageView, ImageLoadHandler handler) {
-		if (imageView == null) {
+	public void addImageView(CubeImageView imageView) {
+		if (null == imageView) {
 			return;
 		}
-		synchronized (mRelatedImageViewList) {
-			final WeakReference<CubeImageView> imageWeakRef = new WeakReference<CubeImageView>(imageView);
-			mRelatedImageViewList.put(imageView.toString(), imageWeakRef);
-			if (mIsLoading && handler != null) {
-				handler.onLoading(this, imageView);
+		if (null == mImageViewHolder) {
+			mImageViewHolder = new ImageViewHolder(imageView);
+			return;
+		}
+
+		ImageViewHolder holder = mImageViewHolder;
+		for (;; holder = holder.next()) {
+			if (holder.contains(imageView)) {
+				return;
+			}
+			if (!holder.hasNext()) {
+				break;
 			}
 		}
+
+		ImageViewHolder newHolder = new ImageViewHolder(imageView);
+		newHolder.mPrev = holder;
+		holder.mNext = newHolder;
 	}
 
-	public void removeRelatedImageView(CubeImageView imageView) {
-		if (imageView == null) {
+	public void removeImageView(CubeImageView imageView) {
+
+		if (null == imageView || null == mImageViewHolder) {
 			return;
 		}
-		synchronized (mRelatedImageViewList) {
-			mRelatedImageViewList.remove(imageView.toString());
-		}
+
+		ImageViewHolder holder = mImageViewHolder;
+
+		do {
+			if (holder.contains(imageView)) {
+
+				if (holder == mImageViewHolder) {
+					mImageViewHolder = holder.mNext;
+				}
+				if (null != holder.mNext) {
+					holder.mNext.mPrev = holder.mPrev;
+				}
+				if (null != holder.mPrev) {
+					holder.mPrev.mNext = holder.mNext;
+				}
+			}
+
+		} while ((holder = holder.next()) != null);
 	}
 
 	public boolean stillHasRelatedImageView() {
-		synchronized (mRelatedImageViewList) {
-			for (Iterator<Entry<String, WeakReference<CubeImageView>>> it = mRelatedImageViewList.entrySet().iterator(); it.hasNext();) {
-				final CubeImageView imageView = it.next().getValue().get();
-				if (imageView != null && equals(imageView.getHoldingImageTask())) {
-					return true;
-				}
-			}
+		if (null == mImageViewHolder || mImageViewHolder.getImageView() == null) {
+			return false;
+		} else {
+			return true;
 		}
-		return false;
 	}
 
 	public void onLoading(ImageLoadHandler handler) {
 		mIsLoading = true;
-		if (null != handler) {
-			synchronized (mRelatedImageViewList) {
-				for (Iterator<Entry<String, WeakReference<CubeImageView>>> it = mRelatedImageViewList.entrySet().iterator(); it.hasNext();) {
-					Entry<String, WeakReference<CubeImageView>> item = it.next();
-					CubeImageView imageView = item.getValue().get();
-					if (imageView != null) {
-						handler.onLoading(this, imageView);
-					}
-				}
-			}
+
+		if (null == handler || null == mImageViewHolder) {
+			return;
 		}
+
+		ImageViewHolder holder = mImageViewHolder;
+		do {
+			final CubeImageView imageView = holder.getImageView();
+			if (null != imageView) {
+				handler.onLoading(this, imageView);
+			}
+		} while ((holder = holder.next()) != null);
 	}
 
 	/**
@@ -123,17 +144,18 @@ public class ImageTask {
 	public void onLoadFinish(BitmapDrawable drawable, ImageLoadHandler handler) {
 		mIsLoading = false;
 		mIsDoneOrAborted = true;
-		if (null != handler) {
-			synchronized (mRelatedImageViewList) {
-				for (Iterator<Entry<String, WeakReference<CubeImageView>>> it = mRelatedImageViewList.entrySet().iterator(); it.hasNext();) {
-					Entry<String, WeakReference<CubeImageView>> item = it.next();
-					CubeImageView imageView = item.getValue().get();
-					if (imageView != null) {
-						handler.onLoadFinish(this, imageView, drawable);
-					}
-				}
-			}
+
+		if (null == handler || null == mImageViewHolder) {
+			return;
 		}
+
+		ImageViewHolder holder = mImageViewHolder;
+		do {
+			final CubeImageView imageView = holder.getImageView();
+			if (null != imageView) {
+				handler.onLoadFinish(this, imageView, drawable);
+			}
+		} while ((holder = holder.next()) != null);
 	}
 
 	public void onCancel() {
@@ -198,5 +220,34 @@ public class ImageTask {
 			mStr = String.format("%s %sx%s", mId, mRequestSize.x, mRequestSize.y);
 		}
 		return mStr;
+	}
+
+	private static class ImageViewHolder {
+		private WeakReference<CubeImageView> mImageViewRef;
+		private ImageViewHolder mNext;
+		private ImageViewHolder mPrev;
+
+		public ImageViewHolder(CubeImageView imageView) {
+			mImageViewRef = new WeakReference<CubeImageView>(imageView);
+		}
+
+		boolean contains(CubeImageView imageView) {
+			return mImageViewRef != null && imageView == mImageViewRef.get();
+		}
+
+		CubeImageView getImageView() {
+			if (null == mImageViewRef) {
+				return null;
+			}
+			return mImageViewRef.get();
+		}
+
+		ImageViewHolder next() {
+			return mNext;
+		}
+
+		boolean hasNext() {
+			return mNext != null;
+		}
 	}
 }

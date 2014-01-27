@@ -21,11 +21,13 @@ public class Cube {
 	private Cube(Application application) {
 		mApplication = application;
 
+		// local display
 		DisplayMetrics dm = new DisplayMetrics();
 		WindowManager wm = (WindowManager) application.getSystemService(Context.WINDOW_SERVICE);
 		wm.getDefaultDisplay().getMetrics(dm);
 		LocalDisplay.init(dm);
 
+		// network status
 		NetworkStatusManager.init(application);
 	}
 

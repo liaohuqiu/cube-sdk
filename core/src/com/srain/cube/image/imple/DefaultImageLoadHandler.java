@@ -8,6 +8,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.util.Log;
+import android.view.ViewGroup;
 
 import com.srain.cube.image.CubeBitmapDrawable;
 import com.srain.cube.image.CubeImageView;
@@ -91,9 +92,19 @@ public class DefaultImageLoadHandler implements ImageLoadHandler {
 			if (mResizeImageViewAfterLoad) {
 				int w = drawable.getIntrinsicWidth();
 				int h = drawable.getIntrinsicHeight();
+
+				if (drawable instanceof CubeBitmapDrawable) {
+					w = ((CubeBitmapDrawable) drawable).getOriginIntrinsicWidth();
+					h = ((CubeBitmapDrawable) drawable).getOriginIntrinsicHeight();
+				}
 				if (w > 0 && h > 0) {
-					imageView.getLayoutParams().width = w;
-					imageView.getLayoutParams().height = h;
+
+					ViewGroup.LayoutParams lyp = imageView.getLayoutParams();
+					if (lyp != null) {
+						lyp.width = w;
+						lyp.height = h;
+						imageView.setLayoutParams(lyp);
+					}
 				}
 			}
 			if (mFadeInBitmap) {
@@ -102,10 +113,13 @@ public class DefaultImageLoadHandler implements ImageLoadHandler {
 				td.startTransition(200);
 			} else {
 
-				Drawable d = imageView.getDrawable();
-				if (d != null) {
-					int w = d.getIntrinsicWidth();
-					int h = d.getIntrinsicHeight();
+				if (DEBUG) {
+					Drawable d = imageView.getDrawable();
+					int w = 0, h = 0;
+					if (d != null) {
+						w = d.getIntrinsicWidth();
+						h = d.getIntrinsicHeight();
+					}
 					Log.d(Log_TAG, String.format("onLoadFinish %s %s %s %s", w, h, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight()));
 				}
 				imageView.setImageDrawable(drawable);

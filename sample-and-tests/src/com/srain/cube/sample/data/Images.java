@@ -26,10 +26,9 @@ public class Images {
 	 * 
 	 * Credit to Romain Guy for the photos: http://www.curious-creature.org/ https://plus.google.com/109538161516040592207/about http://www.flickr.com/photos/romainguy
 	 */
-	public final static String[] imageUrls = new String[] { "http://jpp1.imghb.com/pic/pic/65/40/8/1436911865400840.jpg", "http://jpp2.imghb.com/pic/pic/63/73/28/1402385963732871.png",
-			"http://jpp1.imghb.com/pic/pic/85/34/88/1436380285348861.jpg", "http://jpp1.imghb.com/pic/pic/39/96/39/1404993139963936.jpg",
-			"http://jpp1.imghb.com/pic/pic/95/73/18/1429647195731803.jpg", "http://jpp2.imghb.com/pic/pic/51/2/40/1428931351024073.jpg", "http://jpp1.imghb.com/pic/pic/2/30/83/1425853602308385.jpg",
-			"http://jpp1.imghb.com/pic/pic/63/39/30/1425753163393010.jpg", "http://jpp2.imghb.com/pic/pic/86/93/65/1419337986936531.jpg",
+	public final static String[] imageUrls = new String[] { "http://jpp1.imghb.com/pic/pic/39/96/39/1404993139963936.jpg", "http://jpp2.imghb.com/pic/pic/63/73/28/1402385963732871.png",
+			"http://jpp1.imghb.com/pic/pic/85/34/88/1436380285348861.jpg", "http://jpp1.imghb.com/pic/pic/95/73/18/1429647195731803.jpg", "http://jpp2.imghb.com/pic/pic/51/2/40/1428931351024073.jpg",
+			"http://jpp1.imghb.com/pic/pic/2/30/83/1425853602308385.jpg", "http://jpp1.imghb.com/pic/pic/63/39/30/1425753163393010.jpg", "http://jpp2.imghb.com/pic/pic/86/93/65/1419337986936531.jpg",
 			"http://jpp1.imghb.com/pic/pic/14/19/26/1425195714192689.jpg", "http://jpp1.imghb.com/pic/pic/12/94/81/1424936612948112.jpg",
 			"http://jpp2.imghb.com/pic/pic/28/37/29/1399116828372973.png", "http://jpp1.imghb.com/pic/pic/38/10/93/1424776438109387.jpg", "http://jpp1.imghb.com/pic/pic/2/65/97/1424776302659714.jpg",
 			"http://jpp1.imghb.com/pic/pic/33/68/11/1424589033681131.jpg", "http://jpp2.imghb.com/pic/pic/64/11/69/1423838164116959.jpg",

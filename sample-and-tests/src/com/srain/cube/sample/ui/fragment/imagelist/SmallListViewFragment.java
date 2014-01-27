@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView.ScaleType;
 import android.widget.ListView;
 
 import com.srain.cube.image.CubeImageView;
@@ -52,6 +53,7 @@ public class SmallListViewFragment extends Fragment {
 		public View createView(LayoutInflater inflater) {
 			View v = inflater.inflate(R.layout.item_image_list_small, null);
 			mImageView = (CubeImageView) v.findViewById(R.id.tv_item_image_list_small);
+			mImageView.setScaleType(ScaleType.CENTER_CROP);
 			return v;
 		}
 

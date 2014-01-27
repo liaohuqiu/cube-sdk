@@ -21,9 +21,6 @@ import com.srain.cube.util.CLog;
 
 public class ImageLoader {
 
-	private static final String MSG_DUPLICATED = "%s duplicated";
-	private static final String MSG_BEGIN_PROCESS = "%s processImageTaskInner %s";
-	private static final String MSG_HAS_PRE_TASK = "%s reused, disconnect from previous one.";
 	private static final String MSG_ATTACK_TO_RUNNING_TASK = "%s attach to running: %s";
 
 	private static final String MSG_TASK_DO_IN_BACKGROUND = "%s doInBackground";
@@ -83,6 +80,10 @@ public class ImageLoader {
 		mImageLoadHandler = imageLoadHandler;
 	}
 
+	public ImageLoadHandler getImageLoadHandler() {
+		return mImageLoadHandler;
+	}
+
 	/**
 	 * Load the image in advance.
 	 */
@@ -91,91 +92,61 @@ public class ImageLoader {
 		len = 10;
 		for (int i = 0; i < len; i++) {
 			final ImageTask imageTask = new ImageTask(urls[i], 0, 0, null);
-			processImageTask(imageTask, null);
+			addImageTask(imageTask, null);
 		}
 	}
 
-	/**
-	 * Load image.
-	 */
-	public void loadImage(CubeImageView imageView, String url, int requestWidth, int requestHeight, ImageReuseInfo imageReuseInfo) {
-		final ImageTask imageTask = new ImageTask(url, requestWidth, requestWidth, imageReuseInfo);
-		processImageTaskInner(imageTask, imageView);
+	public ImageTask createImageTask(String url, int requestWidth, int requestHeight, ImageReuseInfo imageReuseInfo) {
+		return new ImageTask(url, requestWidth, requestWidth, imageReuseInfo);
 	}
 
-	/**
-	 * Process the ImageTask.
-	 */
-	public void processImageTask(ImageTask imageTask, CubeImageView imageView) {
-
-		synchronized (mPauseWorkLock) {
-			processImageTaskInner(imageTask, imageView);
-		}
-	}
-
-	private void processImageTaskInner(ImageTask imageTask, CubeImageView imageView) {
-
-		ImageTask hodingImageTask = imageView.getHoldingImageTask();
-
-		// 1. Check the previous ImageTask related to this ImageView
-		if (hodingImageTask != null) {
-
-			// duplicated ImageTask, return directly.
-			if (hodingImageTask.equals(imageTask)) {
-				if (imageView.getDrawable() != null) {
-					if (DEBUG) {
-						Log.d(Log_TAG, String.format(MSG_DUPLICATED, hodingImageTask));
-					}
-					return;
+	public void detachImageViewFromImageTask(ImageTask imageTask, CubeImageView imageView) {
+		imageTask.removeImageView(imageView);
+		if (!imageTask.isDoneOrAborted()) {
+			if (!imageTask.isPreLoad() && !imageTask.stillHasRelatedImageView()) {
+				LoadImageTask task = mLoadWorkList.get(imageTask.getIdentityKey());
+				if (task != null) {
+					task.cancel(true);
 				}
-			}
-			// ImageView is reused, from it from the related ImageViews of the previous ImageTask.
-			else {
-				if (!hodingImageTask.isDoneOrAborted()) {
-					if (DEBUG) {
-						Log.d(Log_TAG, String.format(MSG_HAS_PRE_TASK, imageTask));
-					}
-					hodingImageTask.removeRelatedImageView(imageView);
-					if (!hodingImageTask.isPreLoad() && !hodingImageTask.stillHasRelatedImageView()) {
-						LoadImageTask task = mLoadWorkList.get(hodingImageTask.getIdentityKey());
-						if (task != null) {
-							task.cancel(true);
-						}
-						if (DEBUG) {
-							Log.d(Log_TAG, String.format("%s previous work is cancelled.", hodingImageTask));
-						}
-					}
+				if (DEBUG) {
+					Log.d(Log_TAG, String.format("%s previous work is cancelled.", imageTask));
 				}
 			}
 		}
+	}
 
-		if (DEBUG) {
-			Log.d(Log_TAG, String.format(MSG_BEGIN_PROCESS, imageTask, hodingImageTask));
-		}
-
-		// 2. Let the ImageView hold this ImageTask. When ImageView is reused next time, check it in step 1.
-		if (imageView != null) {
-			imageView.setHoldingImageTask(imageTask);
-		}
-
-		// 3. Make the ImageView related to this ImageTask or the previous running one.
-		LoadImageTask runningLoadImageWork = mLoadWorkList.get(imageTask.getIdentityKey());
-		if (runningLoadImageWork != null) {
+	public void addImageTask(ImageTask imageTask, CubeImageView imageView) {
+		LoadImageTask runningTask = mLoadWorkList.get(imageTask.getIdentityKey());
+		if (runningTask != null) {
 			if (imageView != null) {
 				if (DEBUG) {
-					Log.d(Log_TAG, String.format(MSG_ATTACK_TO_RUNNING_TASK, imageTask, runningLoadImageWork.getImageTask()));
+					Log.d(Log_TAG, String.format(MSG_ATTACK_TO_RUNNING_TASK, imageTask, runningTask.getImageTask()));
 				}
-				runningLoadImageWork.getImageTask().addRelatedImageView(imageView, mImageLoadHandler);
+				runningTask.getImageTask().addImageView(imageView);
 			}
 			return;
 		} else {
-			imageTask.addRelatedImageView(imageView, mImageLoadHandler);
+			imageTask.addImageView(imageView);
 		}
 
-		LoadImageTask work = new LoadImageTask(imageTask);
-		mLoadWorkList.put(imageTask.getIdentityKey(), work);
 		imageTask.onLoading(mImageLoadHandler);
-		mLoadImgageExcutor.execute(work);
+
+		LoadImageTask loadImageTask = new LoadImageTask(imageTask);
+		mLoadWorkList.put(imageTask.getIdentityKey(), loadImageTask);
+		mLoadImgageExcutor.execute(loadImageTask);
+	}
+
+	public boolean queryCache(ImageTask imageTask, CubeImageView imageView) {
+		if (null == mImageProvider) {
+			return false;
+		}
+		BitmapDrawable drawable = mImageProvider.getBitmapFromMemCache(imageTask);
+		if (drawable == null) {
+			return false;
+		}
+		imageTask.addImageView(imageView);
+		imageTask.onLoadFinish(drawable, mImageLoadHandler);
+		return true;
 	}
 
 	private class LoadImageTask extends SimpleTask {
@@ -207,16 +178,6 @@ public class ImageLoader {
 						mPauseWorkLock.wait();
 					} catch (InterruptedException e) {
 					}
-				}
-			}
-
-			if (!isCancelled() && !mExitTasksEarly && (mImageTask.isPreLoad() || mImageTask.stillHasRelatedImageView())) {
-				if (mImageProvider != null) {
-					mDrawable = mImageProvider.getBitmapFromMemCache(mImageTask);
-				}
-				// memory cache is hit, return at once.
-				if (mDrawable != null) {
-					return;
 				}
 			}
 
@@ -339,7 +300,6 @@ public class ImageLoader {
 			}
 		}
 		mLoadWorkList.clear();
-
 	}
 
 	public ImageProvider getImageProvider() {

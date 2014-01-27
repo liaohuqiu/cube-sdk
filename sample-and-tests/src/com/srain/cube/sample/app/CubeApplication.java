@@ -1,13 +1,10 @@
 package com.srain.cube.sample.app;
 
 import android.app.Application;
-import android.content.Context;
-import android.util.DisplayMetrics;
-import android.view.WindowManager;
 
+import com.srain.cube.Cube;
 import com.srain.cube.image.imple.LruImageFileCache;
-import com.srain.cube.util.LocalDisplay;
-import com.srain.cube.util.SystemWather;
+import com.srain.cube.util.CLog;
 
 public class CubeApplication extends Application {
 
@@ -15,21 +12,12 @@ public class CubeApplication extends Application {
 	public void onCreate() {
 		super.onCreate();
 
-		SystemWather.init(this);
-		SystemWather.getInstance().run();
-
 		LruImageFileCache.getDefault(this).initDiskCacheAsync();
 
-		DisplayMetrics dm = new DisplayMetrics();
-		WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-		wm.getDefaultDisplay().getMetrics(dm);
-		LocalDisplay.init(dm);
+		CLog.DEBUG_IMAGE = false;
+		CLog.DEBUG_LIST = true;
 
-		initImageLoader(getApplicationContext());
-	}
-
-	public static void initImageLoader(Context context) {
-
+		Cube.init(this);
 	}
 
 	@Override

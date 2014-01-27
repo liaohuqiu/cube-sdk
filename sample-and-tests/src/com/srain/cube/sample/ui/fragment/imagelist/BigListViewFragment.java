@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ImageView.ScaleType;
 
 import com.srain.cube.image.CubeImageView;
 import com.srain.cube.sample.R;
@@ -56,6 +57,7 @@ public class BigListViewFragment extends Fragment {
 		public View createView(LayoutInflater inflater) {
 			View view = inflater.inflate(R.layout.item_image_list_big, null);
 			mImageView = (CubeImageView) view.findViewById(R.id.tv_item_image_list_big);
+			mImageView.setScaleType(ScaleType.CENTER_CROP);
 
 			LinearLayout.LayoutParams lyp = new LinearLayout.LayoutParams(sBigImageSize, sBigImageSize);
 			mImageView.setLayoutParams(lyp);
