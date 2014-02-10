@@ -7,7 +7,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-import com.srain.cube.app.XActivity;
+import com.srain.cube.app.CubeFragment;
 import com.srain.cube.sample.R;
 import com.srain.cube.sample.ui.views.header.TitleHeaderBar;
 
@@ -22,21 +22,19 @@ import com.srain.cube.sample.ui.views.header.TitleHeaderBar;
  * 
  * @author huqiu.lhq
  */
-public abstract class TitleBaseActivity extends XActivity {
+public abstract class TitleBaseFragment extends CubeFragment {
 
 	protected TitleHeaderBar mTitleHeaderBar;
-	private LinearLayout mContentViewContainer;
+
+	protected abstract View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState);
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-		View view = LayoutInflater.from(this).inflate(R.layout.activity_title_base, null);
-		mContentViewContainer = (LinearLayout) view.findViewById(R.id.ly_main_content_container);
-		super.setContentView(view);
+		LinearLayout view = (LinearLayout) inflater.inflate(R.layout.fragment_title_base, null);
 
 		// 页头逻辑处理
-		mTitleHeaderBar = (TitleHeaderBar) findViewById(R.id.ly_header_bar_title_wrap);
+		mTitleHeaderBar = (TitleHeaderBar) view.findViewById(R.id.ly_header_bar_title_wrap);
 		if (enableDefaultBack()) {
 			mTitleHeaderBar.getLeftTextView().setText(R.string.base_title_return);
 			mTitleHeaderBar.setLeftOnClickListener(new OnClickListener() {
@@ -49,34 +47,15 @@ public abstract class TitleBaseActivity extends XActivity {
 		} else {
 			mTitleHeaderBar.getLeftViewContainer().setVisibility(View.INVISIBLE);
 		}
+
+		View contentView = createView(inflater, container, savedInstanceState);
+		contentView.setLayoutParams(new LinearLayout.LayoutParams(-1, -1));
+		view.addView(contentView);
+		return view;
 	}
 
-	/**
-	 * 重写，将内容置于LinearLayout中的统一的头部下方
-	 */
-	@Override
-	public void setContentView(int layoutResID) {
-		checkCall();
-		View view = LayoutInflater.from(this).inflate(layoutResID, null);
-		mContentViewContainer.addView(view);
-	}
-
-	@Override
-	public void setContentView(View view) {
-		checkCall();
-		mContentViewContainer.addView(view);
-	}
-
-	@Override
-	public void setContentView(View view, ViewGroup.LayoutParams params) {
-		checkCall();
-		mContentViewContainer.addView(view, params);
-	}
-
-	private void checkCall() {
-		if (null == mContentViewContainer) {
-			throw new RuntimeException("You should call 'super.onCreate(savedInstanceState)' first before setContentView()");
-		}
+	private void onBackPressed() {
+		getContext().onBackPressed();
 	}
 
 	/**
@@ -110,8 +89,4 @@ public abstract class TitleBaseActivity extends XActivity {
 		return mTitleHeaderBar;
 	}
 
-	@Override
-	protected String getCloseWarning() {
-		return "Tap back to exit";
-	}
 }

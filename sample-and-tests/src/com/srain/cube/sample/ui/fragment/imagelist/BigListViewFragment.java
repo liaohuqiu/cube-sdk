@@ -5,16 +5,16 @@ import java.util.Arrays;
 import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ImageView.ScaleType;
 
 import com.srain.cube.image.CubeImageView;
 import com.srain.cube.sample.R;
+import com.srain.cube.sample.activity.TitleBaseFragment;
 import com.srain.cube.sample.data.Images;
 import com.srain.cube.sample.image.SampleImageLoader;
 import com.srain.cube.util.LocalDisplay;
@@ -22,7 +22,7 @@ import com.srain.cube.views.list.ListViewDataAdapter;
 import com.srain.cube.views.list.ViewHolderBase;
 import com.srain.cube.views.list.ViewHolderCreator;
 
-public class BigListViewFragment extends Fragment {
+public class BigListViewFragment extends TitleBaseFragment {
 
 	private static final int sBigImageSize = LocalDisplay.SCREEN_WIDTH_PIXELS - LocalDisplay.dp2px(10 + 10);
 
@@ -30,7 +30,7 @@ public class BigListViewFragment extends Fragment {
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
 		mImageLoader = SampleImageLoader.create(getActivity());
 		final View v = inflater.inflate(R.layout.fragment_image_list_big, container, false);
@@ -46,6 +46,8 @@ public class BigListViewFragment extends Fragment {
 		listView.setAdapter(adpter);
 		adpter.getDataList().addAll(Arrays.asList(Images.imageUrls));
 		adpter.notifyDataSetChanged();
+
+		setHeaderTitle("Big Image");
 		return v;
 	}
 

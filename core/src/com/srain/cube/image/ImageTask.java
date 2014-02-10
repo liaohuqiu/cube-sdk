@@ -6,6 +6,7 @@ import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.text.TextUtils;
 import android.util.SparseArray;
+import android.widget.ImageView.ScaleType;
 
 import com.srain.cube.image.iface.ImageLoadHandler;
 import com.srain.cube.util.Encrypt;
@@ -18,26 +19,29 @@ import com.srain.cube.util.Encrypt;
 public class ImageTask {
 
 	private static int sId = 0;;
+
+	private int mFlag;
 	protected int mId;
-
-	private static final String SIZE_SP = "_";
-
 	protected String mUrl;
 
-	protected Point mOriginSize = new Point();
 	private Point mRequestSize = new Point();
+	protected Point mOriginSize = new Point();
 
-	protected boolean mIsPreLoad = false;
-	protected boolean mIsDoneOrAborted = false;
-	protected boolean mIsLoading = false;
+	private static final String SIZE_SP = "_";
+	private final static int STATUS_PRE_LOAD = 0x01;
+	private final static int STATUS_LOADING = 0x02;
+	private final static int STATUS_DONE = 0x04;
+	private final static int STATUS_CANCELED = 0x08;
 
 	protected SparseArray<String> mReuseCacheKeys = new SparseArray<String>();
 
 	private String mIndentityKey;
+	private String mStr;
 
+	private ImageViewHolder mFirstImageViewHolder;
 	protected ImageReuseInfo mImageReuseInfo;
-
-	private ImageViewHolder mImageViewHolder;
+	protected ScaleType mScaleType;
+	protected boolean mAdjustBounds = false;
 
 	public ImageTask(String url, int requestWidth, int requestHeight, ImageReuseInfo imageReuseInfo) {
 
@@ -51,33 +55,49 @@ public class ImageTask {
 		mIndentityKey = genSizeKey(mUrl, mRequestSize.x, mRequestSize.y);
 	}
 
+	public void setCacleType(ScaleType scaleType) {
+		mScaleType = scaleType;
+	}
+
+	public ScaleType getScaleType() {
+		return mScaleType;
+	}
+
+	public boolean isAdjustBounds() {
+		return mAdjustBounds;
+	}
+
+	public void setAdjustBound(boolean adjust) {
+		mAdjustBounds = adjust;
+	}
+
 	public boolean isPreLoad() {
-		return mIsPreLoad;
+		return (mFlag & STATUS_PRE_LOAD) == STATUS_PRE_LOAD;
 	}
 
 	public void setPreLoad(boolean preload) {
-		mIsPreLoad = preload;
+		mFlag = mFlag | STATUS_PRE_LOAD;
 	}
 
-	public boolean isDoneOrAborted() {
-		return mIsDoneOrAborted;
+	public boolean isLoading() {
+		return (mFlag & STATUS_LOADING) != 0;
 	}
 
 	public void addImageView(CubeImageView imageView) {
 		if (null == imageView) {
 			return;
 		}
-		if (null == mImageViewHolder) {
-			mImageViewHolder = new ImageViewHolder(imageView);
+		if (null == mFirstImageViewHolder) {
+			mFirstImageViewHolder = new ImageViewHolder(imageView);
 			return;
 		}
 
-		ImageViewHolder holder = mImageViewHolder;
-		for (;; holder = holder.next()) {
+		ImageViewHolder holder = mFirstImageViewHolder;
+		for (;; holder = holder.mNext) {
 			if (holder.contains(imageView)) {
 				return;
 			}
-			if (!holder.hasNext()) {
+			if (holder.mNext == null) {
 				break;
 			}
 		}
@@ -87,19 +107,25 @@ public class ImageTask {
 		holder.mNext = newHolder;
 	}
 
+	/**
+	 * Remove the ImageView from ImageTask
+	 * 
+	 * @param imageView
+	 */
 	public void removeImageView(CubeImageView imageView) {
 
-		if (null == imageView || null == mImageViewHolder) {
+		if (null == imageView || null == mFirstImageViewHolder) {
 			return;
 		}
 
-		ImageViewHolder holder = mImageViewHolder;
+		ImageViewHolder holder = mFirstImageViewHolder;
 
 		do {
 			if (holder.contains(imageView)) {
 
-				if (holder == mImageViewHolder) {
-					mImageViewHolder = holder.mNext;
+				// Make sure entry is right.
+				if (holder == mFirstImageViewHolder) {
+					mFirstImageViewHolder = holder.mNext;
 				}
 				if (null != holder.mNext) {
 					holder.mNext.mPrev = holder.mPrev;
@@ -109,11 +135,11 @@ public class ImageTask {
 				}
 			}
 
-		} while ((holder = holder.next()) != null);
+		} while ((holder = holder.mNext) != null);
 	}
 
 	public boolean stillHasRelatedImageView() {
-		if (null == mImageViewHolder || mImageViewHolder.getImageView() == null) {
+		if (null == mFirstImageViewHolder || mFirstImageViewHolder.getImageView() == null) {
 			return false;
 		} else {
 			return true;
@@ -121,19 +147,19 @@ public class ImageTask {
 	}
 
 	public void onLoading(ImageLoadHandler handler) {
-		mIsLoading = true;
+		mFlag = mFlag | STATUS_LOADING;
 
-		if (null == handler || null == mImageViewHolder) {
+		if (null == handler || null == mFirstImageViewHolder) {
 			return;
 		}
 
-		ImageViewHolder holder = mImageViewHolder;
+		ImageViewHolder holder = mFirstImageViewHolder;
 		do {
 			final CubeImageView imageView = holder.getImageView();
 			if (null != imageView) {
 				handler.onLoading(this, imageView);
 			}
-		} while ((holder = holder.next()) != null);
+		} while ((holder = holder.mNext) != null);
 	}
 
 	/**
@@ -142,25 +168,38 @@ public class ImageTask {
 	 * @param drawable
 	 */
 	public void onLoadFinish(BitmapDrawable drawable, ImageLoadHandler handler) {
-		mIsLoading = false;
-		mIsDoneOrAborted = true;
 
-		if (null == handler || null == mImageViewHolder) {
+		mFlag &= ~STATUS_LOADING;
+		mFlag |= STATUS_DONE;
+
+		if (null == handler || null == mFirstImageViewHolder) {
 			return;
 		}
 
-		ImageViewHolder holder = mImageViewHolder;
+		ImageViewHolder holder = mFirstImageViewHolder;
 		do {
 			final CubeImageView imageView = holder.getImageView();
 			if (null != imageView) {
 				handler.onLoadFinish(this, imageView, drawable);
 			}
-		} while ((holder = holder.next()) != null);
+		} while ((holder = holder.mNext) != null);
+	}
+
+	public CubeImageView getAImageView() {
+		ImageViewHolder holder = mFirstImageViewHolder;
+
+		CubeImageView imageView = null;
+		do {
+			if ((imageView = holder.getImageView()) != null) {
+				return imageView;
+			}
+		} while ((holder = holder.mNext) != null);
+		return null;
 	}
 
 	public void onCancel() {
-		mIsLoading = false;
-		mIsDoneOrAborted = true;
+		mFlag &= ~STATUS_LOADING;
+		mFlag |= STATUS_CANCELED;
 	}
 
 	public String getRemoteUrl() {
@@ -212,8 +251,6 @@ public class ImageTask {
 		return false;
 	}
 
-	private String mStr;
-
 	@Override
 	public String toString() {
 		if (mStr == null) {
@@ -222,6 +259,9 @@ public class ImageTask {
 		return mStr;
 	}
 
+	/**
+	 * A tiny and light linked list like container to hold all the ImageView related to ImageTask
+	 */
 	private static class ImageViewHolder {
 		private WeakReference<CubeImageView> mImageViewRef;
 		private ImageViewHolder mNext;
@@ -240,14 +280,6 @@ public class ImageTask {
 				return null;
 			}
 			return mImageViewRef.get();
-		}
-
-		ImageViewHolder next() {
-			return mNext;
-		}
-
-		boolean hasNext() {
-			return mNext != null;
 		}
 	}
 }

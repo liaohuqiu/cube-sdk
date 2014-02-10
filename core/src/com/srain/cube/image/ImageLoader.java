@@ -3,7 +3,6 @@ package com.srain.cube.image;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
-import java.util.concurrent.Executor;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -14,11 +13,17 @@ import android.util.Log;
 import com.srain.cube.concurrent.SimpleTask;
 import com.srain.cube.image.iface.ImageLoadHandler;
 import com.srain.cube.image.iface.ImageResizer;
-import com.srain.cube.image.imple.DefaultExecutor;
+import com.srain.cube.image.iface.ImageTaskExcutor;
 import com.srain.cube.image.imple.DefaultImageLoadHandler;
+import com.srain.cube.image.imple.DefaultImageTaskExecutor;
 import com.srain.cube.image.imple.DefaultResizer;
 import com.srain.cube.util.CLog;
 
+/**
+ * Manager the ImageTask loading list,
+ * 
+ * @author srain
+ */
 public class ImageLoader {
 
 	private static final String MSG_ATTACK_TO_RUNNING_TASK = "%s attach to running: %s";
@@ -30,7 +35,7 @@ public class ImageLoader {
 	protected static final boolean DEBUG = CLog.DEBUG_IMAGE;
 	protected static final String Log_TAG = "cube_image";
 
-	protected Executor mLoadImgageExcutor;
+	protected ImageTaskExcutor mImgageTaskExcutor;
 	protected ImageResizer mResizer;
 	protected ImageProvider mImageProvider;
 	protected ImageLoadHandler mImageLoadHandler;
@@ -44,7 +49,11 @@ public class ImageLoader {
 
 	protected Resources mResources;
 
-	public ImageLoader(Context context, ImageProvider imageProvider, Executor executor, ImageResizer imageResizer, ImageLoadHandler imageLoadHandler) {
+	public enum ImageTaskOrder {
+		FIRST_IN_FIRST_OUT, LAST_IN_FIRST_OUT
+	}
+
+	public ImageLoader(Context context, ImageProvider imageProvider, ImageTaskExcutor executor, ImageResizer imageResizer, ImageLoadHandler imageLoadHandler) {
 		mContext = context;
 		mResources = context.getResources();
 
@@ -54,9 +63,9 @@ public class ImageLoader {
 		mImageProvider = imageProvider;
 
 		if (executor == null) {
-			executor = DefaultExecutor.getInstance();
+			executor = DefaultImageTaskExecutor.getInstance();
 		}
-		mLoadImgageExcutor = executor;
+		mImgageTaskExcutor = executor;
 
 		if (imageResizer == null) {
 			imageResizer = DefaultResizer.getInstance();
@@ -73,7 +82,7 @@ public class ImageLoader {
 
 	public static ImageLoader createDefault(Context context) {
 		DefaultImageLoadHandler imageLoadHandler = new DefaultImageLoadHandler(context);
-		return new ImageLoader(context, ImageProvider.getDefault(context), DefaultExecutor.getInstance(), DefaultResizer.getInstance(), imageLoadHandler);
+		return new ImageLoader(context, ImageProvider.getDefault(context), DefaultImageTaskExecutor.getInstance(), DefaultResizer.getInstance(), imageLoadHandler);
 	}
 
 	public void setImageLoadHandler(ImageLoadHandler imageLoadHandler) {
@@ -100,9 +109,15 @@ public class ImageLoader {
 		return new ImageTask(url, requestWidth, requestWidth, imageReuseInfo);
 	}
 
+	/**
+	 * Detach the ImageView from the ImageTask.
+	 * 
+	 * @param imageTask
+	 * @param imageView
+	 */
 	public void detachImageViewFromImageTask(ImageTask imageTask, CubeImageView imageView) {
 		imageTask.removeImageView(imageView);
-		if (!imageTask.isDoneOrAborted()) {
+		if (imageTask.isLoading()) {
 			if (!imageTask.isPreLoad() && !imageTask.stillHasRelatedImageView()) {
 				LoadImageTask task = mLoadWorkList.get(imageTask.getIdentityKey());
 				if (task != null) {
@@ -115,6 +130,12 @@ public class ImageLoader {
 		}
 	}
 
+	/**
+	 * Add the ImageTask into loading list.
+	 * 
+	 * @param imageTask
+	 * @param imageView
+	 */
 	public void addImageTask(ImageTask imageTask, CubeImageView imageView) {
 		LoadImageTask runningTask = mLoadWorkList.get(imageTask.getIdentityKey());
 		if (runningTask != null) {
@@ -133,9 +154,12 @@ public class ImageLoader {
 
 		LoadImageTask loadImageTask = new LoadImageTask(imageTask);
 		mLoadWorkList.put(imageTask.getIdentityKey(), loadImageTask);
-		mLoadImgageExcutor.execute(loadImageTask);
+		mImgageTaskExcutor.execute(loadImageTask);
 	}
 
+	/**
+	 * Check weather this imageTask has cache Drawable data.
+	 */
 	public boolean queryCache(ImageTask imageTask, CubeImageView imageView) {
 		if (null == mImageProvider) {
 			return false;
@@ -147,6 +171,12 @@ public class ImageLoader {
 		imageTask.addImageView(imageView);
 		imageTask.onLoadFinish(drawable, mImageLoadHandler);
 		return true;
+	}
+
+	public void setTaskOrder(ImageTaskOrder order) {
+		if (null != mImgageTaskExcutor) {
+			mImgageTaskExcutor.setTaskOrder(order);
+		}
 	}
 
 	private class LoadImageTask extends SimpleTask {
@@ -268,7 +298,7 @@ public class ImageLoader {
 			Entry<String, LoadImageTask> item = it.next();
 			LoadImageTask task = item.getValue();
 			task.restart();
-			mLoadImgageExcutor.execute(task);
+			mImgageTaskExcutor.execute(task);
 		}
 	}
 

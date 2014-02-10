@@ -54,12 +54,12 @@ public class ImageProvider {
 
 	public static ImageProvider getDefault(Context context) {
 		if (null == sDefault) {
-			sDefault = new ImageProvider(DefaultMemoryCache.getDefault(), LruImageFileCache.getDefault(context));
+			sDefault = new ImageProvider(context, DefaultMemoryCache.getDefault(), LruImageFileCache.getDefault(context));
 		}
 		return sDefault;
 	}
 
-	public ImageProvider(ImageMemoryCache memoryCache, LruImageFileCache fileCache) {
+	public ImageProvider(Context context, ImageMemoryCache memoryCache, LruImageFileCache fileCache) {
 		mMemoryCache = memoryCache;
 		mFileCache = fileCache;
 	}
@@ -201,6 +201,7 @@ public class ImageProvider {
 				if (inputStream != null) {
 					FileDescriptor fd = ((FileInputStream) inputStream).getFD();
 					bitmap = decodeSampledBitmapFromDescriptor(fd, imageTask, imageResizer);
+					// bitmap = convertForImageViewScaleType(bitmap, imageTask);
 
 				} else {
 					Log.e(TAG, imageTask + " fetch bitmap fail.");
@@ -239,7 +240,17 @@ public class ImageProvider {
 			Log.d(TAG, String.format(MSG_DECODE, imageTask, imageTask.getOriginSize().x, imageTask.getOriginSize().y, options.inSampleSize));
 		}
 
-		return BitmapFactory.decodeFileDescriptor(fileDescriptor, null, options);
+		Bitmap bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor, null, options);
+
+		return bitmap;
+	}
+
+	private Bitmap convertForImageViewScaleType(Bitmap src, ImageTask imageTask) {
+		CubeImageView imageView = imageTask.getAImageView();
+		if (imageView != null && src != null) {
+			return imageView.convertBitmap(src);
+		}
+		return src;
 	}
 
 	public void flushFileCache() {

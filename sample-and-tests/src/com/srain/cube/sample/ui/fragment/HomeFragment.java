@@ -1,12 +1,10 @@
-package com.srain.cube.sample.activity;
+package com.srain.cube.sample.ui.fragment;
 
 import java.util.ArrayList;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -14,18 +12,21 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.srain.cube.sample.R;
+import com.srain.cube.sample.activity.TitleBaseFragment;
+import com.srain.cube.sample.ui.fragment.imagelist.BigListViewFragment;
+import com.srain.cube.sample.ui.fragment.imagelist.GridListViewFragment;
+import com.srain.cube.sample.ui.fragment.imagelist.SmallListViewFragment;
 import com.srain.cube.util.LocalDisplay;
 
-public class HomeActivity extends TitleBaseActivity {
+public class HomeFragment extends TitleBaseFragment {
 
 	private RelativeLayout mViewContainer;
-	private ArrayList<ItemInfo> mItemInfos = new ArrayList<HomeActivity.ItemInfo>();
+	private ArrayList<ItemInfo> mItemInfos = new ArrayList<HomeFragment.ItemInfo>();
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_home);
-		mViewContainer = (RelativeLayout) findViewById(R.id.ly_home_container);
+	protected View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		View view = inflater.inflate(R.layout.fragment_home, null);
+		mViewContainer = (RelativeLayout) view.findViewById(R.id.ly_home_container);
 
 		setHeaderTitle("Cube Demo");
 
@@ -33,10 +34,7 @@ public class HomeActivity extends TitleBaseActivity {
 
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent();
-				intent.putExtra("type", "big");
-				intent.setClass(HomeActivity.this, ImageActivity.class);
-				startActivity(intent);
+				getContext().pushFragmentToBackStatck(BigListViewFragment.class, null);
 			}
 		}));
 
@@ -44,10 +42,7 @@ public class HomeActivity extends TitleBaseActivity {
 
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent();
-				intent.putExtra("type", "grid");
-				intent.setClass(HomeActivity.this, ImageActivity.class);
-				startActivity(intent);
+				getContext().pushFragmentToBackStatck(GridListViewFragment.class, null);
 			}
 		}));
 
@@ -55,21 +50,21 @@ public class HomeActivity extends TitleBaseActivity {
 
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent();
-				intent.putExtra("type", "small");
-				intent.setClass(HomeActivity.this, ImageActivity.class);
-				startActivity(intent);
+				getContext().pushFragmentToBackStatck(SmallListViewFragment.class, null);
 			}
 		}));
 
-		mItemInfos.add(new ItemInfo("Shop List", "#4d90fe", new OnClickListener() {
+		mItemInfos.add(new ItemInfo("Bitmap Data", "#4d90fe", new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
+				getContext().pushFragmentToBackStatck(BitmapFragment.class, null);
 			}
 		}));
 
 		setupList();
+
+		return view;
 	}
 
 	public void setupList() {
@@ -103,7 +98,7 @@ public class HomeActivity extends TitleBaseActivity {
 	}
 
 	protected View getView(int index, int size) {
-		ViewGroup view = (ViewGroup) LayoutInflater.from(this).inflate(R.layout.item_home, null);
+		ViewGroup view = (ViewGroup) LayoutInflater.from(getContext()).inflate(R.layout.item_home, null);
 		view.setLayoutParams(new ViewGroup.LayoutParams(size, size));
 
 		((TextView) view.findViewById(R.id.tv_item_home_title)).setText(mItemInfos.get(index).mTitle);
@@ -114,12 +109,6 @@ public class HomeActivity extends TitleBaseActivity {
 	@Override
 	protected boolean enableDefaultBack() {
 		return false;
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.main_menu, menu);
-		return true;
 	}
 
 	private static class ItemInfo {

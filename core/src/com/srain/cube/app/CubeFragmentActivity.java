@@ -1,7 +1,5 @@
 package com.srain.cube.app;
 
-import com.srain.cube.app.FragmentParameter.TYPE;
-
 import android.content.Context;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -11,7 +9,11 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
-public abstract class BaseFragmentActivity extends FragmentActivity {
+import com.srain.cube.app.FragmentParam.TYPE;
+
+public abstract class CubeFragmentActivity extends FragmentActivity {
+
+	private final static String TAG_SP = "_";
 
 	/**
 	 * return the string id of close warning
@@ -20,37 +22,35 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
 	 * 
 	 * @return
 	 */
-	protected abstract int getCloseWarning();
+	protected abstract String getCloseWarning();
 
-	protected BaseFragment currentFragment;
+	protected abstract int getFragmentContianerId();
+
+	protected CubeFragment currentFragment;
 	private boolean mCloseWarned;
 
-	public void pushFragmentToBackStatck(Class<?> cls, int containerId, Object data) {
-		FragmentParameter param = new FragmentParameter();
+	public void pushFragmentToBackStatck(Class<?> cls, Object data) {
+		FragmentParam param = new FragmentParam();
 		param.cls = cls;
-		param.containerId = containerId;
 		param.data = data;
 		param.addToBackStack = true;
 
 		processFragement(param);
 	}
 
-	public void addFragment(Class<?> cls, int containerId, Object data) {
+	public void addFragment(Class<?> cls, Object data) {
 
-		FragmentParameter param = new FragmentParameter();
+		FragmentParam param = new FragmentParam();
 		param.cls = cls;
-		param.containerId = containerId;
 		param.data = data;
 		param.addToBackStack = false;
-
 		processFragement(param);
 	}
 
-	public void replaceFragment(Class<?> cls, int containerId, Object data) {
+	public void replaceFragment(Class<?> cls, Object data) {
 
-		FragmentParameter param = new FragmentParameter();
+		FragmentParam param = new FragmentParam();
 		param.cls = cls;
-		param.containerId = containerId;
 		param.data = data;
 		param.type = TYPE.REPLACE;
 		param.addToBackStack = false;
@@ -58,21 +58,23 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
 		processFragement(param);
 	}
 
-	protected String getFragmentTag(Class<?> cls) {
-		return cls.toString();
+	protected String getFragmentTag(FragmentParam param) {
+
+		StringBuilder sb = new StringBuilder(param.cls.toString());
+		return sb.toString();
 	}
 
-	private void processFragement(FragmentParameter param) {
-
+	private void processFragement(FragmentParam param) {
+		int containerId = getFragmentContianerId();
 		Class<?> cls = param.cls;
 		if (cls == null) {
 			return;
 		}
 		try {
-			String fragmentTag = getFragmentTag(cls);
-			BaseFragment fragment = (BaseFragment) getSupportFragmentManager().findFragmentByTag(fragmentTag);
+			String fragmentTag = getFragmentTag(param);
+			CubeFragment fragment = (CubeFragment) getSupportFragmentManager().findFragmentByTag(fragmentTag);
 			if (fragment == null) {
-				fragment = (BaseFragment) cls.newInstance();
+				fragment = (CubeFragment) cls.newInstance();
 			}
 			fragment.onComeIn(param.data);
 			if (currentFragment != null) {
@@ -84,16 +86,16 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
 				if (fragment.isAdded()) {
 					ft.show(fragment);
 				} else {
-					ft.add(param.containerId, fragment, fragmentTag);
+					ft.add(containerId, fragment, fragmentTag);
 				}
 			} else {
-				ft.replace(param.containerId, fragment, fragmentTag);
+				ft.replace(containerId, fragment, fragmentTag);
 			}
 
 			currentFragment = fragment;
-			if (param.addToBackStack)
+			if (param.addToBackStack) {
 				ft.addToBackStack(fragmentTag);
-			ft.setTransition(param.transition);
+			}
 			ft.commitAllowingStateLoss();
 
 		} catch (InstantiationException e) {
@@ -108,7 +110,7 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
 		if (cls == null) {
 			return;
 		}
-		BaseFragment fragment = (BaseFragment) getSupportFragmentManager().findFragmentByTag(cls.toString());
+		CubeFragment fragment = (CubeFragment) getSupportFragmentManager().findFragmentByTag(cls.toString());
 		if (fragment != null) {
 			currentFragment = fragment;
 			fragment.onBack(data);
@@ -122,7 +124,7 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
 		currentFragment = null;
 		int cnt = fm.getBackStackEntryCount();
 		String name = fm.getBackStackEntryAt(cnt - 1).getName();
-		currentFragment = (BaseFragment) fm.findFragmentByTag(name);
+		currentFragment = (CubeFragment) fm.findFragmentByTag(name);
 		currentFragment.onBack(data);
 	}
 
@@ -143,9 +145,10 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
 		if (enableBackPressed) {
 			int cnt = getSupportFragmentManager().getBackStackEntryCount();
 			if (cnt <= 0) {
-				int closeWarningHint = getCloseWarning();
-				if (!mCloseWarned && closeWarningHint > 0) {
-					showError(getString(closeWarningHint));
+				String closeWarningHint = getCloseWarning();
+				if (!mCloseWarned && closeWarningHint != null && closeWarningHint.length() == 0) {
+					Toast toast = Toast.makeText(this, closeWarningHint, Toast.LENGTH_SHORT);
+					toast.show();
 					mCloseWarned = true;
 				} else {
 					super.onBackPressed();
@@ -167,11 +170,6 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
 	public void showKeyboardAtView(View view) {
 		InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 		inputMethodManager.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
-	}
-
-	public void showError(String word) {
-		Toast toast = Toast.makeText(this, word, Toast.LENGTH_SHORT);
-		toast.show();
 	}
 
 	protected void exitFullScreen() {

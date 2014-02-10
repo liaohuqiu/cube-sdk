@@ -2,13 +2,17 @@ package com.srain.cube.image;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
@@ -40,7 +44,6 @@ public class CubeImageView extends ImageView {
 
 	private ImageTask mImageTask;
 	private Matrix mMatrix = new Matrix();
-	private Matrix mDrawMatrix = null;
 
 	private RectF mTempSrc = new RectF();
 	private RectF mTempDst = new RectF();
@@ -76,7 +79,6 @@ public class CubeImageView extends ImageView {
 	 */
 	@Override
 	public void setImageDrawable(Drawable drawable) {
-		updateDrawable(drawable);
 
 		// Keep hold of previous Drawable
 		final Drawable previousDrawable = getDrawable();
@@ -211,74 +213,86 @@ public class CubeImageView extends ImageView {
 		}
 	}
 
-	@Override
-	protected boolean setFrame(int l, int t, int r, int b) {
-		boolean changed = super.setFrame(l, t, r, b);
-		if (changed) {
-			updateDrawable(getDrawable());
-		}
-		return changed;
-	}
+	/**
+	 * Create Bitmap data according the ScaleType that set to this ImageView
+	 * 
+	 * @param src
+	 * @return
+	 */
+	public Bitmap convertBitmap(Bitmap src) {
+		Matrix matrix = new Matrix();
+		// the original size of the Bitmap data.
+		int dwidth = src.getWidth();
+		int dheight = src.getHeight();
 
-	private void updateDrawable(Drawable drawable) {
-		if (drawable == null || !(drawable instanceof CubeBitmapDrawable)) {
-			return;
-		}
-
-		CubeBitmapDrawable d = (CubeBitmapDrawable) drawable;
-		Bitmap bitmap = d.getBitmap();
-		if (bitmap == null) {
-			return;
-		}
-
-		int dwidth = d.getOriginIntrinsicWidth();
-		int dheight = d.getOriginIntrinsicHeight();
-
+		// The ScaleType of the ImageView
 		ScaleType scaleType = getScaleType();
 		int vwidth = getWidth() - getPaddingLeft() - getPaddingRight();
 		int vheight = getHeight() - getPaddingTop() - getPaddingBottom();
 
 		boolean fits = (dwidth < 0 || vwidth == dwidth) && (dheight < 0 || vheight == dheight);
 
+		int x = 0;
+		int y = 0;
+		int w = 0;
+		int h = 0;
+		float scale = 0;
+
 		if (dwidth <= 0 || dheight <= 0 || ScaleType.FIT_XY == scaleType) {
-			mFitView = true;
-			mDrawMatrix = null;
-			return;
+			return null;
 		} else {
 			mFitView = false;
 			if (ScaleType.MATRIX == scaleType) {
 				// Use the specified matrix as-is.
 				if (mMatrix.isIdentity()) {
-					mDrawMatrix = null;
+					matrix = null;
 				} else {
-					mDrawMatrix = mMatrix;
+					matrix = mMatrix;
 				}
 			} else if (fits) {
 				// The bitmap fits exactly, no transform needed.
-				mDrawMatrix = null;
+				matrix = null;
 			} else if (ScaleType.CENTER == scaleType) {
 				// Center bitmap in view, no scaling.
-				mDrawMatrix = mMatrix;
-				mDrawMatrix.setTranslate((int) ((vwidth - dwidth) * 0.5f + 0.5f), (int) ((vheight - dheight) * 0.5f + 0.5f));
+				matrix = mMatrix;
+				matrix.setTranslate((int) ((vwidth - dwidth) * 0.5f + 0.5f), (int) ((vheight - dheight) * 0.5f + 0.5f));
 			} else if (ScaleType.CENTER_CROP == scaleType) {
-				mDrawMatrix = mMatrix;
+				matrix = mMatrix;
 
-				float scale;
-				float dx = 0, dy = 0;
+				// .vwidth
+				// +-----+
+				// |.....| vheight
+				// +-----+
+				//
+				// case 1:
+				// ..dwidth
+				// +--------+
+				// |........| dheight
+				// +--------+
+				//
+				// case 2:
+				// dwidth
+				// +---+
+				// |...| dheight
+				// |...|
+				// +---+
 
+				// case 1, fit height, crop width:
+				// if (dwidth / dheight > vwidth / vheight) {
 				if (dwidth * vheight > vwidth * dheight) {
-					scale = (float) vheight / (float) dheight;
-					dx = (vwidth - dwidth * scale) * 0.5f;
-				} else {
-					scale = (float) vwidth / (float) dwidth;
-					dy = (vheight - dheight * scale) * 0.5f;
+					scale = (float) dheight / (float) vheight;
+					x = (int) ((dwidth - scale * vwidth) * 0.5f);
+				}
+				// case 2, fit width, crop height:
+				else {
+					scale = (float) dwidth / (float) vwidth;
+					y = (int) ((dheight - vheight * scale) * 0.5f);
 				}
 
-				mDrawMatrix.setScale(scale, scale);
-				mDrawMatrix.postTranslate((int) (dx + 0.5f), (int) (dy + 0.5f));
+				matrix.setScale(scale, scale);
+				// matrix.postTranslate((int) (dx + 0.5f), (int) (dy + 0.5f));
 			} else if (ScaleType.CENTER_INSIDE == scaleType) {
-				mDrawMatrix = mMatrix;
-				float scale;
+				matrix = mMatrix;
 				float dx;
 				float dy;
 
@@ -291,36 +305,103 @@ public class CubeImageView extends ImageView {
 				dx = (int) ((vwidth - dwidth * scale) * 0.5f + 0.5f);
 				dy = (int) ((vheight - dheight * scale) * 0.5f + 0.5f);
 
-				mDrawMatrix.setScale(scale, scale);
-				mDrawMatrix.postTranslate(dx, dy);
+				matrix.setScale(scale, scale);
+				matrix.postTranslate(dx, dy);
 			} else {
 				// Generate the required transform.
 				mTempSrc.set(0, 0, dwidth, dheight);
 				mTempDst.set(0, 0, vwidth, vheight);
 
-				mDrawMatrix = mMatrix;
-				mDrawMatrix.setRectToRect(mTempSrc, mTempDst, sS2FArray[scaleType.ordinal() - 1]);
+				matrix = mMatrix;
+				matrix.setRectToRect(mTempSrc, mTempDst, sS2FArray[scaleType.ordinal() - 1]);
 			}
 		}
+		if (null == matrix || matrix.isIdentity()) {
+			return src;
+		}
+
+		Log.d("test", String.format("%s, %s %s => %s %s, %s %s", mImageTask, dwidth, dheight, vwidth, vheight, x, y));
+
+		Bitmap bitmap = Bitmap.createBitmap(src, x, y, (int) (vwidth * scale), (int) (vheight * scale), matrix, true);
+		Log.d("test", String.format("%s, %s %s", mImageTask, bitmap.getWidth(), bitmap.getHeight()));
+		return bitmap;
 	}
 
-	@Override
-	protected void onDraw(Canvas canvas) {
-		Drawable d = getDrawable();
-		if (d == null || !(d instanceof CubeBitmapDrawable)) {
-			super.onDraw(canvas);
-			return;
-		}
-		CubeBitmapDrawable drawable = (CubeBitmapDrawable) d;
-		if (mDrawMatrix != null) {
-			canvas.concat(mDrawMatrix);
-			if (!mFitView) {
-				drawable.setBounds(0, 0, drawable.getOriginIntrinsicWidth(), drawable.getOriginIntrinsicHeight());
-			} else {
+	private static Bitmap createBitmap(Bitmap source, int x, int y, int width, int height, Matrix m, boolean filter) {
 
-			}
-			drawable.draw(canvas);
+		if (x + width > source.getWidth()) {
+			throw new IllegalArgumentException("x + width must be <= bitmap.width()");
 		}
-		super.onDraw(canvas);
+		if (y + height > source.getHeight()) {
+			throw new IllegalArgumentException("y + height must be <= bitmap.height()");
+		}
+
+		// check if we can just return our argument unchanged
+		if (!source.isMutable() && x == 0 && y == 0 && width == source.getWidth() && height == source.getHeight() && (m == null || m.isIdentity())) {
+			return source;
+		}
+
+		int neww = width;
+		int newh = height;
+		Canvas canvas = new Canvas();
+		Bitmap bitmap;
+		Paint paint;
+
+		Rect srcR = new Rect(x, y, x + width, y + height);
+		RectF dstR = new RectF(0, 0, width, height);
+
+		Config newConfig = Config.ARGB_8888;
+		final Config config = source.getConfig();
+		// GIF files generate null configs, assume ARGB_8888
+		if (config != null) {
+			switch (config) {
+			case RGB_565:
+				newConfig = Config.RGB_565;
+				break;
+			case ALPHA_8:
+				newConfig = Config.ALPHA_8;
+				break;
+			// noinspection deprecation
+			case ARGB_4444:
+			case ARGB_8888:
+			default:
+				newConfig = Config.ARGB_8888;
+				break;
+			}
+		}
+
+		if (m == null || m.isIdentity()) {
+			bitmap = Bitmap.createBitmap(neww, newh, newConfig);
+			paint = null; // not needed
+		} else {
+			final boolean transformed = !m.rectStaysRect();
+
+			RectF deviceR = new RectF();
+			m.mapRect(deviceR, dstR);
+
+			neww = Math.round(deviceR.width());
+			newh = Math.round(deviceR.height());
+
+			bitmap = Bitmap.createBitmap(neww, newh, transformed ? Config.ARGB_8888 : newConfig);
+
+			canvas.translate(-deviceR.left, -deviceR.top);
+			canvas.concat(m);
+
+			paint = new Paint();
+			paint.setFilterBitmap(filter);
+			if (transformed) {
+				paint.setAntiAlias(true);
+			}
+		}
+
+		// The new bitmap was created from a known bitmap source so assume that
+		// they use the same density
+		bitmap.setDensity(source.getDensity());
+
+		canvas.setBitmap(bitmap);
+		canvas.drawBitmap(source, srcR, dstR, paint);
+		canvas.setBitmap(null);
+
+		return bitmap;
 	}
 }

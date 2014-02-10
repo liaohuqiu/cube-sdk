@@ -3,7 +3,6 @@ package com.srain.cube.sample.ui.fragment.imagelist;
 import java.util.Arrays;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +11,7 @@ import android.widget.ListView;
 
 import com.srain.cube.image.CubeImageView;
 import com.srain.cube.sample.R;
+import com.srain.cube.sample.activity.TitleBaseFragment;
 import com.srain.cube.sample.data.Images;
 import com.srain.cube.sample.image.SampleImageLoader;
 import com.srain.cube.util.LocalDisplay;
@@ -19,13 +19,13 @@ import com.srain.cube.views.list.ListViewDataAdapter;
 import com.srain.cube.views.list.ViewHolderBase;
 import com.srain.cube.views.list.ViewHolderCreator;
 
-public class SmallListViewFragment extends Fragment {
+public class SmallListViewFragment extends TitleBaseFragment {
 
 	private SampleImageLoader mImageLoader;
-	public static final int sSmallImageSize = LocalDisplay.dp2px(50);
+	public static final int sSmallImageSize = LocalDisplay.dp2px(100);
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
 		mImageLoader = SampleImageLoader.create(getActivity());
 
@@ -42,6 +42,8 @@ public class SmallListViewFragment extends Fragment {
 		gridListView.setAdapter(adpter);
 		adpter.getDataList().addAll(Arrays.asList(Images.imageUrls));
 		adpter.notifyDataSetChanged();
+
+		setHeaderTitle("Small List");
 		return v;
 	}
 

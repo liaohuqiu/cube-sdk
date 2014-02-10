@@ -1,6 +1,6 @@
 package com.srain.cube.app;
 
-public interface IBaseFragment {
+public interface ICubeFragement {
 
 	void onComeIn(Object data);
 

@@ -1,77 +1,82 @@
 package com.srain.cube.image.imple;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Executor;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.os.Build;
 
+import com.srain.cube.concurrent.LinkedBlockingDeque;
+import com.srain.cube.image.ImageLoader.ImageTaskOrder;
+import com.srain.cube.image.iface.ImageTaskExcutor;
 import com.srain.cube.util.Version;
 
 /**
  * 
- * Use a Thead pool to manager the thread.
+ * Use a Thread pool to manager the thread.
  * 
  * @author huqiu.lhq
  * 
  */
-public class DefaultExecutor implements Executor {
+public class DefaultImageTaskExecutor implements ImageTaskExcutor {
 
 	private static final TimeUnit KEEP_ALIVE_TIME_UNIT;
 	private static final int KEEP_ALIVE_TIME = 1;
 
 	private static int sNUMBER_OF_CORES = Runtime.getRuntime().availableProcessors();
-	private static DefaultExecutor sInstance = null;
+	private static DefaultImageTaskExecutor sInstance = null;
 
 	private final ThreadPoolExecutor mThreadPool;
-	private final BlockingQueue<Runnable> mTaskWorkQueue;
+	private final LinkedBlockingStack<Runnable> mTaskWorkQueue;
 
 	static {
-
 		KEEP_ALIVE_TIME_UNIT = TimeUnit.SECONDS;
-		sInstance = new DefaultExecutor();
+		sInstance = new DefaultImageTaskExecutor();
 	}
 
-	public static DefaultExecutor getInstance() {
+	public static DefaultImageTaskExecutor getInstance() {
 		return sInstance;
 	}
 
-	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
 	public static class LinkedBlockingStack<T> extends LinkedBlockingDeque<T> {
 
 		private static final long serialVersionUID = -4114786347960826192L;
+		private ImageTaskOrder mImageTaskOrder = ImageTaskOrder.FIRST_IN_FIRST_OUT;
+
+		public void setTaskOrder(ImageTaskOrder order) {
+			mImageTaskOrder = order;
+		}
 
 		@Override
 		public boolean offer(T e) {
-			return super.offerFirst(e);
+			if (mImageTaskOrder == ImageTaskOrder.LAST_IN_FIRST_OUT) {
+				return super.offerFirst(e);
+			} else {
+				return super.offer(e);
+			}
 		}
 
 		@Override
 		public T remove() {
-			return super.removeFirst();
+			if (mImageTaskOrder == ImageTaskOrder.LAST_IN_FIRST_OUT) {
+				return super.removeFirst();
+			} else {
+				return super.remove();
+			}
 		}
 	}
 
 	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
-	@SuppressLint("HandlerLeak")
-	private DefaultExecutor() {
+	private DefaultImageTaskExecutor() {
 
-		if (Version.hasGingerbread()) {
-			mTaskWorkQueue = new LinkedBlockingStack<Runnable>();
-		} else {
-			mTaskWorkQueue = new LinkedBlockingQueue<Runnable>();
-		}
-		sNUMBER_OF_CORES = 2;
+		mTaskWorkQueue = new LinkedBlockingStack<Runnable>();
 		mThreadPool = new ThreadPoolExecutor(sNUMBER_OF_CORES, sNUMBER_OF_CORES, KEEP_ALIVE_TIME, KEEP_ALIVE_TIME_UNIT, mTaskWorkQueue, new DefaultThreadFactory());
 		if (Version.hasGingerbread()) {
 			mThreadPool.allowCoreThreadTimeOut(true);
+		} else {
+			// Does nothing
 		}
 	}
 
@@ -105,5 +110,10 @@ public class DefaultExecutor implements Executor {
 	@Override
 	public void execute(Runnable command) {
 		mThreadPool.execute(command);
+	}
+
+	@Override
+	public void setTaskOrder(ImageTaskOrder order) {
+		mTaskWorkQueue.setTaskOrder(order);
 	}
 }

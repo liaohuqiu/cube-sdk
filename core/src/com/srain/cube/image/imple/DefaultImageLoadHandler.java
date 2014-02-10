@@ -32,7 +32,7 @@ public class DefaultImageLoadHandler implements ImageLoadHandler {
 	private final static String MSG_LOAD_FINISH = "%s onLoadFinish %s";
 
 	private Context mContext;
-	private boolean mFadeInBitmap = false;
+	private boolean mFadeInBitmap = true;
 	private BitmapDrawable mLoadingBitmapDrawable;
 	private boolean mResizeImageViewAfterLoad = false;
 
@@ -83,20 +83,13 @@ public class DefaultImageLoadHandler implements ImageLoadHandler {
 
 	@Override
 	public void onLoadFinish(ImageTask imageTask, CubeImageView imageView, BitmapDrawable drawable) {
-		if (DEBUG) {
-			Log.d(Log_TAG, String.format(MSG_LOAD_FINISH, imageTask, drawable));
-		}
 
 		if (drawable != null) {
 
 			if (mResizeImageViewAfterLoad) {
-				int w = drawable.getIntrinsicWidth();
-				int h = drawable.getIntrinsicHeight();
+				int w = drawable.getBitmap().getWidth();
+				int h = drawable.getBitmap().getHeight();
 
-				if (drawable instanceof CubeBitmapDrawable) {
-					w = ((CubeBitmapDrawable) drawable).getOriginIntrinsicWidth();
-					h = ((CubeBitmapDrawable) drawable).getOriginIntrinsicHeight();
-				}
 				if (w > 0 && h > 0) {
 
 					ViewGroup.LayoutParams lyp = imageView.getLayoutParams();
@@ -104,6 +97,7 @@ public class DefaultImageLoadHandler implements ImageLoadHandler {
 						lyp.width = w;
 						lyp.height = h;
 						imageView.setLayoutParams(lyp);
+						Log.d(Log_TAG, String.format("resize %s %s", w, h));
 					}
 				}
 			}

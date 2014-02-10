@@ -4,14 +4,12 @@ import com.srain.cube.app.lifecycle.IComponentContainer;
 import com.srain.cube.app.lifecycle.LifeCycleComponent;
 import com.srain.cube.app.lifecycle.LifeCycleComponentManager;
 
-import android.support.v4.app.FragmentActivity;
-
 /**
  * 1. manager the components when move from a lifetime to another
  * 
  * @author huqiu.lhq
  */
-public abstract class XActivity extends FragmentActivity implements IComponentContainer {
+public abstract class XActivity extends CubeFragmentActivity implements IComponentContainer {
 
 	private LifeCycleComponentManager mComponentContainer = new LifeCycleComponentManager();
 

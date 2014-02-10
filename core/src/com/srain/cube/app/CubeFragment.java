@@ -2,12 +2,12 @@ package com.srain.cube.app;
 
 import android.support.v4.app.Fragment;
 
-public abstract class BaseFragment extends Fragment implements IBaseFragment {
+public abstract class CubeFragment extends Fragment implements ICubeFragement {
 
 	protected Object mDataIn;
 
-	public BaseFragmentActivity getContext() {
-		return (BaseFragmentActivity) getActivity();
+	public CubeFragmentActivity getContext() {
+		return (CubeFragmentActivity) getActivity();
 	}
 
 	// ===========================================================

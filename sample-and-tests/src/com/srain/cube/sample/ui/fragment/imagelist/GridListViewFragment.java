@@ -2,10 +2,7 @@ package com.srain.cube.sample.ui.fragment.imagelist;
 
 import java.util.Arrays;
 
-import android.annotation.TargetApi;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +12,7 @@ import android.widget.LinearLayout;
 
 import com.srain.cube.image.CubeImageView;
 import com.srain.cube.sample.R;
+import com.srain.cube.sample.activity.TitleBaseFragment;
 import com.srain.cube.sample.data.Images;
 import com.srain.cube.sample.image.SampleImageLoader;
 import com.srain.cube.util.LocalDisplay;
@@ -22,14 +20,13 @@ import com.srain.cube.views.list.ListViewDataAdapter;
 import com.srain.cube.views.list.ViewHolderBase;
 import com.srain.cube.views.list.ViewHolderCreator;
 
-public class GridListViewFragment extends Fragment {
+public class GridListViewFragment extends TitleBaseFragment {
 
 	private static final int sGirdImageSize = (LocalDisplay.SCREEN_WIDTH_PIXELS - LocalDisplay.dp2px(10 + 10 + 10)) / 2;
 	private SampleImageLoader mImageLoader;
 
-	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
 		mImageLoader = SampleImageLoader.create(getActivity());
 
@@ -45,6 +42,7 @@ public class GridListViewFragment extends Fragment {
 		gridListView.setAdapter(adpter);
 		adpter.getDataList().addAll(Arrays.asList(Images.imageUrls));
 		adpter.notifyDataSetChanged();
+		setHeaderTitle("Grid");
 		return v;
 	}
 
