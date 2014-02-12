@@ -86,7 +86,7 @@ body {
   font-weight: 500;
   color: #fff;
   background-color: #563d7c;
-  border-radius: 15%;
+  border-radius: 22px;
   cursor: default;
   text-align: center;
 }
@@ -97,7 +97,7 @@ body {
   line-height: 28px;
 }
 .bs-booticon-lg {
-  width: 144px;
+  width: 460px;;
   height: 144px;
   font-size: 108px;
   line-height: 140px;

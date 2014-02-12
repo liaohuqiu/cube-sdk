@@ -1,10 +1,8 @@
 ---
 layout: default
 title: Getting started
-slug: getting-started
-lead: "Build a documents page in a easy way."
+lead: "Set up in a easy way."
 ---
-
 <!-- Getting started
 ================================================== -->
 <div class="bs-docs-section">
