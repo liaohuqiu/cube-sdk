@@ -1,0 +1,36 @@
+# Dependencies
+markdown:         rdiscount
+pygments:         true
+
+# Permalinks
+permalink:        pretty
+
+# Server
+destination:      ./_site
+host:             0.0.0.0
+port:             9001
+baseurl:          /
+url:              http://localhost:9001
+encoding:         UTF-8
+
+exclude:
+  - "conf"
+
+info:
+  site_name:    Bt-docs
+
+meta:
+  description:  Write beautiful bootstrap style document in a easy way.
+  keywords:     bootstrap documentation template, beautiful documentation, easy documentation
+  author:       huqiu
+
+navigation:
+  name:    Bt-docs
+  left:
+    - path:     getting-started
+      title:    Getting Started
+
+analytics:
+  google:
+    account:    UA-43024238-1
+
