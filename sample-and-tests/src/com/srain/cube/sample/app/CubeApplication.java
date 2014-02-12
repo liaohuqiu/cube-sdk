@@ -3,8 +3,6 @@ package com.srain.cube.sample.app;
 import android.app.Application;
 
 import com.srain.cube.Cube;
-import com.srain.cube.image.imple.LruImageFileCache;
-import com.srain.cube.util.CLog;
 
 public class CubeApplication extends Application {
 
@@ -12,16 +10,19 @@ public class CubeApplication extends Application {
 	public void onCreate() {
 		super.onCreate();
 
-		LruImageFileCache.getDefault(this).initDiskCacheAsync();
+		// other code
+		// ..
 
-		CLog.DEBUG_IMAGE = false;
-		CLog.DEBUG_LIST = true;
-
-		Cube.init(this);
+		Cube.onCreate(this);
 	}
 
 	@Override
 	public void onTerminate() {
 		super.onTerminate();
+
+		// other code
+		// ...
+
+		Cube.onTerminate();
 	}
 }

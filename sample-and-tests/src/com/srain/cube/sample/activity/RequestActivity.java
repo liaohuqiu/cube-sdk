@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 
-import com.srain.cube.Cube;
 import com.srain.cube.sample.R;
 
 public class RequestActivity extends Activity {
@@ -13,7 +12,6 @@ public class RequestActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		Cube.init(getApplication());
 		testRequest();
 	}
 

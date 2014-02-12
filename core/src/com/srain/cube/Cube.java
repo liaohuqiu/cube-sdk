@@ -1,12 +1,12 @@
 package com.srain.cube;
 
-import com.srain.cube.util.LocalDisplay;
-import com.srain.cube.util.NetworkStatusManager;
-
 import android.app.Application;
 import android.content.Context;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
+
+import com.srain.cube.util.LocalDisplay;
+import com.srain.cube.util.NetworkStatusManager;
 
 public class Cube {
 
@@ -14,8 +14,12 @@ public class Cube {
 
 	private Application mApplication;
 
-	public static void init(Application app) {
+	public static void onCreate(Application app) {
 		instance = new Cube(app);
+	}
+
+	public static void onTerminate() {
+
 	}
 
 	private Cube(Application application) {
