@@ -1,6 +1,7 @@
-cube-sdk
-========
+`Cube` is a light package for Android development. 
 
-`Cube SDK` is a light package for Android development. It handles the Netwrok image and Network request.
+It handles the `Netwrok image` and `Network request`.
 
-Visit Github Page for more imformation: [`cube-sdk.liaohuqiu.net`](http://cube-sdk.liaohuqiu.net)
+Visit Github Page for more imformation.
+
+###[`cube-sdk.liaohuqiu.net`](http://cube-sdk.liaohuqiu.net)
