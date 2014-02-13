@@ -17,7 +17,7 @@ exclude:
   - "conf"
 
 info:
-  site_name:    Cube-sdk
+  site_name:    Cube SDK
 
 meta:
   description:  A android development framework. It make loading image and network request easy.
@@ -37,6 +37,8 @@ analytics:
     account:    UA-43024238-1
 
 download:
-  resp:         https://github.com/liaohuqiu/cube-sdk
+  rep:          https://github.com/liaohuqiu/cube-sdk
   dist:         https://github.com/liaohuqiu/cube-sdk/archive/master.zip
-
+  apk:          https://github.com/liaohuqiu/cube-sdk/blob/master/cube-sdk-sample.apk
+  qrcode:       /assets/img/qrcode.png
+  google_play:   /
