@@ -28,7 +28,7 @@ navigation:
   name:    Cube
   left:
     - path:     load-image
-      title:    Load Image
+      title:    Image Loader
     - path:     network-request
       title:    Network Request
 
@@ -39,6 +39,6 @@ analytics:
 download:
   rep:          https://github.com/liaohuqiu/cube-sdk
   dist:         https://github.com/liaohuqiu/cube-sdk/archive/master.zip
-  apk:          https://github.com/liaohuqiu/cube-sdk/blob/master/cube-sdk-sample.apk
+  apk:          https://github.com/liaohuqiu/cube-sdk/raw/master/cube-sdk-sample.apk
   qrcode:       /assets/img/qrcode.png
   google_play:   /
