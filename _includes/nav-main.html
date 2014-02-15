@@ -13,15 +13,16 @@
             <ul class="nav navbar-nav">
                 {% for item in site.navigation.left %}
                 <li{% if page.path == item.path %} class="active"{% endif %}>
-                <a href="/{{ item.path }}">{{ item.title }}</a>
+                <a href="{{ item.path }}">{{ item.title }}</a>
                 </li>
                 {% endfor %}
             </ul>
             <ul class="nav navbar-nav navbar-right">
-                <!--
-        <li><a href="{{ site.expo }}" onclick="_gaq.push(['_trackEvent', 'Navbar', 'Community links', 'Expo']);">Expo</a></li>
-        <li><a href="{{ site.blog }}" onclick="_gaq.push(['_trackEvent', 'Navbar', 'Community links', 'Blog']);">Blog</a></li>
-        -->
+                {% for item in site.navigation.right %}
+                <li>
+                <a href="{{ item.path }}">{{ item.title }}</a>
+                </li>
+                {% endfor %}
             </ul>
         </nav>
     </div>

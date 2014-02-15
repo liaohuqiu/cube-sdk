@@ -104,6 +104,7 @@ button.setText("Click to request");
 ```
 
 In the following code, you can see it is realy very simple to call the web API and use the data.
+
 ```
 OnClickListener onClickListener = new OnClickListener() {
 

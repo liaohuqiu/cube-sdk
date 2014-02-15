@@ -27,10 +27,13 @@ meta:
 navigation:
   name:    Cube
   left:
-    - path:     load-image
+    - path:     /load-image
       title:    Image Loader
-    - path:     network-request
+    - path:     /network-request
       title:    Network Request
+  right:
+    - title:    Fork on Github
+      path:     https://github.com/liaohuqiu/cube-sdk
 
 analytics:
   google:
