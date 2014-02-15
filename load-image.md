@@ -119,25 +119,42 @@ void onLoadFinish(ImageTask imageTask, CubeImageView cubeImageView, BitmapDrawab
 
 <p class='lead'>Most of the components interface has a default implementions, you can implement for your own application.</p>
 
-###Customize the loading image
+###A speical loading image
 There are lots of ways:
 
 1. Implement the interface `ImageLoadHandler`;
 
-2. Use the `DefaultImageLoadHandler`:
+1. Use the `DefaultImageLoadHandler` which implements `ImageLoadHandler`:
 
     ```
     DefaultImageLoadHandler handler = new DefaultImageLoadHandler();
-    handler.set();
+
+    // pick one of the following method
+    handler.setLoadingBitmap(Bitmap loadingBitmap);
+    handler.setLoadingResources(int loadingBitmap);
+    handler.setLoadingImageColor(int color);
+    handler.setLoadingImageColor(String colorString);
     ```
 
 ###Some speical effect after the image is loaded
 
-1.  In the `DefaultImageLoadHandler`, there is a fade in effect when the image is loaded, you can use this. This is on by default, you can call `setFadeIn(false)` to turn it off.
+1.  You can also implement the `ImageLoadHandler`, in the `onLoadFinish()` method, you can add whatever effect you want, as long as they are based on `Drawable`.
 
-2.  You can also implement the `ImageLoadHandler`, in the `onLoadFinish()` method, you can add whatever effect you want, as long as they are based on `Drawable`.
+2.  In the `DefaultImageLoadHandler`, there are some effects;
 
-###Diffrent url for diffrent size?
+    * **Fade in** by default, this effect is on.
+
+        ```
+    setImageFadeIn(boolean fadeIn);
+        ```
+    * **Rounded corner**
+
+        ```
+    setImageRounded(boolean rouded, float cornerRadius);
+        ```
+
+
+###Diffrent url for diffrent size
 
 If you have a thumbnail web service which can return multiple size image according the url, you can implements this method to return the specified url according the request size.
 
@@ -154,7 +171,3 @@ public class EtaoImageResizer extends DefaultResizer {
             // return url according the request size
     }
 ```
-
-
-
-###A webp format?
