@@ -35,7 +35,7 @@ public class ImageLoader {
 	protected static final boolean DEBUG = CLog.DEBUG_IMAGE;
 	protected static final String Log_TAG = "cube_image";
 
-	protected ImageTaskExcutor mImgageTaskExcutor;
+	protected ImageTaskExcutor mImageTaskExcutor;
 	protected ImageResizer mResizer;
 	protected ImageProvider mImageProvider;
 	protected ImageLoadHandler mImageLoadHandler;
@@ -53,28 +53,13 @@ public class ImageLoader {
 		FIRST_IN_FIRST_OUT, LAST_IN_FIRST_OUT
 	}
 
-	public ImageLoader(Context context, ImageProvider imageProvider, ImageTaskExcutor executor, ImageResizer imageResizer, ImageLoadHandler imageLoadHandler) {
+	public ImageLoader(Context context, ImageProvider imageProvider, ImageTaskExcutor imageTaskExcutor, ImageResizer imageResizer, ImageLoadHandler imageLoadHandler) {
 		mContext = context;
 		mResources = context.getResources();
 
-		if (imageProvider == null) {
-			imageProvider = ImageProvider.getDefault(context);
-		}
 		mImageProvider = imageProvider;
-
-		if (executor == null) {
-			executor = DefaultImageTaskExecutor.getInstance();
-		}
-		mImgageTaskExcutor = executor;
-
-		if (imageResizer == null) {
-			imageResizer = DefaultResizer.getInstance();
-		}
+		mImageTaskExcutor = imageTaskExcutor;
 		mResizer = imageResizer;
-
-		if (imageLoadHandler == null) {
-			imageLoadHandler = new DefaultImageLoadHandler(context);
-		}
 		mImageLoadHandler = imageLoadHandler;
 
 		mLoadWorkList = new HashMap<String, LoadImageTask>();
@@ -154,7 +139,7 @@ public class ImageLoader {
 
 		LoadImageTask loadImageTask = new LoadImageTask(imageTask);
 		mLoadWorkList.put(imageTask.getIdentityKey(), loadImageTask);
-		mImgageTaskExcutor.execute(loadImageTask);
+		mImageTaskExcutor.execute(loadImageTask);
 	}
 
 	/**
@@ -174,8 +159,8 @@ public class ImageLoader {
 	}
 
 	public void setTaskOrder(ImageTaskOrder order) {
-		if (null != mImgageTaskExcutor) {
-			mImgageTaskExcutor.setTaskOrder(order);
+		if (null != mImageTaskExcutor) {
+			mImageTaskExcutor.setTaskOrder(order);
 		}
 	}
 
@@ -298,7 +283,7 @@ public class ImageLoader {
 			Entry<String, LoadImageTask> item = it.next();
 			LoadImageTask task = item.getValue();
 			task.restart();
-			mImgageTaskExcutor.execute(task);
+			mImageTaskExcutor.execute(task);
 		}
 	}
 

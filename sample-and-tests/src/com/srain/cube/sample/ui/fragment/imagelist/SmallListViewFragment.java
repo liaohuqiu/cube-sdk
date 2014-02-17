@@ -10,10 +10,12 @@ import android.widget.ImageView.ScaleType;
 import android.widget.ListView;
 
 import com.srain.cube.image.CubeImageView;
+import com.srain.cube.image.ImageLoader;
+import com.srain.cube.image.ImageLoaderFactory;
+import com.srain.cube.image.imple.DefaultImageLoadHandler;
 import com.srain.cube.sample.R;
 import com.srain.cube.sample.activity.TitleBaseFragment;
 import com.srain.cube.sample.data.Images;
-import com.srain.cube.sample.image.SampleImageLoader;
 import com.srain.cube.util.LocalDisplay;
 import com.srain.cube.views.list.ListViewDataAdapter;
 import com.srain.cube.views.list.ViewHolderBase;
@@ -21,13 +23,14 @@ import com.srain.cube.views.list.ViewHolderCreator;
 
 public class SmallListViewFragment extends TitleBaseFragment {
 
-	private SampleImageLoader mImageLoader;
+	private ImageLoader mImageLoader;
 	public static final int sSmallImageSize = LocalDisplay.dp2px(100);
 
 	@Override
 	public View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-		mImageLoader = SampleImageLoader.create(getActivity());
+		mImageLoader = ImageLoaderFactory.create(getActivity());
+		((DefaultImageLoadHandler) mImageLoader.getImageLoadHandler()).setImageRounded(true, 15);
 
 		final View v = inflater.inflate(R.layout.fragment_image_list_small, container, false);
 

@@ -13,7 +13,7 @@
         android:padding="1dp" >
 
         <com.srain.cube.image.CubeImageView
-            android:id="@+id/tv_item_image_list_big"
+            android:id="@+id/iv_item_image_list_big"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="fitCenter" />

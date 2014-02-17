@@ -151,13 +151,17 @@ public abstract class CubeFragmentActivity extends FragmentActivity {
 					toast.show();
 					mCloseWarned = true;
 				} else {
-					super.onBackPressed();
+					returnBack();
 				}
 			} else {
 				mCloseWarned = false;
-				super.onBackPressed();
+				returnBack();
 			}
 		}
+	}
+
+	private void returnBack() {
+		super.onBackPressed();
 	}
 
 	public void hideKeyboardForCurrentFocus() {

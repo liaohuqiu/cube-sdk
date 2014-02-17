@@ -24,23 +24,26 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
     }
     public static final class color {
         public static final int base_background=0x7f040000;
-        public static final int base_font=0x7f040002;
-        public static final int base_google_blue=0x7f040001;
+        public static final int base_font=0x7f040001;
     }
     public static final class drawable {
         public static final int base_img_placeholder=0x7f020000;
         public static final int bg_border_normal=0x7f020001;
         public static final int ic_launcher=0x7f020002;
         public static final int pic2=0x7f020003;
-        public static final int selector_border=0x7f020004;
-        public static final int selector_border_normal=0x7f020005;
+        public static final int request_demo_divider=0x7f020004;
+        public static final int selector_border=0x7f020005;
+        public static final int selector_border_normal=0x7f020006;
+        public static final int selector_border_selected=0x7f020007;
     }
     public static final class id {
-        public static final int clear_cache=0x7f080013;
+        public static final int btn_request_demo_time=0x7f080012;
+        public static final int clear_cache=0x7f080017;
         public static final int id_fragment=0x7f080000;
+        public static final int input_request_demo_str=0x7f08000e;
         public static final int iv_bitmap=0x7f080009;
-        public static final int iv_item_home=0x7f08000e;
-        public static final int iv_item_iamge_list_grid=0x7f080011;
+        public static final int iv_item_iamge_list_grid=0x7f080015;
+        public static final int iv_item_image_list_big=0x7f080014;
         public static final int ly_header_bar_title_wrap=0x7f080001;
         public static final int ly_home_container=0x7f08000a;
         public static final int ly_image_list_big=0x7f08000c;
@@ -50,9 +53,11 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int ly_title_bar_center=0x7f080004;
         public static final int ly_title_bar_left=0x7f080003;
         public static final int ly_title_bar_right=0x7f080005;
-        public static final int tv_item_home_title=0x7f08000f;
-        public static final int tv_item_image_list_big=0x7f080010;
-        public static final int tv_item_image_list_small=0x7f080012;
+        public static final int tv_item_home_title=0x7f080013;
+        public static final int tv_item_image_list_small=0x7f080016;
+        public static final int tv_request_demo_ok=0x7f08000f;
+        public static final int tv_request_demo_result=0x7f080010;
+        public static final int tv_request_demo_server_time=0x7f080011;
         public static final int tv_title_bar_left=0x7f080006;
         public static final int tv_title_bar_right=0x7f080008;
         public static final int tv_title_bar_title=0x7f080007;
@@ -68,11 +73,12 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int fragment_image_gird=0x7f030007;
         public static final int fragment_image_list_big=0x7f030008;
         public static final int fragment_image_list_small=0x7f030009;
-        public static final int fragment_title_base=0x7f03000a;
-        public static final int item_home=0x7f03000b;
-        public static final int item_image_list_big=0x7f03000c;
-        public static final int item_image_list_grid=0x7f03000d;
-        public static final int item_image_list_small=0x7f03000e;
+        public static final int fragment_request=0x7f03000a;
+        public static final int fragment_title_base=0x7f03000b;
+        public static final int item_home=0x7f03000c;
+        public static final int item_image_list_big=0x7f03000d;
+        public static final int item_image_list_grid=0x7f03000e;
+        public static final int item_image_list_small=0x7f03000f;
     }
     public static final class menu {
         public static final int main_menu=0x7f070000;
@@ -91,6 +97,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int AppTheme=0x7f060000;
         public static final int AppTheme_FullScreen=0x7f060001;
         public static final int AppTheme_NoTitleBar=0x7f060002;
+        public static final int Login_edit_text=0x7f060003;
     }
     public static final class styleable {
         /** Attributes that can be used with a ScrollHeaderFrame.

@@ -1,6 +1,5 @@
 package com.srain.cube.sample.ui.fragment;
 
-import android.R.integer;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
@@ -59,7 +58,6 @@ public class BitmapFragment extends TitleBaseFragment {
 	}
 
 	private Bitmap convert1(Bitmap src, Rect srcR, int width, int height, ScaleType scaleType, Matrix m) {
-
 		return null;
 	}
 

@@ -5,7 +5,7 @@ import android.support.v4.util.LruCache;
 import android.util.Log;
 
 import com.srain.cube.image.ImageProvider;
-import com.srain.cube.image.RecyclingBitmapDrawable;
+import com.srain.cube.image.drawable.RecyclingBitmapDrawable;
 import com.srain.cube.image.iface.ImageMemoryCache;
 import com.srain.cube.util.CLog;
 

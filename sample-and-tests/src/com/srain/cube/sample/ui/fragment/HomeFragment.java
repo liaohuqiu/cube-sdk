@@ -54,11 +54,11 @@ public class HomeFragment extends TitleBaseFragment {
 			}
 		}));
 
-		mItemInfos.add(new ItemInfo("Bitmap Data", "#4d90fe", new OnClickListener() {
+		mItemInfos.add(new ItemInfo("API Request", "#4d90fe", new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				getContext().pushFragmentToBackStatck(BitmapFragment.class, null);
+				getContext().pushFragmentToBackStatck(RequestDemoFragment.class, null);
 			}
 		}));
 
@@ -101,8 +101,9 @@ public class HomeFragment extends TitleBaseFragment {
 		ViewGroup view = (ViewGroup) LayoutInflater.from(getContext()).inflate(R.layout.item_home, null);
 		view.setLayoutParams(new ViewGroup.LayoutParams(size, size));
 
-		((TextView) view.findViewById(R.id.tv_item_home_title)).setText(mItemInfos.get(index).mTitle);
-		view.findViewById(R.id.iv_item_home).setBackgroundColor(mItemInfos.get(index).getColor());
+		TextView textView = ((TextView) view.findViewById(R.id.tv_item_home_title));
+		textView.setText(mItemInfos.get(index).mTitle);
+		view.setBackgroundColor(mItemInfos.get(index).getColor());
 		return view;
 	}
 

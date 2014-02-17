@@ -21,10 +21,10 @@ public interface ImageLoadHandler {
 	/**
 	 * When begin to load the image from disk or network.
 	 */
-	public void onLoading(ImageTask imageTask, CubeImageView cubeImageView);
+	void onLoading(ImageTask imageTask, CubeImageView cubeImageView);
 
 	/**
 	 * After image is loaded.
 	 */
-	public void onLoadFinish(ImageTask imageTask, CubeImageView cubeImageView, BitmapDrawable drawable);
+	void onLoadFinish(ImageTask imageTask, CubeImageView cubeImageView, BitmapDrawable drawable);
 }

@@ -4,13 +4,6 @@
     android:layout_height="match_parent"
     android:layout_gravity="center" >
 
-    <ImageView
-        android:id="@+id/iv_item_home"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerInParent="true"
-        android:background="@color/base_google_blue" />
-
     <TextView
         android:id="@+id/tv_item_home_title"
         android:layout_width="wrap_content"

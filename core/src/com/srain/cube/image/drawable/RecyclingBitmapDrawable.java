@@ -1,7 +1,8 @@
-package com.srain.cube.image;
+package com.srain.cube.image.drawable;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
 
 /**
@@ -11,7 +12,7 @@ import android.util.Log;
  * 
  * Most of the code is taken from the Android best practice of displaying Bitmaps <a href="http://developer.android.com/training/displaying-bitmaps/index.html">Displaying Bitmaps Efficiently</a>.
  */
-public class RecyclingBitmapDrawable extends CubeBitmapDrawable {
+public class RecyclingBitmapDrawable extends BitmapDrawable {
 
 	static final String LOG_TAG = "cube_image";
 	static final boolean DEBUG = false;

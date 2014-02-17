@@ -7,4 +7,11 @@
 
     <style name="AppTheme.NoTitleBar" parent="@android:style/Theme.Black.NoTitleBar"></style>
 
+    <style name="Login_edit_text">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/base_font</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
 </resources>

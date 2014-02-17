@@ -3,6 +3,7 @@ package com.srain.cube.sample.app;
 import android.app.Application;
 
 import com.srain.cube.Cube;
+import com.srain.cube.util.CLog;
 
 public class CubeApplication extends Application {
 
@@ -13,6 +14,7 @@ public class CubeApplication extends Application {
 		// other code
 		// ..
 
+		CLog.DEBUG_IMAGE = true;
 		Cube.onCreate(this);
 	}
 

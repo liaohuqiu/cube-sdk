@@ -13,10 +13,11 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.srain.cube.image.CubeImageView;
+import com.srain.cube.image.ImageLoader;
+import com.srain.cube.image.ImageLoaderFactory;
 import com.srain.cube.sample.R;
 import com.srain.cube.sample.activity.TitleBaseFragment;
 import com.srain.cube.sample.data.Images;
-import com.srain.cube.sample.image.SampleImageLoader;
 import com.srain.cube.util.LocalDisplay;
 import com.srain.cube.views.list.ListViewDataAdapter;
 import com.srain.cube.views.list.ViewHolderBase;
@@ -26,13 +27,13 @@ public class BigListViewFragment extends TitleBaseFragment {
 
 	private static final int sBigImageSize = LocalDisplay.SCREEN_WIDTH_PIXELS - LocalDisplay.dp2px(10 + 10);
 
-	private SampleImageLoader mImageLoader;
+	private ImageLoader mImageLoader;
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 	@Override
 	public View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-		mImageLoader = SampleImageLoader.create(getActivity());
+		mImageLoader = ImageLoaderFactory.create(getActivity());
 		final View v = inflater.inflate(R.layout.fragment_image_list_big, container, false);
 
 		ListView listView = (ListView) v.findViewById(R.id.ly_image_list_big);
@@ -58,7 +59,7 @@ public class BigListViewFragment extends TitleBaseFragment {
 		@Override
 		public View createView(LayoutInflater inflater) {
 			View view = inflater.inflate(R.layout.item_image_list_big, null);
-			mImageView = (CubeImageView) view.findViewById(R.id.tv_item_image_list_big);
+			mImageView = (CubeImageView) view.findViewById(R.id.iv_item_image_list_big);
 			mImageView.setScaleType(ScaleType.CENTER_CROP);
 
 			LinearLayout.LayoutParams lyp = new LinearLayout.LayoutParams(sBigImageSize, sBigImageSize);

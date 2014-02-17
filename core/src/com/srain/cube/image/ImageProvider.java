@@ -17,6 +17,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.srain.cube.file.DiskLruCache;
+import com.srain.cube.image.drawable.RecyclingBitmapDrawable;
 import com.srain.cube.image.iface.ImageMemoryCache;
 import com.srain.cube.image.iface.ImageResizer;
 import com.srain.cube.image.imple.DefaultMemoryCache;
@@ -79,7 +80,7 @@ public class ImageProvider {
 		if (bitmap != null) {
 			if (Version.hasHoneycomb()) {
 				// Running on Honeycomb or newer, so wrap in a standard BitmapDrawable
-				drawable = new CubeBitmapDrawable(resources, bitmap);
+				drawable = new BitmapDrawable(resources, bitmap);
 			} else {
 				// Running on Gingerbread or older, so wrap in a RecyclingBitmapDrawable
 				// which will recycle automagically
@@ -243,14 +244,6 @@ public class ImageProvider {
 		Bitmap bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor, null, options);
 
 		return bitmap;
-	}
-
-	private Bitmap convertForImageViewScaleType(Bitmap src, ImageTask imageTask) {
-		CubeImageView imageView = imageTask.getAImageView();
-		if (imageView != null && src != null) {
-			return imageView.convertBitmap(src);
-		}
-		return src;
 	}
 
 	public void flushFileCache() {

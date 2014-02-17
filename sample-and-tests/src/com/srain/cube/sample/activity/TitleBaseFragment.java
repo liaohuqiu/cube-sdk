@@ -12,7 +12,7 @@ import com.srain.cube.sample.R;
 import com.srain.cube.sample.ui.views.header.TitleHeaderBar;
 
 /**
- * 带页头的 Activity基类
+ * 带页头的 页面基类
  * 
  * <p>
  * 使用一个orientation="vertical", LinearLayout，包含一个统一的页头{@link TitleHeaderBar} , 内容置于页头下部
@@ -25,8 +25,6 @@ import com.srain.cube.sample.ui.views.header.TitleHeaderBar;
 public abstract class TitleBaseFragment extends CubeFragment {
 
 	protected TitleHeaderBar mTitleHeaderBar;
-
-	protected abstract View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState);
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

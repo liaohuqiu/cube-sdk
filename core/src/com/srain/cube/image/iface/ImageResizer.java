@@ -12,14 +12,14 @@ public interface ImageResizer {
 	/**
 	 * Return the {@link BitmapFactory.Options#inSampleSize}, which will be used when load the image from the disk.
 	 * 
-	 * You should better calculate this value accroding the hard device of the mobile.
+	 * You should better calculate this value according the hard device of the mobile.
 	 */
-	public int getInSampleSize(ImageTask imageTask);
+	int getInSampleSize(ImageTask imageTask);
 
 	/**
-	 * If you have a thrumb web service which can return multiple size image acrroding the url,
+	 * If you have a thumbnail web service which can return multiple size image according the url,
 	 * 
-	 * you can implements this method to return the specified url accoding the request size.
+	 * you can implements this method to return the specified url according the request size.
 	 */
-	public String getResizedUrl(ImageTask imageTask);
+	String getResizedUrl(ImageTask imageTask);
 }

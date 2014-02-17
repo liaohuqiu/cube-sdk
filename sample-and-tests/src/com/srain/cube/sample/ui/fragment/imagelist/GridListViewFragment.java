@@ -11,10 +11,11 @@ import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 
 import com.srain.cube.image.CubeImageView;
+import com.srain.cube.image.ImageLoader;
+import com.srain.cube.image.ImageLoaderFactory;
 import com.srain.cube.sample.R;
 import com.srain.cube.sample.activity.TitleBaseFragment;
 import com.srain.cube.sample.data.Images;
-import com.srain.cube.sample.image.SampleImageLoader;
 import com.srain.cube.util.LocalDisplay;
 import com.srain.cube.views.list.ListViewDataAdapter;
 import com.srain.cube.views.list.ViewHolderBase;
@@ -23,12 +24,12 @@ import com.srain.cube.views.list.ViewHolderCreator;
 public class GridListViewFragment extends TitleBaseFragment {
 
 	private static final int sGirdImageSize = (LocalDisplay.SCREEN_WIDTH_PIXELS - LocalDisplay.dp2px(10 + 10 + 10)) / 2;
-	private SampleImageLoader mImageLoader;
+	private ImageLoader mImageLoader;
 
 	@Override
 	public View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-		mImageLoader = SampleImageLoader.create(getActivity());
+		mImageLoader = ImageLoaderFactory.create(getActivity());
 
 		final View v = inflater.inflate(R.layout.fragment_image_gird, container, false);
 		GridView gridListView = (GridView) v.findViewById(R.id.ly_image_list_grid);

@@ -3,6 +3,7 @@ package com.srain.cube.image.imple;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -10,9 +11,9 @@ import android.graphics.drawable.TransitionDrawable;
 import android.util.Log;
 import android.view.ViewGroup;
 
-import com.srain.cube.image.CubeBitmapDrawable;
 import com.srain.cube.image.CubeImageView;
 import com.srain.cube.image.ImageTask;
+import com.srain.cube.image.drawable.RoundedDrawable;
 import com.srain.cube.image.iface.ImageLoadHandler;
 import com.srain.cube.util.CLog;
 import com.srain.cube.util.Version;
@@ -29,22 +30,49 @@ public class DefaultImageLoadHandler implements ImageLoadHandler {
 	private final static boolean DEBUG = CLog.DEBUG_IMAGE;
 	private final static String Log_TAG = "cube_image";
 	private final static String MSG_LOADING = "%s onLoading";
-	private final static String MSG_LOAD_FINISH = "%s onLoadFinish %s";
+	private final static String MSG_LOAD_FINISH = "%s onLoadFinish %s %s %s %s";
 
 	private Context mContext;
-	private boolean mFadeInBitmap = true;
-	private BitmapDrawable mLoadingBitmapDrawable;
+	private final static int DISPLAY_FADE_IN = 0x01;
+	private final static int DISPLAY_ROUNDED = 0x02;
+
+	private int mDisplayTag = DISPLAY_FADE_IN;
+
+	private Drawable mLoadingDrawable;
+	private int mLoadingColor = -1;
+	private float mCornerRadius = 10;
+
 	private boolean mResizeImageViewAfterLoad = false;
 
 	public DefaultImageLoadHandler(Context context) {
 		mContext = context;
+		if (Version.hasHoneycomb()) {
+			int color = Color.parseColor("#fafafa");
+			mLoadingDrawable = new ColorDrawable(color);
+		}
 	}
 
 	/**
 	 * If set to true, the image will fade-in once it has been loaded by the background thread.
 	 */
 	public void setImageFadeIn(boolean fadeIn) {
-		mFadeInBitmap = fadeIn;
+		if (fadeIn) {
+			mDisplayTag |= DISPLAY_FADE_IN;
+		} else {
+			mDisplayTag &= ~DISPLAY_FADE_IN;
+		}
+	}
+
+	/**
+	 * 
+	 */
+	public void setImageRounded(boolean rouded, float cornerRadius) {
+		if (rouded) {
+			mDisplayTag |= DISPLAY_ROUNDED;
+			mCornerRadius = cornerRadius;
+		} else {
+			mDisplayTag &= ~DISPLAY_ROUNDED;
+		}
 	}
 
 	public void setReszieImageViewAfterLoad(boolean resize) {
@@ -56,15 +84,37 @@ public class DefaultImageLoadHandler implements ImageLoadHandler {
 	 */
 	public void setLoadingBitmap(Bitmap loadingBitmap) {
 		if (Version.hasHoneycomb()) {
-			mLoadingBitmapDrawable = new CubeBitmapDrawable(mContext.getResources(), loadingBitmap);
+			mLoadingDrawable = new BitmapDrawable(mContext.getResources(), loadingBitmap);
 		}
 	}
 
 	/**
-	 * set the placeholder bitmap
+	 * set the placeholder Image
+	 * 
+	 * @param loadingBitmap
+	 *            the resources id
 	 */
-	public void setLoadingBitmap(int loadingBitmap) {
+	public void setLoadingResources(int loadingBitmap) {
 		setLoadingBitmap(BitmapFactory.decodeResource(mContext.getResources(), loadingBitmap));
+	}
+
+	/**
+	 * set the placeholder by color
+	 * 
+	 * @param color
+	 */
+	public void setLoadingImageColor(int color) {
+		mLoadingColor = color;
+		mLoadingDrawable = new ColorDrawable(color);
+	}
+
+	/**
+	 * set the placeholder image by color string like: #ffffff
+	 * 
+	 * @param colorString
+	 */
+	public void setLoadingImageColor(String colorString) {
+		setLoadingImageColor(Color.parseColor(colorString));
 	}
 
 	@Override
@@ -73,8 +123,8 @@ public class DefaultImageLoadHandler implements ImageLoadHandler {
 			Log.d(Log_TAG, String.format(MSG_LOADING, imageTask));
 		}
 		if (Version.hasHoneycomb()) {
-			if (mLoadingBitmapDrawable != null && imageView != null && imageView.getDrawable() != mLoadingBitmapDrawable) {
-				imageView.setImageDrawable(mLoadingBitmapDrawable);
+			if (mLoadingDrawable != null && imageView != null && imageView.getDrawable() != mLoadingDrawable) {
+				imageView.setImageDrawable(mLoadingDrawable);
 			}
 		} else {
 			imageView.setImageDrawable(null);
@@ -84,6 +134,7 @@ public class DefaultImageLoadHandler implements ImageLoadHandler {
 	@Override
 	public void onLoadFinish(ImageTask imageTask, CubeImageView imageView, BitmapDrawable drawable) {
 
+		Drawable d = drawable;
 		if (drawable != null) {
 
 			if (mResizeImageViewAfterLoad) {
@@ -97,24 +148,32 @@ public class DefaultImageLoadHandler implements ImageLoadHandler {
 						lyp.width = w;
 						lyp.height = h;
 						imageView.setLayoutParams(lyp);
-						Log.d(Log_TAG, String.format("resize %s %s", w, h));
 					}
 				}
 			}
-			if (mFadeInBitmap) {
-				final TransitionDrawable td = new TransitionDrawable(new Drawable[] { new ColorDrawable(android.R.color.transparent), drawable });
+
+			// RoundedDrawable will not recycle automatically when API level is lower than 11
+			if ((mDisplayTag & DISPLAY_ROUNDED) == DISPLAY_ROUNDED && Version.hasHoneycomb()) {
+				d = new RoundedDrawable(drawable.getBitmap(), mCornerRadius, 0);
+			}
+			if ((mDisplayTag & DISPLAY_FADE_IN) == DISPLAY_FADE_IN) {
+				int loadingColor = android.R.color.transparent;
+				if (mLoadingColor != -1) {
+					loadingColor = mLoadingColor;
+				}
+				final TransitionDrawable td = new TransitionDrawable(new Drawable[] { new ColorDrawable(loadingColor), d });
 				imageView.setImageDrawable(td);
 				td.startTransition(200);
 			} else {
 
 				if (DEBUG) {
-					Drawable d = imageView.getDrawable();
+					Drawable oldDrawable = imageView.getDrawable();
 					int w = 0, h = 0;
-					if (d != null) {
-						w = d.getIntrinsicWidth();
-						h = d.getIntrinsicHeight();
+					if (oldDrawable != null) {
+						w = oldDrawable.getIntrinsicWidth();
+						h = oldDrawable.getIntrinsicHeight();
 					}
-					Log.d(Log_TAG, String.format("onLoadFinish %s %s %s %s", w, h, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight()));
+					Log.d(Log_TAG, String.format(MSG_LOAD_FINISH, imageTask, w, h, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight()));
 				}
 				imageView.setImageDrawable(drawable);
 			}
