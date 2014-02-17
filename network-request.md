@@ -131,3 +131,6 @@ OnClickListener onClickListener = new OnClickListener() {
 };
 button.setOnClickListener(onClickListener);
 ```
+#Request Cache
+
+To be continued.
