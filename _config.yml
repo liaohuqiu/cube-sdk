@@ -1,5 +1,5 @@
 # Dependencies
-markdown:         rdiscount
+markdown:         redcarpet
 pygments:         true
 
 # Permalinks
@@ -27,9 +27,9 @@ meta:
 navigation:
   name:    Cube
   left:
-    - path:     /load-image
+    - path:     /imageloader
       title:    Image Loader
-    - path:     /network-request
+    - path:     /request
       title:    Network Request
   right:
     - title:    Fork on Github
@@ -45,3 +45,6 @@ download:
   apk:          https://github.com/liaohuqiu/cube-sdk/raw/master/cube-sdk-sample.apk
   qrcode:       /assets/img/qrcode.png
   google_play:   /
+
+
+languages:      ["en", "cn"]

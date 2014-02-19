@@ -13,20 +13,20 @@ lead: "Make Loading Image Efficiently & Easily."
 
 1. First, create an `ImageLoader`:
 
-    ```
+    ```java
     Context context;
     ImageLoader imageLoader = ImageLoaderFatory.create(context);
     ```
 
 2. Find the ImageView in which the image will be loaded.
 
-    ```
+    ```java
     CubeImageView imageView = (CubeImageView) view.findViewById(R.id.iv_item_image_list_big);
     ```
 
     `CubeImageView` is a subclass of `ImageView`, the layout file maybe like:
 
-    ```
+    ```xml
     <?xml version="1.0" encoding="utf-8"?>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="wrap_content"
@@ -44,7 +44,7 @@ lead: "Make Loading Image Efficiently & Easily."
 
 3. Use the ImageView and the ImageLoader to load image
 
-    ```
+    ```java
     String url = '';
     imageView.loadImage(imageLoader, url);
     ```
@@ -71,7 +71,7 @@ There are four components used in `ImageLoader` to load image. As you can see in
 
 * `ImageLoader`
 
-    ```
+    ```java
     public ImageLoader(Context context, 
     
                             ImageProvider provider, 
@@ -126,7 +126,7 @@ There are lots of ways:
 
 1. Use the `DefaultImageLoadHandler` which implements `ImageLoadHandler`:
 
-    ```
+    ```java
     DefaultImageLoadHandler handler = new DefaultImageLoadHandler();
 
     // pick one of the following method
@@ -141,15 +141,14 @@ There are lots of ways:
 1.  You can also implement the `ImageLoadHandler`, in the `onLoadFinish()` method, you can add whatever effect you want, as long as they are based on `Drawable`.
 
 2.  In the `DefaultImageLoadHandler`, there are some effects;
-
     * **Fade in** by default, this effect is on.
 
-        ```
+        ```java
     setImageFadeIn(boolean fadeIn);
         ```
     * **Rounded corner**
 
-        ```
+        ```java
     setImageRounded(boolean rouded, float cornerRadius);
         ```
 
@@ -160,7 +159,7 @@ If you have a thumbnail web service which can return multiple size image accordi
 
 That is easy:
 
-```
+```java
 public class EtaoImageResizer extends DefaultResizer {
 
     public String getResizedUrl(ImageTask imageTask) {
@@ -170,4 +169,5 @@ public class EtaoImageResizer extends DefaultResizer {
 
             // return url according the request size
     }
+}
 ```

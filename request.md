@@ -15,7 +15,7 @@ It takes a input parameter: `str`, then reverse it.
 
 The conent of the `reverse.php`:
 
-```
+```php
 <?php
 date_default_timezone_set('UTC');
 $msg = $_REQUEST['str'];
@@ -40,7 +40,7 @@ echo json_encode($data);
 
 The output json:
 
-```
+```json
 {
     ok: 1,
     str: "123"
@@ -53,7 +53,7 @@ The output json:
 
 It is a good practice to encapsulate all the request logic in a module, for example:
 
-```
+```java
 public class SampleRequest {
 
     /**
@@ -93,7 +93,7 @@ public class SampleRequest {
 
 The controls:
 
-```
+```java
 final EditText inpuText = (EditText) view.findViewById(R.id.input_request_demo_str);
 final TextView okTextView = (TextView) view.findViewById(R.id.tv_request_demo_ok);
 final TextView resultTimeTextView = (TextView) view.findViewById(R.id.tv_request_demo_result);
@@ -105,7 +105,7 @@ button.setText("Click to request");
 
 In the following code, you can see it is realy very simple to call the web API and use the data.
 
-```
+```java
 OnClickListener onClickListener = new OnClickListener() {
 
     @Override

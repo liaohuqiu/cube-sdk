@@ -7,13 +7,13 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a href="/" class="navbar-brand">{{ site.navigation.name }}</a>
+            <a href="{{ site.baseurl }}" class="navbar-brand">{{ site.navigation.name }}</a>
         </div>
         <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
             <ul class="nav navbar-nav">
                 {% for item in site.navigation.left %}
                 <li{% if page.path == item.path %} class="active"{% endif %}>
-                <a href="{{ item.path }}">{{ item.title }}</a>
+                <a href="{{ site.baseurl }}{{ item.path }}">{{ item.title }}</a>
                 </li>
                 {% endfor %}
             </ul>
