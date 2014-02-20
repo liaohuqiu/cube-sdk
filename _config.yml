@@ -16,7 +16,6 @@ encoding:         UTF-8
 exclude:
   - "conf"
   - "tools"
-  - "CNAME"
 
 info:
   site_name:    Cube SDK
