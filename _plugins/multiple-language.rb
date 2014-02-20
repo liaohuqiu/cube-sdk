@@ -29,8 +29,8 @@ module Jekyll
             languages.drop(1).each do |lang|
 
                 # Build site for language
-                self.dest = self.bind_path(self.dest, lang)
-                self.config['baseurl'] = self.bind_path(self.config['baseurl'], lang)
+                self.dest = File.join(self.dest, lang)
+                self.config['baseurl'] = File.join(self.config['baseurl'], lang)
                 self.config['lang'] = lang
 
                 inner_process
@@ -43,25 +43,21 @@ module Jekyll
         end
 
         def inner_process()
-            puts "Building site for language: \"#{self.config['lang']}\" to: " + self.dest
+            puts "Try to building site for language: \"#{self.config['lang']}\" to: " + self.dest
             process_org
-        end
-
-        def bind_path(path1, path2)
-            if !path1 || path1 == ''
-                return '/' + path2
-            end
-            if path1[-1].chr == "/"
-                path1 += path2
-            else
-                path1 += '/' + path2
-            end
-            path1
+            puts
         end
 
         def read
             self.read_layouts
-            self.read_directories("/lang/" + self.config['lang']);
+
+
+            lang_path = "/lang/" + self.config['lang']
+            if File.exists?(File.join(self.source, lang_path))
+                self.read_directories(lang_path)
+            else
+                puts "Language directory is not exist: " + lang_path
+            end
             self.read_directories
             self.read_data(config['data_source'])
         end
