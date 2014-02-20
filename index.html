@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="A android development framework. It make loading image and network request easy.">
+<meta name="keywords" content="Cube-SDK, Android development framework, Image Loader, Easy netwrok request.">
+<meta name="author" content="liaohuqiu@gmail.com">
+
+<title>
+  
+  Cube SDK &middot; Cube SDK
+  
+</title>
+
+<!-- Bootstrap core CSS -->
+<link href="/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Documentation extras -->
+<link href="/assets/css/docs.min.css" rel="stylesheet">
+<!--[if lt IE 9]><script src="../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+
+<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+  <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Favicons -->
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="/assets/ico/apple-touch-icon-144-precomposed.png">
+<link rel="shortcut icon" href="/assets/ico/favicon.ico">
+
+<script>
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-43024238-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+
+  </head>
+  <body>
+    <a class="sr-only" href="#content">Skip to main content</a>
+
+    <!-- Docs master nav -->
+    <header class="navbar navbar-static-top bs-docs-nav" role="banner">
+    <div class="container">
+        <div class="navbar-header">
+            <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Cube</a>
+        </div>
+        <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+            <ul class="nav navbar-nav">
+                
+                <li>
+                <a href="/imageloader">Image Loader</a>
+                </li>
+                
+                <li>
+                <a href="/request">Network Request</a>
+                </li>
+                
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                
+                <li>
+                <a href="https://github.com/liaohuqiu/cube-sdk">Fork on Github</a>
+                </li>
+                
+            </ul>
+        </nav>
+    </div>
+</header>
+
+
+    <!-- Docs page layout -->
+    <div class="bs-header" id="content">
+      <div class="container">
+        <h1>Cube SDK</h1>
+        <p>For andorid development</p>
+      </div>
+    </div>
+
+    <div class="container bs-docs-container">
+
+      <div class="row">
+        <div class="col-md-9" role="main">
+          <div class="bs-docs-section">
+    <h1 id="what-it-can-do" class="page-header">What it can do?</h1>
+    <p class='lead'>It is a light andorid development framework.</p>
+
+    <div class="row bs-downloads">
+        <div class="col-sm-4">
+            <h3>Load Image</h3>
+            <p>Load network image efficiently and easily.</p>
+        </div>
+        <div class="col-sm-4">
+            <h3>Network request</h3>
+            <p>Easy to process network API request.</p>
+        </div>
+        <div class="col-sm-4">
+            <h3>Toolkits</h3>
+        </div>
+    </div>
+
+</div>
+
+<div class="bs-docs-section">
+    <h1 id="getting-started" class="page-header">Getting Started</h1>
+
+    <h2 id="download">Download</h2>
+    <p class='lead'>You can fork the github repository, then use the library project in your project or download zip package.</p>
+
+    <div class="row bs-downloads">
+        <div class="col-sm-4">
+            <h3>Github</h3>
+            <p>Fork it in Github, use the souce code in your project.</p>
+            <a href="https://github.com/liaohuqiu/cube-sdk" class="btn btn-lg btn-outline" role="button" >View on Github</a>
+        </div>
+        <div class="col-sm-4">
+            <h3 id="download-zip">Zip</h3>
+            <p>Down load the zip and use it in your project.</p>
+            <a href="https://github.com/liaohuqiu/cube-sdk/archive/master.zip" class="btn btn-lg btn-outline" role="button" >Download Cube-SDK</a>
+        </div>
+    </div>
+
+    <h2 id="configure">Configure</h2>
+    <p>Once add cube library to your project, you can use the following code to configure this framework.</p>
+
+<div class="highlight"><pre><code class="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">CubeApplication</span> <span class="kd">extends</span> <span class="n">Application</span> <span class="o">{</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">.</span><span class="na">onCreate</span><span class="o">();</span>
+
+        <span class="c1">// other code</span>
+        <span class="c1">// ..</span>
+
+        <span class="n">Cube</span><span class="o">.</span><span class="na">onCreate</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onTerminate</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">.</span><span class="na">onTerminate</span><span class="o">();</span>
+
+        <span class="c1">// other code</span>
+        <span class="c1">// ...</span>
+
+        <span class="n">Cube</span><span class="o">.</span><span class="na">onTerminate</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>
+</div>
+
+<div class="bs-docs-section">
+    <h1 id="sample" class="page-header">Sample</h1>
+    <p class='lead'>The sample shows how it works, you can build it by the source code or download it and install it.</p>
+
+    <h2 id="sample-snapshot">Snapshots</h2>
+    <div class="row bs-downloads">
+        <div class="col-sm-4">
+            <h3>Gird image</h3>
+            <div class="thumbnail">
+                <img src="/assets/img/sample-snapshot/cube-image-grid.png" alt="">
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <h3>Small image</h3>
+            <div class="thumbnail">
+                <img src="/assets/img/sample-snapshot/cube-image-small.png" alt="">
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <h3>Big image</h3>
+            <div class="thumbnail">
+                <img src="/assets/img/sample-snapshot/cube-image-big.png" alt="">
+            </div>
+        </div>
+    </div>
+
+    <h2 id="install-sample">Install sample App</h2>
+    <div class="row">
+        <div class="col-sm-4">
+            <h3>Build from source</h3>
+            <p>If you has downloaded the souce code or forked the github repository, you can open the sample project.</p>
+        </div>
+        <div class="col-sm-4">
+            <h3>Download</h3>
+            <p>Download the apk file then install it manually.</p>
+            <a href="https://github.com/liaohuqiu/cube-sdk/raw/master/cube-sdk-sample.apk" class="btn btn-lg btn-outline" role="button" >Download</a>
+        </div>
+        <!--
+        <div class="col-sm-4">
+            <h3>Google Play</h3>
+            <p>Access this sample App in Google Play.</p>
+            <a href="/" class="btn btn-lg btn-outline" role="button" >Google Play</a>
+        </div>
+    </div>
+    <div class='row'>
+        -->
+        <div class="col-sm-4">
+            <h3>Scan</h3>
+            <div class='thumbnail'>
+                <img src="/assets/img/qrcode.png" alt="">
+            </div>
+        </div>
+    </div>
+
+</div>
+
+        </div>
+        <div class="col-md-3">
+          <div class="bs-sidebar hidden-print" role="complementary">
+            <ul class="nav bs-sidenav">
+                <!-- auto gen -->
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer
+================================================== -->
+<footer class="bs-footer" role="contentinfo">
+  <div class="container">
+  </div>
+</footer>
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="/assets/js/jquery.min.js"></script>
+<script src="/dist/js/bootstrap.min.js"></script>
+<script src="/assets/js/docs.min.js"></script>
+
+  </body>
+</html>
