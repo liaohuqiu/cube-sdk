@@ -22,6 +22,6 @@ if [ $error_code != 0 ];then
     echo 'Switch branch fail.'
     exit
 else
-    cmd="ls | grep -v _site|xargs rm && cp -r _site/* . && rm -rf _site/ && touch .nojekyll"
-    echo $cmd
+    cmd="ls | grep -v _site|xargs rm -rf && cp -r _site/* . && rm -rf _site/ && touch .nojekyll"
+    exe_cmd $cmd
 fi
