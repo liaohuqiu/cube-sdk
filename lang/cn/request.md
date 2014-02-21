@@ -1,19 +1,20 @@
 ---
 layout: default
-title: Network Request
-lead: Request data in a simple way, then use the data easily.
+title: 网络请求
+lead: 简单的网络请求，方便地使用接口数据。
 ---
 
-#Usage
+#用法
 ---
 
-##The Web API
-A sample API to reverse string:
+##服务器端API
+在Demo中，我们使用了一个反转字符串的服务器端接口：`reverse`，
 [http://cube-server.liaohuqiu.net/api_demo/reverse.php](http://cube-server.liaohuqiu.net/api_demo/reverse.php)
 
-It takes a input parameter: `str`, then reverse it.
+传入一个参数:
+`str`，反转，然后输出。比如输入`123`，输入`321`。输出为`json`格式。
 
-The conent of the `reverse.php`:
+下面是这个接口的内容，非常简单，`reverse.php`:
 
 ```php
 <?php
@@ -34,24 +35,24 @@ $data['server_time'] = date('Y-m-d H:i:s');
 echo json_encode($data);
 ```
 
-####A sample request:
+####一个请求的例子:
 
 [http://cube-server.liaohuqiu.net/api_demo/reverse.php?str=123](http://cube-server.liaohuqiu.net/api_demo/reverse.php?str=123)
 
-The output json:
+输出的结果为：
 
 ```json
 {
-    ok: 1,
-    str: "123"
-    result: "321",
-    server_time: "2014-02-14 15:56:25"
+    "ok": 1,
+    "str": "123",
+    "result": "321",
+    "server_time": "2014-02-14 23:56:25"
 }
 ```
 
-##Encapsulate Reuqest
+##请求封装
 
-It is a good practice to encapsulate all the request logic in a module, for example:
+我们建议，把网络请求进行封装，放在数据层。使用的时候，调用数据层，将数据显示在界面上。如下：
 
 ```java
 public class SampleRequest {
@@ -74,12 +75,12 @@ public class SampleRequest {
 }
 ```
 
-##The UI
+##界面
 
 <div class='row'>
     <div class="col-sm-10">
-        <h3>Request Demo</h3>
-        <p class='lead'>Click the button in the buttom, fetch the data, then display the data.</p>
+        <h3>网络请求的Demo</h3>
+        <p>功能：点击底部的按钮，利用输入的输入数据访问服务器端接口，然后将结果显示出来。</p>
     </div>
 </div>
 <div class='row'>
@@ -91,7 +92,7 @@ public class SampleRequest {
 </div>
 
 
-The controls:
+界面上的元素:
 
 ```java
 final EditText inpuText = (EditText) view.findViewById(R.id.input_request_demo_str);
@@ -103,7 +104,7 @@ final TextView button = (TextView) view.findViewById(R.id.btn_request_demo_time)
 button.setText("Click to request");
 ```
 
-In the following code, you can see it is realy very simple to call the web API and use the data.
+点击按钮的时候，调用数据层接口，然后显示出来：
 
 ```java
 OnClickListener onClickListener = new OnClickListener() {
@@ -115,11 +116,13 @@ OnClickListener onClickListener = new OnClickListener() {
 
         String str = inpuText.getText().toString();
 
+        // 调用数据层接口
         SampleRequest.reverse(str, new JsonRequestSuccHandler() {
 
                 @Override
                 public void onRequestFinish(JsonData jsonData) {
 
+                // 更新显示
                 button.setText("Click to request");
                 okTextView.setText(jsonData.optString("ok"));
                 resultTimeTextView.setText(jsonData.optString("result"));
@@ -131,6 +134,9 @@ OnClickListener onClickListener = new OnClickListener() {
 };
 button.setOnClickListener(onClickListener);
 ```
-#Request Cache
 
-To be continued.
+当然，例子中的情况是比较简单的，有些理想化。但是事情，本来就是应该做得很简单的。
+
+#请求缓存
+
+未完待续。

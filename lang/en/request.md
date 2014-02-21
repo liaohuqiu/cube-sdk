@@ -42,10 +42,10 @@ The output json:
 
 ```json
 {
-    ok: 1,
-    str: "123"
-    result: "321",
-    server_time: "2014-02-14 15:56:25"
+    "ok": 1,
+    "str": "123",
+    "result": "321",
+    "server_time": "2014-02-14 23:56:25"
 }
 ```
 

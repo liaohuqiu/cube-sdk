@@ -1,12 +1,8 @@
 ---
 layout: default
 title: Image Loader
-lead: "简单，高效地加载图片"
+lead: "简单，高效地加载图片 / 图片复用"
 ---
-#ImageLoader
----
-<p class='lead'><code>ImageLoader</code> 是图片加载组件的核心。</p>
-
 #非常简单的用法
 ---
 <p class='lead'>一共三步：</p>
@@ -59,15 +55,15 @@ lead: "简单，高效地加载图片"
 2.  检查图片是否在内存缓存中，如果再内存中，显示内存中的图片。 
 3.  否则，创建一个 `ImageTask`，传递给`ImageLoader`，`ImageTaskExecutor`会处理这个任务。 
     
-    `ImageTaskExecutor` has an work queue, it has some threads to do the work in backgroud. If all of the threads are busy with current task, this task will put into the work queue.
+    `ImageTaskExecutor` 会用后台线程处理这个`ImageTask`.
     
-4.  If the image is stored in file cache, it will be decoded, or else `ImageProvider` will fetch it from remote server then store it to file cache.
+4.  `ImageProvider`负责获取图片，如果图片在本地有文件缓存，那么直接从本地文件加载；否则从网络下载，存文件缓存。
 
-5.  After decoded, the process is complete. The ImageView will be notified to display this image.
+5.  获取到图片之后，存内存缓存，通知加载完成。收到加载完成通知后，`ImageView`就可以显示图片了。
 
-##Components
+##组成
 
-There are four components used in `ImageLoader` to load image. As you can see in the construct method in the `ImageLoader`:
+`ImageLoader`中包含了几个组件，让我们看看它的构造函数：
 
 * `ImageLoader`
 
@@ -82,15 +78,15 @@ There are four components used in `ImageLoader` to load image. As you can see in
     }
     ```
 
-They are:
+具体的是：
 
 * `ImageProvider`
 
-    It managers the `ImageMemoryCache` and `ImageFileCache`; request the image from remote server; decode bitmap from file.
+    管理 `ImageMemoryCache` 和 `ImageFileCache`，负责图片的内存缓存，文件缓存处理逻辑，图片不存在时，负责从网络下载。
 
 * `ImageTaskExexutor`
 
-    It is an interface which extends `ava.util.concurrent.Executor`. An `ImageTaskExecutor` can execute `LoadImageTask`, it allows the task can be executed in different order.
+    是一个接口，继承自 `java.util.concurrent.Executor`, 用来执 `LoadImageTask`, 它还允许设置任务不同的执行顺序：先加入先执行 / 后加入先执行。
 
     ```
 void setTaskOrder(ImageTaskOrder order);
@@ -98,7 +94,7 @@ void execute(Runnable command);
     ```
 * `ImageResizer`
     
-    It controls the `BitmapFactory.Options.inSampleSize` when decode bitmap from file and builds the network url according the request size.
+    是一个接口，控制从文件读取图片时`BitmapFactory.encode()`时的 `BitmapFactory.Options.inSampleSize` 选项，同时可根据不同的请求尺寸，拼接不同的图片url。
 
     ```
 int getInSampleSize(ImageTask imageTask);
@@ -106,25 +102,27 @@ String getResizedUrl(ImageTask imageTask);
     ```
 * `ImageLoadHandler`
 
+    是一个接口，定义如下：
+
     ```
 void onLoading(ImageTask imageTask, CubeImageView cubeImageView);
 void onLoadFinish(ImageTask imageTask, CubeImageView cubeImageView, BitmapDrawable drawable);
     ```
 
-    When the image is loading in the backgroud thread, `onLoading()` will be called to notify the ImageView. The ImageView can display a loading image place hodler. 
+    当`LoadImageTask`被加入到`ImageTaskExecutor`时，`ImageLoader`调用`ImageLoadHandler.onLoading()`通知`ImageView`，这时`ImageView`可显示一个loading图。
 
-    Once image is loaded, `onLoadFinish()` will be called to notify the ImageView to display the image.
+    当图像加载完成, 调用`ImageLoadHandler.onLoadFinish()`，通知ImageView显示图像。
 
-#Customize
+#扩展
 
-<p class='lead'>Most of the components interface has a default implementions, you can implement for your own application.</p>
+<p class='lead'>这些接口，Cube-SDK都有一个默认的实现，你可以在你自己的App中，自己实现这些接口，实现特殊需求。</p>
 
-###A speical loading image
-There are lots of ways:
+###自定义loading图
+自定义loading图有很多种办法：
 
-1. Implement the interface `ImageLoadHandler`;
+1. 最深度的办法是实现 `ImageLoadHandler`，这可以实现你任何需求，当然一般情况下你不用这样大动干戈；
 
-1. Use the `DefaultImageLoadHandler` which implements `ImageLoadHandler`:
+1. 用`ImageLoadHandler` 的默认实现 `DefaultImageLoadHandler`，他提供了几种方法用来设置loading图：
 
     ```java
     DefaultImageLoadHandler handler = new DefaultImageLoadHandler();
@@ -136,28 +134,28 @@ There are lots of ways:
     handler.setLoadingImageColor(String colorString);
     ```
 
-###Some speical effect after the image is loaded
+###图像加载完成之后，一些特殊效果
 
-1.  You can also implement the `ImageLoadHandler`, in the `onLoadFinish()` method, you can add whatever effect you want, as long as they are based on `Drawable`.
+1.  实现`ImageLoadHandler.onLoadFinish()`，想要什么效果都行，`自己动手，丰衣足食`。
 
-2.  In the `DefaultImageLoadHandler`, there are some effects;
-    * **Fade in** by default, this effect is on.
+2.  `DefaultImageLoadHandler`内置了一些效果，你可以直接使用：
+    * 淡入。**淡入** 默认启用，不需要的话，记得关掉。
 
         ```java
     setImageFadeIn(boolean fadeIn);
         ```
-    * **Rounded corner**
+    * **圆角**
 
         ```java
     setImageRounded(boolean rouded, float cornerRadius);
         ```
 
 
-###Diffrent url for diffrent size
+###通过拼接不同的url，获得不同尺寸的图
 
-If you have a thumbnail web service which can return multiple size image according the url, you can implements this method to return the specified url according the request size.
+如果你的服务器支持通过拼接不同的url，获取不同尺寸，不同质量的尺寸，你想在加载图片的时候，根据`ImageView`的尺寸大小，加载最合适的图，
 
-That is easy:
+非常简单：
 
 ```java
 public class EtaoImageResizer extends DefaultResizer {
@@ -171,3 +169,31 @@ public class EtaoImageResizer extends DefaultResizer {
     }
 }
 ```
+
+#高级用法
+###图片复用
+如果你加载了一个大图(360x360)，随后你又要加载同一个图的较小尺寸(180x180)，这样做能节省网络带宽，不管是用户的，还是服务器的。
+
+我们把大图叫做 `big_360`，小图叫做`small_180`，用`ImageReuseInfoManger`管理这些可复用的尺寸：
+
+```java
+// "big_360" 在 "small_180" 之前
+private static final String[] sizeList = new String[] { "big_360", "small_180" };
+public static final ImageReuseInfoManger sImageReuseInfoManger = new ImageReuseInfoManger(sizeList);
+```
+
+在加载大图的时候：
+
+```java
+ImageReuseInfo bigImageReuseInfo = sImageReuseInfoManger.create("big_360");
+imageView.loadImage(imageLoader, url, bigImageReuseInfo);
+```
+
+在加载小图的时候：
+
+```java
+ImageReuseInfo smallImageReuseInfo = sImageReuseInfoManger.create("small_360");
+imageView.loadImage(imageLoader, url, smallImageReuseInfo);
+```
+
+这样，在加载小图时，就会尝试复用大图了。
