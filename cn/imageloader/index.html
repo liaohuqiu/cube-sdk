@@ -97,7 +97,7 @@
     <div class="bs-header" id="content">
       <div class="container">
         <h1>Image Loader</h1>
-        <p>简单，高效地加载图片</p>
+        <p>简单，高效地加载图片 / 图片复用</p>
       </div>
     </div>
 
@@ -105,13 +105,7 @@
 
       <div class="row">
         <div class="col-md-9" role="main">
-          <h1>ImageLoader</h1>
-
-<hr>
-
-<p class='lead'><code>ImageLoader</code> 是图片加载组件的核心。</p>
-
-<h1>非常简单的用法</h1>
+          <h1>非常简单的用法</h1>
 
 <hr>
 
@@ -159,14 +153,14 @@
 <li> 检查图片是否在内存缓存中，如果再内存中，显示内存中的图片。 </li>
 <li><p>否则，创建一个 <code>ImageTask</code>，传递给<code>ImageLoader</code>，<code>ImageTaskExecutor</code>会处理这个任务。 </p>
 
-<p><code>ImageTaskExecutor</code> has an work queue, it has some threads to do the work in backgroud. If all of the threads are busy with current task, this task will put into the work queue.</p></li>
-<li><p>If the image is stored in file cache, it will be decoded, or else <code>ImageProvider</code> will fetch it from remote server then store it to file cache.</p></li>
-<li><p>After decoded, the process is complete. The ImageView will be notified to display this image.</p></li>
+<p><code>ImageTaskExecutor</code> 会用后台线程处理这个<code>ImageTask</code>.</p></li>
+<li><p><code>ImageProvider</code>负责获取图片，如果图片在本地有文件缓存，那么直接从本地文件加载；否则从网络下载，存文件缓存。</p></li>
+<li><p>获取到图片之后，存内存缓存，通知加载完成。收到加载完成通知后，<code>ImageView</code>就可以显示图片了。</p></li>
 </ol>
 
-<h2>Components</h2>
+<h2>组成</h2>
 
-<p>There are four components used in <code>ImageLoader</code> to load image. As you can see in the construct method in the <code>ImageLoader</code>:</p>
+<p><code>ImageLoader</code>中包含了几个组件，让我们看看它的构造函数：</p>
 
 <ul>
 <li><p><code>ImageLoader</code></p>
@@ -181,44 +175,46 @@
 </code></pre></div></li>
 </ul>
 
-<p>They are:</p>
+<p>具体的是：</p>
 
 <ul>
 <li><p><code>ImageProvider</code></p>
 
-<p>It managers the <code>ImageMemoryCache</code> and <code>ImageFileCache</code>; request the image from remote server; decode bitmap from file.</p></li>
+<p>管理 <code>ImageMemoryCache</code> 和 <code>ImageFileCache</code>，负责图片的内存缓存，文件缓存处理逻辑，图片不存在时，负责从网络下载。</p></li>
 <li><p><code>ImageTaskExexutor</code></p>
 
-<p>It is an interface which extends <code>ava.util.concurrent.Executor</code>. An <code>ImageTaskExecutor</code> can execute <code>LoadImageTask</code>, it allows the task can be executed in different order.</p>
+<p>是一个接口，继承自 <code>java.util.concurrent.Executor</code>, 用来执 <code>LoadImageTask</code>, 它还允许设置任务不同的执行顺序：先加入先执行 / 后加入先执行。</p>
 <div class="highlight"><pre><code class="text language-text" data-lang="text">void setTaskOrder(ImageTaskOrder order);
 void execute(Runnable command);
 </code></pre></div></li>
 <li><p><code>ImageResizer</code></p>
 
-<p>It controls the <code>BitmapFactory.Options.inSampleSize</code> when decode bitmap from file and builds the network url according the request size.</p>
+<p>是一个接口，控制从文件读取图片时<code>BitmapFactory.encode()</code>时的 <code>BitmapFactory.Options.inSampleSize</code> 选项，同时可根据不同的请求尺寸，拼接不同的图片url。</p>
 <div class="highlight"><pre><code class="text language-text" data-lang="text">int getInSampleSize(ImageTask imageTask);
 String getResizedUrl(ImageTask imageTask);
 </code></pre></div></li>
 <li><p><code>ImageLoadHandler</code></p>
+
+<p>是一个接口，定义如下：</p>
 <div class="highlight"><pre><code class="text language-text" data-lang="text">void onLoading(ImageTask imageTask, CubeImageView cubeImageView);
 void onLoadFinish(ImageTask imageTask, CubeImageView cubeImageView, BitmapDrawable drawable);
 </code></pre></div>
-<p>When the image is loading in the backgroud thread, <code>onLoading()</code> will be called to notify the ImageView. The ImageView can display a loading image place hodler. </p>
+<p>当<code>LoadImageTask</code>被加入到<code>ImageTaskExecutor</code>时，<code>ImageLoader</code>调用<code>ImageLoadHandler.onLoading()</code>通知<code>ImageView</code>，这时<code>ImageView</code>可显示一个loading图。</p>
 
-<p>Once image is loaded, <code>onLoadFinish()</code> will be called to notify the ImageView to display the image.</p></li>
+<p>当图像加载完成, 调用<code>ImageLoadHandler.onLoadFinish()</code>，通知ImageView显示图像。</p></li>
 </ul>
 
-<h1>Customize</h1>
+<h1>扩展</h1>
 
-<p class='lead'>Most of the components interface has a default implementions, you can implement for your own application.</p>
+<p class='lead'>这些接口，Cube-SDK都有一个默认的实现，你可以在你自己的App中，自己实现这些接口，实现特殊需求。</p>
 
-<h3>A speical loading image</h3>
+<h3>自定义loading图</h3>
 
-<p>There are lots of ways:</p>
+<p>自定义loading图有很多种办法：</p>
 
 <ol>
-<li><p>Implement the interface <code>ImageLoadHandler</code>;</p></li>
-<li><p>Use the <code>DefaultImageLoadHandler</code> which implements <code>ImageLoadHandler</code>:</p>
+<li><p>最深度的办法是实现 <code>ImageLoadHandler</code>，这可以实现你任何需求，当然一般情况下你不用这样大动干戈；</p></li>
+<li><p>用<code>ImageLoadHandler</code> 的默认实现 <code>DefaultImageLoadHandler</code>，他提供了几种方法用来设置loading图：</p>
 <div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="n">DefaultImageLoadHandler</span> <span class="n">handler</span> <span class="o">=</span> <span class="k">new</span> <span class="n">DefaultImageLoadHandler</span><span class="o">();</span>
 
 <span class="c1">// pick one of the following method</span>
@@ -229,27 +225,27 @@ void onLoadFinish(ImageTask imageTask, CubeImageView cubeImageView, BitmapDrawab
 </code></pre></div></li>
 </ol>
 
-<h3>Some speical effect after the image is loaded</h3>
+<h3>图像加载完成之后，一些特殊效果</h3>
 
 <ol>
-<li><p>You can also implement the <code>ImageLoadHandler</code>, in the <code>onLoadFinish()</code> method, you can add whatever effect you want, as long as they are based on <code>Drawable</code>.</p></li>
-<li><p>In the <code>DefaultImageLoadHandler</code>, there are some effects;</p>
+<li><p>实现<code>ImageLoadHandler.onLoadFinish()</code>，想要什么效果都行，<code>自己动手，丰衣足食</code>。</p></li>
+<li><p><code>DefaultImageLoadHandler</code>内置了一些效果，你可以直接使用：</p>
 
 <ul>
-<li><p><strong>Fade in</strong> by default, this effect is on.</p>
+<li><p>淡入。<strong>淡入</strong> 默认启用，不需要的话，记得关掉。</p>
 <div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="n">setImageFadeIn</span><span class="o">(</span><span class="kt">boolean</span> <span class="n">fadeIn</span><span class="o">);</span>
 </code></pre></div></li>
-<li><p><strong>Rounded corner</strong></p>
+<li><p><strong>圆角</strong></p>
 <div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="n">setImageRounded</span><span class="o">(</span><span class="kt">boolean</span> <span class="n">rouded</span><span class="o">,</span> <span class="kt">float</span> <span class="n">cornerRadius</span><span class="o">);</span>
 </code></pre></div></li>
 </ul></li>
 </ol>
 
-<h3>Diffrent url for diffrent size</h3>
+<h3>通过拼接不同的url，获得不同尺寸的图</h3>
 
-<p>If you have a thumbnail web service which can return multiple size image according the url, you can implements this method to return the specified url according the request size.</p>
+<p>如果你的服务器支持通过拼接不同的url，获取不同尺寸，不同质量的尺寸，你想在加载图片的时候，根据<code>ImageView</code>的尺寸大小，加载最合适的图，</p>
 
-<p>That is easy:</p>
+<p>非常简单：</p>
 <div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">EtaoImageResizer</span> <span class="kd">extends</span> <span class="n">DefaultResizer</span> <span class="o">{</span>
 
     <span class="kd">public</span> <span class="n">String</span> <span class="nf">getResizedUrl</span><span class="o">(</span><span class="n">ImageTask</span> <span class="n">imageTask</span><span class="o">)</span> <span class="o">{</span>
@@ -261,6 +257,27 @@ void onLoadFinish(ImageTask imageTask, CubeImageView cubeImageView, BitmapDrawab
     <span class="o">}</span>
 <span class="o">}</span>
 </code></pre></div>
+<h1>高级用法</h1>
+
+<h3>图片复用</h3>
+
+<p>如果你加载了一个大图(360x360)，随后你又要加载同一个图的较小尺寸(180x180)，这样做能节省网络带宽，不管是用户的，还是服务器的。</p>
+
+<p>我们把大图叫做 <code>big_360</code>，小图叫做<code>small_180</code>，用<code>ImageReuseInfoManger</code>管理这些可复用的尺寸：</p>
+<div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="c1">// &quot;big_360&quot; 在 &quot;small_180&quot; 之前</span>
+<span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span><span class="o">[]</span> <span class="n">sizeList</span> <span class="o">=</span> <span class="k">new</span> <span class="n">String</span><span class="o">[]</span> <span class="o">{</span> <span class="s">&quot;big_360&quot;</span><span class="o">,</span> <span class="s">&quot;small_180&quot;</span> <span class="o">};</span>
+<span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">ImageReuseInfoManger</span> <span class="n">sImageReuseInfoManger</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ImageReuseInfoManger</span><span class="o">(</span><span class="n">sizeList</span><span class="o">);</span>
+</code></pre></div>
+<p>在加载大图的时候：</p>
+<div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="n">ImageReuseInfo</span> <span class="n">bigImageReuseInfo</span> <span class="o">=</span> <span class="n">sImageReuseInfoManger</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="s">&quot;big_360&quot;</span><span class="o">);</span>
+<span class="n">imageView</span><span class="o">.</span><span class="na">loadImage</span><span class="o">(</span><span class="n">imageLoader</span><span class="o">,</span> <span class="n">url</span><span class="o">,</span> <span class="n">bigImageReuseInfo</span><span class="o">);</span>
+</code></pre></div>
+<p>在加载小图的时候：</p>
+<div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="n">ImageReuseInfo</span> <span class="n">smallImageReuseInfo</span> <span class="o">=</span> <span class="n">sImageReuseInfoManger</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="s">&quot;small_360&quot;</span><span class="o">);</span>
+<span class="n">imageView</span><span class="o">.</span><span class="na">loadImage</span><span class="o">(</span><span class="n">imageLoader</span><span class="o">,</span> <span class="n">url</span><span class="o">,</span> <span class="n">smallImageReuseInfo</span><span class="o">);</span>
+</code></pre></div>
+<p>这样，在加载小图时，就会尝试复用大图了。</p>
+
         </div>
         <div class="col-md-3">
           <div class="bs-sidebar hidden-print" role="complementary">

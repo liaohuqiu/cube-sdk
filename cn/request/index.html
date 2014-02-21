@@ -11,7 +11,7 @@
 
 <title>
   
-  Network Request &middot; Cube SDK
+  网络请求 &middot; Cube SDK
   
 </title>
 
@@ -96,8 +96,8 @@
     <!-- Docs page layout -->
     <div class="bs-header" id="content">
       <div class="container">
-        <h1>Network Request</h1>
-        <p>Request data in a simple way, then use the data easily.</p>
+        <h1>网络请求</h1>
+        <p>简单的网络请求，方便地使用接口数据。</p>
       </div>
     </div>
 
@@ -105,18 +105,19 @@
 
       <div class="row">
         <div class="col-md-9" role="main">
-          <h1>Usage</h1>
+          <h1>用法</h1>
 
 <hr>
 
-<h2>The Web API</h2>
+<h2>服务器端API</h2>
 
-<p>A sample API to reverse string:
+<p>在Demo中，我们使用了一个反转字符串的服务器端接口：<code>reverse</code>，
 <a href="http://cube-server.liaohuqiu.net/api_demo/reverse.php">http://cube-server.liaohuqiu.net/api_demo/reverse.php</a></p>
 
-<p>It takes a input parameter: <code>str</code>, then reverse it.</p>
+<p>传入一个参数:
+<code>str</code>，反转，然后输出。比如输入<code>123</code>，输入<code>321</code>。输出为<code>json</code>格式。</p>
 
-<p>The conent of the <code>reverse.php</code>:</p>
+<p>下面是这个接口的内容，非常简单，<code>reverse.php</code>:</p>
 <div class="highlight"><pre><code class="php language-php" data-lang="php"><span class="cp">&lt;?php</span>
 <span class="nb">date_default_timezone_set</span><span class="p">(</span><span class="s1">&#39;UTC&#39;</span><span class="p">);</span>
 <span class="nv">$msg</span> <span class="o">=</span> <span class="nv">$_REQUEST</span><span class="p">[</span><span class="s1">&#39;str&#39;</span><span class="p">];</span>
@@ -134,21 +135,21 @@
 <span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;server_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">date</span><span class="p">(</span><span class="s1">&#39;Y-m-d H:i:s&#39;</span><span class="p">);</span>
 <span class="k">echo</span> <span class="nb">json_encode</span><span class="p">(</span><span class="nv">$data</span><span class="p">);</span>
 </code></pre></div>
-<h4>A sample request:</h4>
+<h4>一个请求的例子:</h4>
 
 <p><a href="http://cube-server.liaohuqiu.net/api_demo/reverse.php?str=123">http://cube-server.liaohuqiu.net/api_demo/reverse.php?str=123</a></p>
 
-<p>The output json:</p>
+<p>输出的结果为：</p>
 <div class="highlight"><pre><code class="json language-json" data-lang="json"><span class="p">{</span>
-    <span class="err">ok:</span> <span class="err">1,</span>
-    <span class="err">str:</span> <span class="nt">&quot;123&quot;</span>
-    <span class="err">result</span><span class="p">:</span> <span class="s2">&quot;321&quot;</span><span class="p">,</span>
-    <span class="err">server_time:</span> <span class="nt">&quot;2014-02-14 15:56:25&quot;</span>
+    <span class="nt">&quot;ok&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="nt">&quot;str&quot;</span><span class="p">:</span> <span class="s2">&quot;123&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;result&quot;</span><span class="p">:</span> <span class="s2">&quot;321&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;server_time&quot;</span><span class="p">:</span> <span class="s2">&quot;2014-02-14 23:56:25&quot;</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2>Encapsulate Reuqest</h2>
+<h2>请求封装</h2>
 
-<p>It is a good practice to encapsulate all the request logic in a module, for example:</p>
+<p>我们建议，把网络请求进行封装，放在数据层。使用的时候，调用数据层，将数据显示在界面上。如下：</p>
 <div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">SampleRequest</span> <span class="o">{</span>
 
     <span class="cm">/**</span>
@@ -168,12 +169,12 @@
     <span class="o">}</span>
 <span class="o">}</span>
 </code></pre></div>
-<h2>The UI</h2>
+<h2>界面</h2>
 
 <div class='row'>
     <div class="col-sm-10">
-        <h3>Request Demo</h3>
-        <p class='lead'>Click the button in the buttom, fetch the data, then display the data.</p>
+        <h3>网络请求的Demo</h3>
+        <p>功能：点击底部的按钮，利用输入的输入数据访问服务器端接口，然后将结果显示出来。</p>
     </div>
 </div>
 
@@ -185,7 +186,7 @@
     </div>
 </div>
 
-<p>The controls:</p>
+<p>界面上的元素:</p>
 <div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="kd">final</span> <span class="n">EditText</span> <span class="n">inpuText</span> <span class="o">=</span> <span class="o">(</span><span class="n">EditText</span><span class="o">)</span> <span class="n">view</span><span class="o">.</span><span class="na">findViewById</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">input_request_demo_str</span><span class="o">);</span>
 <span class="kd">final</span> <span class="n">TextView</span> <span class="n">okTextView</span> <span class="o">=</span> <span class="o">(</span><span class="n">TextView</span><span class="o">)</span> <span class="n">view</span><span class="o">.</span><span class="na">findViewById</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">tv_request_demo_ok</span><span class="o">);</span>
 <span class="kd">final</span> <span class="n">TextView</span> <span class="n">resultTimeTextView</span> <span class="o">=</span> <span class="o">(</span><span class="n">TextView</span><span class="o">)</span> <span class="n">view</span><span class="o">.</span><span class="na">findViewById</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">tv_request_demo_result</span><span class="o">);</span>
@@ -194,7 +195,7 @@
 
 <span class="n">button</span><span class="o">.</span><span class="na">setText</span><span class="o">(</span><span class="s">&quot;Click to request&quot;</span><span class="o">);</span>
 </code></pre></div>
-<p>In the following code, you can see it is realy very simple to call the web API and use the data.</p>
+<p>点击按钮的时候，调用数据层接口，然后显示出来：</p>
 <div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="n">OnClickListener</span> <span class="n">onClickListener</span> <span class="o">=</span> <span class="k">new</span> <span class="n">OnClickListener</span><span class="o">()</span> <span class="o">{</span>
 
     <span class="nd">@Override</span>
@@ -204,11 +205,13 @@
 
         <span class="n">String</span> <span class="n">str</span> <span class="o">=</span> <span class="n">inpuText</span><span class="o">.</span><span class="na">getText</span><span class="o">().</span><span class="na">toString</span><span class="o">();</span>
 
+        <span class="c1">// 调用数据层接口</span>
         <span class="n">SampleRequest</span><span class="o">.</span><span class="na">reverse</span><span class="o">(</span><span class="n">str</span><span class="o">,</span> <span class="k">new</span> <span class="n">JsonRequestSuccHandler</span><span class="o">()</span> <span class="o">{</span>
 
                 <span class="nd">@Override</span>
                 <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onRequestFinish</span><span class="o">(</span><span class="n">JsonData</span> <span class="n">jsonData</span><span class="o">)</span> <span class="o">{</span>
 
+                <span class="c1">// 更新显示</span>
                 <span class="n">button</span><span class="o">.</span><span class="na">setText</span><span class="o">(</span><span class="s">&quot;Click to request&quot;</span><span class="o">);</span>
                 <span class="n">okTextView</span><span class="o">.</span><span class="na">setText</span><span class="o">(</span><span class="n">jsonData</span><span class="o">.</span><span class="na">optString</span><span class="o">(</span><span class="s">&quot;ok&quot;</span><span class="o">));</span>
                 <span class="n">resultTimeTextView</span><span class="o">.</span><span class="na">setText</span><span class="o">(</span><span class="n">jsonData</span><span class="o">.</span><span class="na">optString</span><span class="o">(</span><span class="s">&quot;result&quot;</span><span class="o">));</span>
@@ -220,9 +223,11 @@
 <span class="o">};</span>
 <span class="n">button</span><span class="o">.</span><span class="na">setOnClickListener</span><span class="o">(</span><span class="n">onClickListener</span><span class="o">);</span>
 </code></pre></div>
-<h1>Request Cache</h1>
+<p>当然，例子中的情况是比较简单的，有些理想化。但是事情，本来就是应该做得很简单的。</p>
 
-<p>To be continued.</p>
+<h1>请求缓存</h1>
+
+<p>未完待续。</p>
 
         </div>
         <div class="col-md-3">
