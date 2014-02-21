@@ -5,8 +5,13 @@ function exe_cmd() {
     eval $1
 }
 
+if [ $# -lt 1 ]; then
+    echo "Usage: sh $0 [ gh-pages | master ]"
+    exit
+fi
+
 branch=$1
-if [ -z "$branch" ] || [ -a "$branch" == " " ]; then
+if [ -z "$branch" ] || [ "$branch" != "master" ]; then
     branch='gh-pages'
 fi
 

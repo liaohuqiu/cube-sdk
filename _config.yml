@@ -40,7 +40,7 @@ navigation:
       - path:     /imageloader
         title:    图片加载组件
       - path:     /request
-        title:    API请求
+        title:    网络请求
 
 right_nav:
   - title:    English Version
@@ -52,7 +52,7 @@ right_nav:
 
 analytics:
   google:
-    account:    UA-43024238-1
+    account:    UA-43024238-2
 
 download:
   rep:          https://github.com/liaohuqiu/cube-sdk
