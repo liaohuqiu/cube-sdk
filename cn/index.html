@@ -51,6 +51,7 @@
     <!-- Docs master nav -->
     <header class="navbar navbar-static-top bs-docs-nav" role="banner">
     <div class="container">
+        
         <div class="navbar-header">
             <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
                 <span class="sr-only">Toggle navigation</span>
@@ -64,15 +65,23 @@
             <ul class="nav navbar-nav">
                 
                 <li>
-                <a href="/cn/imageloader">Image Loader</a>
+                <a href="/cn/imageloader">图片加载组件</a>
                 </li>
                 
                 <li>
-                <a href="/cn/request">Network Request</a>
+                <a href="/cn/request">API请求</a>
                 </li>
                 
             </ul>
             <ul class="nav navbar-nav navbar-right">
+                
+                <li>
+                <a href="/">English Version</a>
+                </li>
+                
+                <li>
+                <a href="/cn">中文版文档</a>
+                </li>
                 
                 <li>
                 <a href="https://github.com/liaohuqiu/cube-sdk">Fork on Github</a>
@@ -88,7 +97,7 @@
     <div class="bs-header" id="content">
       <div class="container">
         <h1>Cube SDK</h1>
-        <p>For andorid development</p>
+        <p>简单 / 好用</p>
       </div>
     </div>
 
@@ -97,46 +106,85 @@
       <div class="row">
         <div class="col-md-9" role="main">
           <div class="bs-docs-section">
-    <h1 id="what-it-can-do" class="page-header">What it can do?</h1>
-    <p class='lead'>It is a light andorid development framework.</p>
+    <h1 id="what-it-can-do" class="page-header">Cube 是什么？</h1>
+
+    <p class='lead'>一个Android开发包, 可极大提高你的开发效率。</p>
 
     <div class="row bs-downloads">
         <div class="col-sm-4">
-            <h3>Load Image</h3>
-            <p>Load network image efficiently and easily.</p>
+            <h3>图片加载</h3>
+            <p>使用简单</p>
+            <p>加载速度快，节省资源</p>
+            <p>方便定制和改造</p>
         </div>
         <div class="col-sm-4">
-            <h3>Network request</h3>
-            <p>Easy to process network API request.</p>
+            <h3>简化接口请求</h3>
+            <p>只关注请求结果，专注于业务</p>
+            <p>请求缓存 / 本地预设请求数据</p>
+            <p>简单的JsonData，轻松访问接口数据</p>
         </div>
         <div class="col-sm-4">
             <h3>Toolkits</h3>
+            <p>屏幕尺寸信息</p>
+            <p>网络状态信息</p>
+            <p>...</p>
         </div>
     </div>
-
 </div>
 
 <div class="bs-docs-section">
-    <h1 id="getting-started" class="page-header">Getting Started</h1>
+    <h1 id="getting-started" class="page-header">如何使用</h1>
 
-    <h2 id="download">Download</h2>
-    <p class='lead'>You can fork the github repository, then use the library project in your project or download zip package.</p>
+    <h2 id="download">下载</h2>
+    <p class='lead'>你可以在Github上fork这个项目，或者直接下载源码包。</p>
 
     <div class="row bs-downloads">
         <div class="col-sm-4">
             <h3>Github</h3>
-            <p>Fork it in Github, use the souce code in your project.</p>
-            <a href="https://github.com/liaohuqiu/cube-sdk" class="btn btn-lg btn-outline" role="button" >View on Github</a>
+            <p>在Git上Fork我们的项目，然后在项目中使用。</p>
+            <a href="https://github.com/liaohuqiu/cube-sdk" class="btn btn-lg btn-outline" role="button" >Fork on Github</a>
         </div>
         <div class="col-sm-4">
-            <h3 id="download-zip">Zip</h3>
-            <p>Down load the zip and use it in your project.</p>
-            <a href="https://github.com/liaohuqiu/cube-sdk/archive/master.zip" class="btn btn-lg btn-outline" role="button" >Download Cube-SDK</a>
+            <h3 id="download-zip">源码包</h3>
+            <p>如果你不使用Git，你可以直接下载源码包。</p>
+            <a href="https://github.com/liaohuqiu/cube-sdk/archive/master.zip" class="btn btn-lg btn-outline" role="button" >下载源码包</a>
         </div>
     </div>
 
-    <h2 id="configure">Configure</h2>
-    <p>Once add cube library to your project, you can use the following code to configure this framework.</p>
+    <h3>目录结构</h3>
+    <p><code>Git clone</code> 或者解压源码包之后，目录结构大致如下:</p>
+<div class="highlight"><pre><code class="bash">cube-sdk/
+├── core/
+│   └── bin/
+│       └── cube-sdk.jar
+├── sample-and-tests/
+└── cube-sdk-sample.apk
+</code></pre></div>
+
+    <p><code>cube-sdk</code>目录下有两个文件夹，是两个Android项目：</p>
+    <ol>
+        <li>
+        <p><code>core</code>为框架，是一个Library项目。</p>
+        </li>
+        <li>
+        <p><code>core</code>为Demo</p>
+        </li>
+    </ol>
+
+    <p><code>cube-sdk-sample.apk</code>是Demo的apk。</p>
+
+    <h2 id="configure">添加到你的项目</h2>
+    <p>你可以通过两种方式在你的项目中使用<code>cube-sdk</code></p>
+    <ol>
+        <li>
+        <p>在ADT中打开core项目； 然后将这个Library加入到你的项目中：选中你的项目，右键属性，Android项，Library，添加。</p>
+        </li>
+        <li>
+        <p>将<code>cube-sdk/core/bin/cube-sdk.jar</code>添加到你的项目中。</p>
+        </li>
+    </ol>
+    <h2>配置</h2>
+    <p>在使用cube之前，你需要做一些简单的配置：</p>
 
 <div class="highlight"><pre><code class="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">CubeApplication</span> <span class="kd">extends</span> <span class="n">Application</span> <span class="o">{</span>
 
@@ -161,44 +209,48 @@
     <span class="o">}</span>
 <span class="o">}</span>
 </code></pre></div>
+<p>peizhi wancheng</p>
 </div>
 
 <div class="bs-docs-section">
-    <h1 id="sample" class="page-header">Sample</h1>
-    <p class='lead'>The sample shows how it works, you can build it by the source code or download it and install it.</p>
+    <h1 id="sample" class="page-header">Demo</h1>
+    <p class='lead'>Demo项目演示了框架的功能和用法，Demo本身就是一个APP，，你可以下载安装感受一下。</p>
 
-    <h2 id="sample-snapshot">Snapshots</h2>
+    <h2 id="sample-snapshot">一些屏幕截图</h2>
     <div class="row bs-downloads">
         <div class="col-sm-4">
-            <h3>Gird image</h3>
+            <h3>GirdView下的图片加载</h3>
+            <p>最多同时加载10张图</p>
             <div class="thumbnail">
                 <img src="/assets/img/sample-snapshot/cube-image-grid.png" alt="">
             </div>
         </div>
         <div class="col-sm-4">
-            <h3>Small image</h3>
+            <h3>ListView下的小图</h3>
+            <p>加载完后加上圆角效果</p>
             <div class="thumbnail">
                 <img src="/assets/img/sample-snapshot/cube-image-small.png" alt="">
             </div>
         </div>
         <div class="col-sm-4">
-            <h3>Big image</h3>
+            <h3>大图列表</h3>
+            <p>低内存，2.3版本测试通过，表示毫无压力</p>
             <div class="thumbnail">
                 <img src="/assets/img/sample-snapshot/cube-image-big.png" alt="">
             </div>
         </div>
     </div>
 
-    <h2 id="install-sample">Install sample App</h2>
+    <h2 id="install-sample">安装Demo</h2>
     <div class="row">
         <div class="col-sm-4">
-            <h3>Build from source</h3>
-            <p>If you has downloaded the souce code or forked the github repository, you can open the sample project.</p>
+            <h3>用源码安装</h3>
+            <p>如果你已经下载了源码，源码中 <code>sample-and-tests</code> 文件夹就是Demo项目，你可以在ADT中打开。</p>
         </div>
         <div class="col-sm-4">
-            <h3>Download</h3>
-            <p>Download the apk file then install it manually.</p>
-            <a href="https://github.com/liaohuqiu/cube-sdk/raw/master/cube-sdk-sample.apk" class="btn btn-lg btn-outline" role="button" >Download</a>
+            <h3>下载安装</h3>
+            <p>下载apk。通过<code>adb</code>或者豌豆荚等工具安装到手机</p>
+            <a href="https://github.com/liaohuqiu/cube-sdk/raw/master/cube-sdk-sample.apk" class="btn btn-lg btn-outline" role="button" >下载APK</a>
         </div>
         <!--
         <div class="col-sm-4">
@@ -210,7 +262,7 @@
     <div class='row'>
         -->
         <div class="col-sm-4">
-            <h3>Scan</h3>
+            <h3>扫描二维码安装</h3>
             <div class='thumbnail'>
                 <img src="/assets/img/qrcode.png" alt="">
             </div>
