@@ -51,7 +51,6 @@ module Jekyll
         def read
             self.read_layouts
 
-
             lang_path = "/lang/" + self.config['lang']
             if File.exists?(File.join(self.source, lang_path))
                 self.read_directories(lang_path)

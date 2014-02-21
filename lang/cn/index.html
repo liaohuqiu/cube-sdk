@@ -1,0 +1,174 @@
+---
+layout: default
+title: Cube SDK
+lead:  简单 / 好用
+---
+
+<div class="bs-docs-section">
+    <h1 id="what-it-can-do" class="page-header">Cube 是什么？</h1>
+
+    <p class='lead'>一个Android开发包, 可极大提高你的开发效率。</p>
+
+    <div class="row bs-downloads">
+        <div class="col-sm-4">
+            <h3>图片加载</h3>
+            <p>使用简单</p>
+            <p>加载速度快，节省资源</p>
+            <p>方便定制和改造</p>
+        </div>
+        <div class="col-sm-4">
+            <h3>简化接口请求</h3>
+            <p>只关注请求结果，专注于业务</p>
+            <p>请求缓存 / 本地预设请求数据</p>
+            <p>简单的JsonData，轻松访问接口数据</p>
+        </div>
+        <div class="col-sm-4">
+            <h3>Toolkits</h3>
+            <p>屏幕尺寸信息</p>
+            <p>网络状态信息</p>
+            <p>...</p>
+        </div>
+    </div>
+</div>
+
+<div class="bs-docs-section">
+    <h1 id="getting-started" class="page-header">如何使用</h1>
+
+    <h2 id="download">下载</h2>
+    <p class='lead'>你可以在Github上fork这个项目，或者直接下载源码包。</p>
+
+    <div class="row bs-downloads">
+        <div class="col-sm-4">
+            <h3>Github</h3>
+            <p>在Git上Fork我们的项目，然后在项目中使用。</p>
+            <a href="{{ site.download.rep }}" class="btn btn-lg btn-outline" role="button" >Fork on Github</a>
+        </div>
+        <div class="col-sm-4">
+            <h3 id="download-zip">源码包</h3>
+            <p>如果你不使用Git，你可以直接下载源码包。</p>
+            <a href="{{ site.download.dist }}" class="btn btn-lg btn-outline" role="button" >下载源码包</a>
+        </div>
+    </div>
+
+    <h3>目录结构</h3>
+    <p><code>Git clone</code> 或者解压源码包之后，目录结构大致如下:</p>
+{% highlight bash %}
+cube-sdk/
+├── core/
+│   └── bin/
+│       └── cube-sdk.jar
+├── sample-and-tests/
+└── cube-sdk-sample.apk
+
+{% endhighlight %}
+
+    <p><code>cube-sdk</code>目录下有两个文件夹，是两个Android项目：</p>
+    <ol>
+        <li>
+        <p><code>core</code>为框架，是一个Library项目。</p>
+        </li>
+        <li>
+        <p><code>core</code>为Demo</p>
+        </li>
+    </ol>
+
+    <p><code>cube-sdk-sample.apk</code>是Demo的apk。</p>
+
+    <h2 id="configure">添加到你的项目</h2>
+    <p>你可以通过两种方式在你的项目中使用<code>cube-sdk</code></p>
+    <ol>
+        <li>
+        <p>在ADT中打开core项目； 然后将这个Library加入到你的项目中：选中你的项目，右键属性，Android项，Library，添加。</p>
+        </li>
+        <li>
+        <p>将<code>cube-sdk/core/bin/cube-sdk.jar</code>添加到你的项目中。</p>
+        </li>
+    </ol>
+    <h2>配置</h2>
+    <p>在使用cube之前，你需要做一些简单的配置：</p>
+
+{% highlight java %}
+public class CubeApplication extends Application {
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        // other code
+        // ..
+
+        Cube.onCreate(this);
+    }
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+
+        // other code
+        // ...
+
+        Cube.onTerminate();
+    }
+}
+{% endhighlight %}
+<p>peizhi wancheng</p>
+</div>
+
+<div class="bs-docs-section">
+    <h1 id="sample" class="page-header">Demo</h1>
+    <p class='lead'>Demo项目演示了框架的功能和用法，Demo本身就是一个APP，，你可以下载安装感受一下。</p>
+
+    <h2 id="sample-snapshot">一些屏幕截图</h2>
+    <div class="row bs-downloads">
+        <div class="col-sm-4">
+            <h3>GirdView下的图片加载</h3>
+            <p>最多同时加载10张图</p>
+            <div class="thumbnail">
+                <img src="/assets/img/sample-snapshot/cube-image-grid.png" alt="">
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <h3>ListView下的小图</h3>
+            <p>加载完后加上圆角效果</p>
+            <div class="thumbnail">
+                <img src="/assets/img/sample-snapshot/cube-image-small.png" alt="">
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <h3>大图列表</h3>
+            <p>低内存，2.3版本测试通过，表示毫无压力</p>
+            <div class="thumbnail">
+                <img src="/assets/img/sample-snapshot/cube-image-big.png" alt="">
+            </div>
+        </div>
+    </div>
+
+    <h2 id="install-sample">安装Demo</h2>
+    <div class="row">
+        <div class="col-sm-4">
+            <h3>用源码安装</h3>
+            <p>如果你已经下载了源码，源码中 <code>sample-and-tests</code> 文件夹就是Demo项目，你可以在ADT中打开。</p>
+        </div>
+        <div class="col-sm-4">
+            <h3>下载安装</h3>
+            <p>下载apk。通过<code>adb</code>或者豌豆荚等工具安装到手机</p>
+            <a href="{{ site.download.apk }}" class="btn btn-lg btn-outline" role="button" >下载APK</a>
+        </div>
+        <!--
+        <div class="col-sm-4">
+            <h3>Google Play</h3>
+            <p>Access this sample App in Google Play.</p>
+            <a href="{{ site.download.google_play }}" class="btn btn-lg btn-outline" role="button" >Google Play</a>
+        </div>
+    </div>
+    <div class='row'>
+        -->
+        <div class="col-sm-4">
+            <h3>扫描二维码安装</h3>
+            <div class='thumbnail'>
+                <img src="{{ site.download.qrcode }}" alt="">
+            </div>
+        </div>
+    </div>
+
+</div>
