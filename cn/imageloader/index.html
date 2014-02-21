@@ -34,7 +34,7 @@
 
 <script>
   var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-43024238-1']);
+  _gaq.push(['_setAccount', 'UA-43024238-2']);
   _gaq.push(['_trackPageview']);
   (function() {
     var ga = document.createElement('script'); ga.async = true;
@@ -69,7 +69,7 @@
                 </li>
                 
                 <li>
-                <a href="/cn/request">API请求</a>
+                <a href="/cn/request">网络请求</a>
                 </li>
                 
             </ul>
@@ -97,7 +97,7 @@
     <div class="bs-header" id="content">
       <div class="container">
         <h1>Image Loader</h1>
-        <p>Make Loading Image Efficiently & Easily.</p>
+        <p>简单，高效地加载图片</p>
       </div>
     </div>
 
@@ -109,30 +109,31 @@
 
 <hr>
 
-<p class='lead'>The <code>ImageLoader</code>, it is...</p>
+<p class='lead'><code>ImageLoader</code> 是图片加载组件的核心。</p>
 
-<h1>Simple Usage</h1>
+<h1>非常简单的用法</h1>
 
 <hr>
 
-<p class='lead'>It is very simple to use <code>ImageLoader</code>.</p>
+<p class='lead'>一共三步：</p>
 
 <ol>
-<li><p>First, create an <code>ImageLoader</code>:</p>
+<li><p>首先，创建一个<code>ImageLoader</code>:</p>
 <div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="n">Context</span> <span class="n">context</span><span class="o">;</span>
 <span class="n">ImageLoader</span> <span class="n">imageLoader</span> <span class="o">=</span> <span class="n">ImageLoaderFatory</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
 </code></pre></div></li>
-<li><p>Find the ImageView in which the image will be loaded.</p>
+<li><p>用<code>findViewById()</code>找到要加载图片的<code>ImageView</code>：</p>
 <div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="n">CubeImageView</span> <span class="n">imageView</span> <span class="o">=</span> <span class="o">(</span><span class="n">CubeImageView</span><span class="o">)</span> <span class="n">view</span><span class="o">.</span><span class="na">findViewById</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">iv_item_image_list_big</span><span class="o">);</span>
 </code></pre></div>
-<p><code>CubeImageView</code> is a subclass of <code>ImageView</code>, the layout file maybe like:</p>
+<p>这里留意一下：<code>CubeImageView</code> 是 <code>ImageView</code> 的子类, 在xml布局文件中应该这样写:</p>
 <div class="highlight"><pre><code class="xml language-xml" data-lang="xml"><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span>
 <span class="nt">&lt;LinearLayout</span> <span class="na">xmlns:android=</span><span class="s">&quot;http://schemas.android.com/apk/res/android&quot;</span>
     <span class="na">android:layout_width=</span><span class="s">&quot;wrap_content&quot;</span>
     <span class="na">android:layout_height=</span><span class="s">&quot;wrap_content&quot;</span>
     <span class="na">android:orientation=</span><span class="s">&quot;vertical&quot;</span> <span class="nt">&gt;</span>
 
-    <span class="nt">&lt;com.srain.cube.image.CubeImageView</span>
+    <span class="c">&lt;!-- 用定制的CubeImageView --&gt;</span>
+    <span class="nt">&lt;com.srain.cube.image.CubeImageView</span> 
         <span class="na">android:id=</span><span class="s">&quot;@+id/iv_item_image_list_big&quot;</span>
         <span class="na">android:layout_width=</span><span class="s">&quot;match_parent&quot;</span>
         <span class="na">android:layout_height=</span><span class="s">&quot;match_parent&quot;</span>
@@ -140,24 +141,23 @@
 
 <span class="nt">&lt;/LinearLayout&gt;</span>
 </code></pre></div></li>
-<li><p>Use the ImageView and the ImageLoader to load image</p>
-<div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="n">String</span> <span class="n">url</span> <span class="o">=</span> <span class="err">&#39;&#39;</span><span class="o">;</span>
-<span class="n">imageView</span><span class="o">.</span><span class="na">loadImage</span><span class="o">(</span><span class="n">imageLoader</span><span class="o">,</span> <span class="n">url</span><span class="o">);</span>
+<li><p>加载图片。就一句代码：</p>
+<div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="n">imageView</span><span class="o">.</span><span class="na">loadImage</span><span class="o">(</span><span class="n">imageLoader</span><span class="o">,</span> <span class="n">url</span><span class="o">);</span>
 </code></pre></div></li>
 </ol>
 
-<h1>How does it work</h1>
+<h1>工作原理</h1>
 
 <hr>
 
-<p class='lead'>The process of loading a bitmap is also very simple.</p>
+<p class='lead'>整个加载图片的流程非常简单。</p>
 
-<h2>Workflow</h2>
+<h2>加载流程：</h2>
 
 <ol>
-<li> If image has been loaded, it will not be loaded again.</li>
-<li> Check if the image is in memory cache, if yes, display it.</li>
-<li><p>An <code>ImageTask</code> is created, then added to <code>ImageLoader</code>. The <code>ImageTaskExecutor</code> will take it.</p>
+<li> <code>CubeImageView</code>会检查图片是否已经加载过，图片已经加载完成并已经在显示的重复请求直接忽略。</li>
+<li> 检查图片是否在内存缓存中，如果再内存中，显示内存中的图片。 </li>
+<li><p>否则，创建一个 <code>ImageTask</code>，传递给<code>ImageLoader</code>，<code>ImageTaskExecutor</code>会处理这个任务。 </p>
 
 <p><code>ImageTaskExecutor</code> has an work queue, it has some threads to do the work in backgroud. If all of the threads are busy with current task, this task will put into the work queue.</p></li>
 <li><p>If the image is stored in file cache, it will be decoded, or else <code>ImageProvider</code> will fetch it from remote server then store it to file cache.</p></li>
