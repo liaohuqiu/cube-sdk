@@ -20,7 +20,7 @@ info:
   site_name:    Cube SDK
 
 meta:
-  description:  A android development framework. It make loading image and network request easy.
+  description:  A android development framework. It makes loading image and network request easy.
   keywords:     Cube-SDK, Android development framework, Image Loader, Easy netwrok request.
   author:       liaohuqiu@gmail.com
 
