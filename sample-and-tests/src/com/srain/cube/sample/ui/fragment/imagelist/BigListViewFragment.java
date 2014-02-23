@@ -15,6 +15,7 @@ import android.widget.ListView;
 import com.srain.cube.image.CubeImageView;
 import com.srain.cube.image.ImageLoader;
 import com.srain.cube.image.ImageLoaderFactory;
+import com.srain.cube.image.ImageReuseInfo;
 import com.srain.cube.sample.R;
 import com.srain.cube.sample.activity.TitleBaseFragment;
 import com.srain.cube.sample.data.Images;
@@ -28,6 +29,7 @@ public class BigListViewFragment extends TitleBaseFragment {
 	private static final int sBigImageSize = LocalDisplay.SCREEN_WIDTH_PIXELS - LocalDisplay.dp2px(10 + 10);
 
 	private ImageLoader mImageLoader;
+	private static final ImageReuseInfo sBigImageReuseInfo = Images.sImageReuseInfoManger.create("big");
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 	@Override
@@ -70,7 +72,7 @@ public class BigListViewFragment extends TitleBaseFragment {
 
 		@Override
 		public void showData(int position, String itemData) {
-			mImageView.loadImage(mImageLoader, itemData);
+			mImageView.loadImage(mImageLoader, itemData, sBigImageReuseInfo);
 		}
 	}
 }

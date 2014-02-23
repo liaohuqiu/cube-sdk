@@ -16,16 +16,16 @@
 
 package com.srain.cube.sample.data;
 
+import com.srain.cube.image.ImageReuseInfoManger;
+
 /**
  * Some simple test data to use for this sample app.
  */
 public class Images {
 
-	/**
-	 * This are PicasaWeb URLs and could potentially change. Ideally the PicasaWeb API should be used to fetch the URLs.
-	 * 
-	 * Credit to Romain Guy for the photos: http://www.curious-creature.org/ https://plus.google.com/109538161516040592207/about http://www.flickr.com/photos/romainguy
-	 */
+	private static final String[] sizeList = new String[] { "big_360", "small_180" };
+	public static final ImageReuseInfoManger sImageReuseInfoManger = new ImageReuseInfoManger(sizeList);
+
 	public final static String[] imageUrls = new String[] { "http://jpp1.imghb.com/pic/pic/39/96/39/1404993139963936.jpg", "http://jpp2.imghb.com/pic/pic/63/73/28/1402385963732871.png",
 			"http://jpp1.imghb.com/pic/pic/85/34/88/1436380285348861.jpg", "http://jpp1.imghb.com/pic/pic/95/73/18/1429647195731803.jpg", "http://jpp2.imghb.com/pic/pic/51/2/40/1428931351024073.jpg",
 			"http://jpp1.imghb.com/pic/pic/2/30/83/1425853602308385.jpg", "http://jpp1.imghb.com/pic/pic/63/39/30/1425753163393010.jpg", "http://jpp2.imghb.com/pic/pic/86/93/65/1419337986936531.jpg",
