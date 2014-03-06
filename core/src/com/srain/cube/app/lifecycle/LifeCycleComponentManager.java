@@ -11,9 +11,9 @@ public class LifeCycleComponentManager implements IComponentContainer {
 
 	private HashMap<String, WeakReference<LifeCycleComponent>> mComponentList;
 
-	public static void tryAddComponentToContainer(LifeCycleComponent component, Context componentContainerContext) {
-		if (componentContainerContext instanceof IComponentContainer) {
-			((IComponentContainer) componentContainerContext).addComponent(component);
+	public static void tryAddComponentToContainer(LifeCycleComponent component, Context context) {
+		if (context instanceof IComponentContainer) {
+			((IComponentContainer) context).addComponent(component);
 		} else {
 			throw new IllegalArgumentException("componentContainerContext should impletemnts IComponentContainer");
 		}
@@ -42,7 +42,8 @@ public class LifeCycleComponentManager implements IComponentContainer {
 	}
 
 	public void onStop() {
-		for (Iterator<Entry<String, WeakReference<LifeCycleComponent>>> it = mComponentList.entrySet().iterator(); it.hasNext();) {
+		Iterator<Entry<String, WeakReference<LifeCycleComponent>>> it = mComponentList.entrySet().iterator();
+		while (it.hasNext()) {
 			LifeCycleComponent component = it.next().getValue().get();
 			if (null != component) {
 				component.onStop();
