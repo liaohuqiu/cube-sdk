@@ -224,7 +224,7 @@ public class LruImageFileCache {
 	/**
 	 * Flushes the disk cache associated with this ImageProvider object. Note that this includes disk access so this should not be executed on the main/UI thread.
 	 */
-	public void flushDishCache() {
+	public void flushDiskCache() {
 		synchronized (mDiskCacheLock) {
 			long now = System.currentTimeMillis();
 			if (now - 1000 < mLastFlushTime) {
@@ -290,7 +290,7 @@ public class LruImageFileCache {
 				closeDiskCache();
 				break;
 			case flush_cache:
-				flushDishCache();
+				flushDiskCache();
 				break;
 			default:
 				break;
@@ -329,7 +329,7 @@ public class LruImageFileCache {
 	/**
 	 * flush the data to disk cache
 	 */
-	public void flushDishCacheAsync() {
+	public void flushDiskCacheAsync() {
 		if (DEBUG) {
 			Log.d(TAG, "flushDishCacheAsync");
 		}

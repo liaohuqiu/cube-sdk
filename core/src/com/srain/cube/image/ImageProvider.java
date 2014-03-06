@@ -248,7 +248,7 @@ public class ImageProvider {
 
 	public void flushFileCache() {
 		if (null != mFileCache) {
-			mFileCache.flushDishCacheAsync();
+			mFileCache.flushDiskCacheAsync();
 		}
 	}
 

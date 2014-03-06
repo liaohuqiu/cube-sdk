@@ -296,6 +296,10 @@ public class ImageLoader {
 		}
 		mExitTasksEarly = true;
 		setPause(false);
+
+		if (null != mImageProvider) {
+			mImageProvider.flushFileCache();
+		}
 	}
 
 	/**
@@ -315,9 +319,5 @@ public class ImageLoader {
 			}
 		}
 		mLoadWorkList.clear();
-	}
-
-	public ImageProvider getImageProvider() {
-		return mImageProvider;
 	}
 }
