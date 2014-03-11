@@ -1,0 +1,30 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:cube_dotview="http://schemas.android.com/apk/res/com.srain.cube.sample"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="200dp" >
+
+        <com.srain.cube.views.DotView
+            android:id="@+id/dot_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="100dp"
+            cube_dotview:dot_radius="3dp"
+            cube_dotview:dot_selected_color="0xFF377BEE"
+            cube_dotview:dot_span="18dp"
+            cube_dotview:dot_unselected_color="0xFFC5CEDB" />
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/bt_next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/next_dot" />
+
+</LinearLayout>

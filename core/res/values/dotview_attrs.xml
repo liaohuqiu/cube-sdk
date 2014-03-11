@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="DotView">
+        <attr name="dot_radius" format="dimension" />
+        <attr name="dot_span" format="dimension" />
+        <attr name="dot_unselected_color" format="integer" />
+        <attr name="dot_selected_color" format="integer" />
+    </declare-styleable>
+
+</resources>
