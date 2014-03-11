@@ -64,6 +64,14 @@ public class HomeFragment extends TitleBaseFragment {
 			}
 		}));
 
+		mItemInfos.add(new ItemInfo("Dot View", "#4d90fe", new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				getContext().pushFragmentToBackStatck(DotViewFragment.class, null);
+			}
+		}));
+
 		setupList();
 
 		return view;

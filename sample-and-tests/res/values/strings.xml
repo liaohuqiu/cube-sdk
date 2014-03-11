@@ -10,5 +10,7 @@
     <string name="image_list_change">change layout</string>
     <string name="base_title_return">Back</string>
 
+    <string name="next_dot">Next Dot</string>
+
 
 </resources>
