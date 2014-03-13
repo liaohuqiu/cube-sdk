@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -19,6 +20,8 @@ import com.srain.cube.util.LocalDisplay;
 import com.srain.cube.views.block.BlockListAdapter;
 import com.srain.cube.views.block.BlockListView;
 import com.srain.cube.views.block.BlockListView.OnItemClickListener;
+import com.srain.cube.views.list.ListPageInfo;
+import com.srain.cube.views.list.PagedListDataModel.PagedListDataHandler;
 
 public class HomeFragment extends TitleBaseFragment {
 
@@ -73,7 +76,6 @@ public class HomeFragment extends TitleBaseFragment {
 		}));
 
 		setupList();
-
 		return view;
 	}
 

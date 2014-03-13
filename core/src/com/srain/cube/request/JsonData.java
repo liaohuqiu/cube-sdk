@@ -1,10 +1,12 @@
 package com.srain.cube.request;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -13,6 +15,10 @@ public class JsonData {
 
 	private Object mJson;
 	private static final String EMPTY_STRING = "";
+
+	public static JsonData newMap() {
+		return create(new HashMap<String, Object>());
+	}
 
 	public static JsonData create(String str) {
 		Object object = null;
@@ -70,7 +76,7 @@ public class JsonData {
 	public int optInt(String name) {
 		return optMapOrNew().optInt(name);
 	}
-	
+
 	public int optInt(int index) {
 		return optArrayOrNew().optInt(index);
 	}
@@ -96,6 +102,32 @@ public class JsonData {
 			return (JSONObject) mJson;
 		}
 		return new JSONObject();
+	}
+
+	public void put(String key, Object value) {
+		if (mJson instanceof JSONObject) {
+			try {
+				((JSONObject) mJson).put(key, value);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void put(Object value) {
+		if (mJson instanceof JSONArray) {
+			((JSONArray) mJson).put(value);
+		}
+	}
+
+	public void put(int index, Object value) {
+		if (mJson instanceof JSONArray) {
+			try {
+				((JSONArray) mJson).put(index, value);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public JSONArray optArrayOrNew() {

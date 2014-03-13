@@ -46,7 +46,7 @@ public class NetworkStatusManager {
 
 	public static void init(Context context) {
 		sInstance = new NetworkStatusManager();
-        sInstance.mIsWifi = checkIsWifi(context);
+		sInstance.mIsWifi = checkIsWifi(context);
 		sInstance.startListening(context);
 	}
 
