@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="MoreActionView">
+        <attr name="more_action_dot_radius" format="dimension" />
+        <attr name="more_action_dot_span" format="dimension" />
+        <attr name="more_action_dot_color" format="reference|color" />
+    </declare-styleable>
+
+</resources>
