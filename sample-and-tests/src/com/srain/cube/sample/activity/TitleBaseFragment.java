@@ -86,5 +86,4 @@ public abstract class TitleBaseFragment extends CubeFragment {
 	public TitleHeaderBar getTitleHeaderBar() {
 		return mTitleHeaderBar;
 	}
-
 }

@@ -50,6 +50,14 @@ public class BlockListView extends RelativeLayout {
 		}
 	}
 
+	@Override
+	protected void onAttachedToWindow() {
+		super.onAttachedToWindow();
+		if (null != mBlockListAdpater) {
+			mBlockListAdpater.registerView(this);
+		}
+	}
+
 	public void setOnItemClickListener(OnItemClickListener listener) {
 		mOnItemClickListener = listener;
 	}

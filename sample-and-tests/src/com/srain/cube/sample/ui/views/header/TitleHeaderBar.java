@@ -2,6 +2,7 @@ package com.srain.cube.sample.ui.views.header;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.TextView;
 
 import com.srain.cube.sample.R;
@@ -26,6 +27,7 @@ public class TitleHeaderBar extends HeaderBarBase {
 	private TextView mTitleTextView;
 	private TextView mRightTextView;
 	private TextView mReturnImageView;
+	private View mMoreAction;
 
 	public TitleHeaderBar(Context context) {
 		this(context, null);
@@ -40,6 +42,7 @@ public class TitleHeaderBar extends HeaderBarBase {
 		mReturnImageView = (TextView) findViewById(R.id.tv_title_bar_left);
 		mTitleTextView = (TextView) findViewById(R.id.tv_title_bar_title);
 		mRightTextView = (TextView) findViewById(R.id.tv_title_bar_right);
+		mMoreAction = findViewById(R.id.ly_title_bar_more_action);
 	}
 
 	@Override
@@ -57,5 +60,10 @@ public class TitleHeaderBar extends HeaderBarBase {
 
 	public TextView getRightTextView() {
 		return mRightTextView;
+	}
+
+	public void showMoreMenu() {
+		mRightTextView.setVisibility(GONE);
+		mMoreAction.setVisibility(VISIBLE);
 	}
 }
