@@ -257,7 +257,8 @@ public class RequestCache {
 		void done() {
 
 			int lastTime = mRawData.optInt("time");
-			boolean outOfDate = System.currentTimeMillis() / 1000 - lastTime > mCacheable.getCacheTime();
+			long timeInterval = System.currentTimeMillis() / 1000 - lastTime;
+			boolean outOfDate = timeInterval > mCacheable.getCacheTime() || timeInterval < 0;
 			mCacheable.onCacheData(mResult, outOfDate);
 		}
 	}
