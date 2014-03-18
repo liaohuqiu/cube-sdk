@@ -25,7 +25,6 @@ import com.srain.cube.image.drawable.RecyclingBitmapDrawable;
  */
 public class CubeImageView extends ImageView {
 
-	private String mLastUrl = "";
 	private String mUrl = "";
 	private int mSpecifiedWidth = 0;
 	private int mSpecifiedHeight = 0;
@@ -94,6 +93,11 @@ public class CubeImageView extends ImageView {
 		}
 	}
 
+	public void onLoadFinish() {
+		mUrl = null;
+		mImageTask = null;
+	}
+
 	public void loadImage(ImageLoader imageLoader, String url) {
 		loadImage(imageLoader, url, 0, 0, null);
 	}
@@ -132,9 +136,6 @@ public class CubeImageView extends ImageView {
 	private void tryLoadImage() {
 
 		if (TextUtils.isEmpty(mUrl)) {
-			return;
-		}
-		if (mLastUrl != null && mLastUrl.equals(mUrl)) {
 			return;
 		}
 

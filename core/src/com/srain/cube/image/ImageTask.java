@@ -180,6 +180,7 @@ public class ImageTask {
 		do {
 			final CubeImageView imageView = holder.getImageView();
 			if (null != imageView) {
+				imageView.onLoadFinish();
 				handler.onLoadFinish(this, imageView, drawable);
 			}
 		} while ((holder = holder.mNext) != null);
