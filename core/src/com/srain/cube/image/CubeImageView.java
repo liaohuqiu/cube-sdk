@@ -1,9 +1,11 @@
 package com.srain.cube.image;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
+import android.net.Uri;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
@@ -51,9 +53,16 @@ public class CubeImageView extends ImageView {
 
 		if (null != mImageTask && null != mImageLoader) {
 			mImageLoader.detachImageViewFromImageTask(mImageTask, this);
+			clearLoadTask();
 		}
 
 		super.onDetachedFromWindow();
+	}
+
+	@Override
+	protected void onAttachedToWindow() {
+		super.onAttachedToWindow();
+		tryLoadImage();
 	}
 
 	/**
@@ -72,6 +81,24 @@ public class CubeImageView extends ImageView {
 
 		// Notify old Drawable so it is no longer being displayed
 		notifyDrawable(previousDrawable, false);
+	}
+
+	@Override
+	public void setImageBitmap(Bitmap bm) {
+		super.setImageBitmap(bm);
+		clearLoadTask();
+	}
+
+	@Override
+	public void setImageResource(int resId) {
+		super.setImageResource(resId);
+		clearLoadTask();
+	}
+
+	@Override
+	public void setImageURI(Uri uri) {
+		super.setImageURI(uri);
+		clearLoadTask();
 	}
 
 	/**
@@ -94,8 +121,6 @@ public class CubeImageView extends ImageView {
 	}
 
 	public void onLoadFinish() {
-		mUrl = null;
-		mImageTask = null;
 	}
 
 	public void loadImage(ImageLoader imageLoader, String url) {
@@ -116,6 +141,10 @@ public class CubeImageView extends ImageView {
 
 	public void loadImage(ImageLoader imageLoader, String url, int specifiedWidth, int specifieHeight) {
 		loadImage(imageLoader, url, specifiedWidth, specifieHeight, null);
+	}
+
+	private void clearLoadTask() {
+		mImageTask = null;
 	}
 
 	public void loadImage(ImageLoader imageLoader, String url, int specifiedWidth, int specifieHeight, ImageReuseInfo imageReuseInfo) {
