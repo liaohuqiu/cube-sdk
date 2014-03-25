@@ -13,7 +13,7 @@ import com.srain.cube.util.CLog;
 /**
  * A adapter using View Holder to display the item of a list view;
  * 
- * @author huqiu.lhq
+ * @author http://www.liaohuqiu.net
  * 
  * @param <ItemDataType>
  */

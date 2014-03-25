@@ -23,7 +23,7 @@ import com.srain.cube.image.ImageReuseInfoManger;
  */
 public class Images {
 
-	private static final String[] sizeList = new String[] { "big_360", "small_180" };
+	private static final String[] sizeList = new String[] { "small_180", "big_360", "big" };
 	public static final ImageReuseInfoManger sImageReuseInfoManger = new ImageReuseInfoManger(sizeList);
 
 	public final static String[] imageUrls = new String[] { "http://jpp1.imghb.com/pic/pic/39/96/39/1404993139963936.jpg", "http://jpp2.imghb.com/pic/pic/63/73/28/1402385963732871.png",

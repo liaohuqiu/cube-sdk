@@ -23,7 +23,7 @@ import com.srain.cube.request.SimpleRequest;
  * callback which will be applied after the request is finished.
  * </p>
  * 
- * @author huqiu.lhq
+ * @author http://www.liaohuqiu.net
  */
 public class SampleRequest {
 

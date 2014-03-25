@@ -15,11 +15,4 @@ public interface ImageResizer {
 	 * You should better calculate this value according the hard device of the mobile.
 	 */
 	int getInSampleSize(ImageTask imageTask);
-
-	/**
-	 * If you have a thumbnail web service which can return multiple size image according the url,
-	 * 
-	 * you can implements this method to return the specified url according the request size.
-	 */
-	String getResizedUrl(ImageTask imageTask);
 }

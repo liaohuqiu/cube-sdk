@@ -13,7 +13,6 @@ import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build.VERSION_CODES;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.srain.cube.file.DiskLruCache;
@@ -32,7 +31,7 @@ import com.srain.cube.util.Version;
  * 
  * Most of the code is taken from the Android best practice of displaying Bitmaps <a href="http://developer.android.com/training/displaying-bitmaps/index.html">Displaying Bitmaps Efficiently</a>.
  * 
- * @author huqiu.lhq
+ * @author http://www.liaohuqiu.net
  */
 public class ImageProvider {
 
@@ -40,12 +39,12 @@ public class ImageProvider {
 
 	protected static final String TAG = "image_provider";
 
-	private static final String MSG_FETCH_BEGIN = "%s fetchBitmapData, %s, size:%s";
-	private static final String MSG_FETCH_TRY_REUSE = "%s Disk Cache not hit. Try to reuse, %s";
+	private static final String MSG_FETCH_BEGIN = "%s fetchBitmapData, file cache key: %s";
+	private static final String MSG_FETCH_TRY_REUSE = "%s Disk Cache not hit. Try to reuse";
 	private static final String MSG_FETCH_HIT_DISK_CACHE = "%s Disk Cache hit %s";
 	private static final String MSG_FETCH_REUSE_SUCC = "%s reuse size: %s";
 	private static final String MSG_FETCH_REUSE_FAIL = "%s reuse fail: %s, %s";
-	private static final String MSG_FETCH_DOWNLOAD = "%s not found in cache, downloading: %s";
+	private static final String MSG_FETCH_DOWNLOAD = "%s downloading: %s";
 	private static final String MSG_DECODE = "%s decode: %sx%s inSampleSize:%s";
 
 	private ImageMemoryCache mMemoryCache;
@@ -122,50 +121,39 @@ public class ImageProvider {
 	}
 
 	/**
-	 * Get Bitmap
+	 * Get Bitmap. If not exist in file cache, will try to re-use the file cache of the other sizes.
+	 * 
+	 * If no file cache can be used, download then save to file.
 	 */
 	public Bitmap fetchBitmapData(ImageTask imageTask, ImageResizer imageResizer) {
 		Bitmap bitmap = null;
 		if (mFileCache != null) {
 			InputStream inputStream = null;
 
-			String cacheKey = null;
-			String indentitySizeKey = null;
-
+			String fileCacheKey = imageTask.getFileCacheKey();
 			ImageReuseInfo reuseInfo = imageTask.getImageReuseInfo();
-			if (reuseInfo != null) {
-				indentitySizeKey = reuseInfo.getIndentitySize();
-			}
 
-			cacheKey = imageTask.genFileCacheKey(indentitySizeKey);
 			if (DEBUG) {
-				Log.d(TAG, String.format(MSG_FETCH_BEGIN, imageTask, cacheKey, indentitySizeKey));
+				Log.d(TAG, String.format(MSG_FETCH_BEGIN, imageTask, fileCacheKey));
 			}
 
-			inputStream = mFileCache.read(cacheKey);
+			// read from file cache
+			inputStream = mFileCache.read(fileCacheKey);
 
 			// try to reuse
-			if (inputStream == null && reuseInfo != null && reuseInfo.getResuzeSize() != null) {
-				if (DEBUG) {
-					Log.d(TAG, String.format(MSG_FETCH_TRY_REUSE, imageTask, cacheKey));
-				}
-
-				final String[] sizeKeyList = reuseInfo.getResuzeSize();
-
-				boolean canBeReused = false;
-				for (int i = 0; i < sizeKeyList.length; i++) {
-					String size = sizeKeyList[i];
-
-					if (indentitySizeKey.equals(size)) {
-						canBeReused = true;
-						continue;
+			if (inputStream == null) {
+				if (reuseInfo != null && reuseInfo.getReuseSizeList() != null && reuseInfo.getReuseSizeList().length > 0) {
+					if (DEBUG) {
+						Log.d(TAG, String.format(MSG_FETCH_TRY_REUSE, imageTask));
 					}
 
-					if (!TextUtils.isEmpty(size) && canBeReused) {
-						final String key = imageTask.genFileCacheKey(size);
+					final String[] sizeKeyList = reuseInfo.getReuseSizeList();
+					for (int i = 0; i < sizeKeyList.length; i++) {
+						String size = sizeKeyList[i];
+						final String key = ImageTask.genFileCacheKey(imageTask.getOriginUrl(), size);
 						inputStream = mFileCache.read(key);
+
 						if (inputStream != null) {
-							cacheKey = key;
 							if (DEBUG) {
 								Log.d(TAG, String.format(MSG_FETCH_REUSE_SUCC, imageTask, size));
 							}
@@ -179,33 +167,33 @@ public class ImageProvider {
 				}
 			} else {
 				if (DEBUG) {
-					Log.d(TAG, String.format(MSG_FETCH_HIT_DISK_CACHE, imageTask, cacheKey));
+					Log.d(TAG, String.format(MSG_FETCH_HIT_DISK_CACHE, imageTask, fileCacheKey));
 				}
 			}
+
+			// We've got nothing from file cache
 			try {
 				if (inputStream == null) {
 					if (DEBUG) {
-						Log.d(TAG, String.format(MSG_FETCH_DOWNLOAD, imageTask, imageResizer.getResizedUrl(imageTask)));
+						Log.d(TAG, String.format(MSG_FETCH_DOWNLOAD, imageTask, fileCacheKey));
 					}
-					DiskLruCache.Editor editor = mFileCache.open(cacheKey);
+					DiskLruCache.Editor editor = mFileCache.open(fileCacheKey);
 					if (editor != null) {
-						if (Downloader.downloadUrlToStream(imageResizer.getResizedUrl(imageTask), editor.newOutputStream(0))) {
+						if (Downloader.downloadUrlToStream(imageTask.getRemoteUrl(), editor.newOutputStream(0))) {
 							editor.commit();
 						} else {
 							editor.abort();
 						}
 					} else {
-						Log.e(TAG, imageTask + " open editor fail.");
+						Log.e(TAG, imageTask + " open editor fail. file cache key: " + fileCacheKey);
 					}
-					inputStream = mFileCache.read(cacheKey);
+					inputStream = mFileCache.read(fileCacheKey);
 				}
 				if (inputStream != null) {
 					FileDescriptor fd = ((FileInputStream) inputStream).getFD();
 					bitmap = decodeSampledBitmapFromDescriptor(fd, imageTask, imageResizer);
-					// bitmap = convertForImageViewScaleType(bitmap, imageTask);
-
 				} else {
-					Log.e(TAG, imageTask + " fetch bitmap fail.");
+					Log.e(TAG, imageTask + " fetch bitmap fail. file cache key: " + fileCacheKey);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -229,7 +217,7 @@ public class ImageProvider {
 		options.inJustDecodeBounds = true;
 		BitmapFactory.decodeFileDescriptor(fileDescriptor, null, options);
 
-		imageTask.setOriginSize(options.outWidth, options.outHeight);
+		imageTask.setBitmapOriginSize(options.outWidth, options.outHeight);
 
 		// Calculate inSampleSize
 		options.inSampleSize = imageResizer.getInSampleSize(imageTask);
@@ -238,7 +226,7 @@ public class ImageProvider {
 		options.inJustDecodeBounds = false;
 
 		if (DEBUG) {
-			Log.d(TAG, String.format(MSG_DECODE, imageTask, imageTask.getOriginSize().x, imageTask.getOriginSize().y, options.inSampleSize));
+			Log.d(TAG, String.format(MSG_DECODE, imageTask, imageTask.getBitmapOriginSize().x, imageTask.getBitmapOriginSize().y, options.inSampleSize));
 		}
 
 		Bitmap bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor, null, options);

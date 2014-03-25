@@ -1,7 +1,7 @@
 package com.srain.cube.request;
 
 /**
- * @author huqiu.lhq
+ * @author http://www.liaohuqiu.net
  */
 public class JsonSimpleRequest extends SimpleRequest<JsonData> {
 

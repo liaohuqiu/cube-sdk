@@ -12,6 +12,7 @@ import android.widget.ListView;
 import com.srain.cube.image.CubeImageView;
 import com.srain.cube.image.ImageLoader;
 import com.srain.cube.image.ImageLoaderFactory;
+import com.srain.cube.image.ImageReuseInfo;
 import com.srain.cube.image.imple.DefaultImageLoadHandler;
 import com.srain.cube.sample.R;
 import com.srain.cube.sample.activity.TitleBaseFragment;
@@ -25,6 +26,8 @@ public class SmallListViewFragment extends TitleBaseFragment {
 
 	private ImageLoader mImageLoader;
 	public static final int sSmallImageSize = LocalDisplay.dp2px(100);
+
+	private static final ImageReuseInfo sSmallImageReuseInfo = Images.sImageReuseInfoManger.create("small_180");
 
 	@Override
 	public View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -64,7 +67,7 @@ public class SmallListViewFragment extends TitleBaseFragment {
 
 		@Override
 		public void showData(int position, String itemData) {
-			mImageView.loadImage(mImageLoader, itemData);
+			mImageView.loadImage(mImageLoader, itemData, sSmallImageReuseInfo);
 		}
 	}
 }

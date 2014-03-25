@@ -31,6 +31,7 @@ public class ImageLoader {
 	private static final String MSG_TASK_DO_IN_BACKGROUND = "%s doInBackground";
 	private static final String MSG_TASK_FINISH = "%s onFinish";
 	private static final String MSG_TASK_CANCEL = "%s onCancel";
+	private static final String MSG_TASK_HIT_CACHE = "%s hit cache %s %s";
 
 	protected static final boolean DEBUG = CLog.DEBUG_IMAGE;
 	protected static final String Log_TAG = "cube_image";
@@ -90,6 +91,17 @@ public class ImageLoader {
 		}
 	}
 
+	/**
+	 * Create an ImageTask.
+	 * <p>
+	 * You can override this method to return a customized ImagetTask.
+	 * 
+	 * @param url
+	 * @param requestWidth
+	 * @param requestHeight
+	 * @param imageReuseInfo
+	 * @return
+	 */
 	public ImageTask createImageTask(String url, int requestWidth, int requestHeight, ImageReuseInfo imageReuseInfo) {
 		return new ImageTask(url, requestWidth, requestWidth, imageReuseInfo);
 	}
@@ -153,6 +165,13 @@ public class ImageLoader {
 		if (drawable == null) {
 			return false;
 		}
+
+		if (DEBUG) {
+			Log.d(Log_TAG, String.format(MSG_TASK_HIT_CACHE, imageTask, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight()));
+			if (drawable.getIntrinsicWidth() == 270) {
+				Log.d(Log_TAG, String.format(MSG_TASK_HIT_CACHE, imageTask, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight()));
+			}
+		}
 		imageTask.addImageView(imageView);
 		imageTask.onLoadFinish(drawable, mImageLoadHandler);
 		return true;
@@ -164,6 +183,11 @@ public class ImageLoader {
 		}
 	}
 
+	/**
+	 * Inner class to process the image loading task in background threads.
+	 * 
+	 * @author http://www.liaohuqiu.net
+	 */
 	private class LoadImageTask extends SimpleTask {
 
 		private ImageTask mImageTask;

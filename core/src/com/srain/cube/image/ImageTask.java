@@ -5,8 +5,6 @@ import java.lang.ref.WeakReference;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.text.TextUtils;
-import android.util.SparseArray;
-import android.widget.ImageView.ScaleType;
 
 import com.srain.cube.image.iface.ImageLoadHandler;
 import com.srain.cube.util.Encrypt;
@@ -14,7 +12,7 @@ import com.srain.cube.util.Encrypt;
 /**
  * A wrapper of the related information used in loading a bitmap
  * 
- * @author huqiu.lhq
+ * @author http://www.liaohuqiu.net
  */
 public class ImageTask {
 
@@ -22,53 +20,41 @@ public class ImageTask {
 
 	private int mFlag;
 	protected int mId;
-	protected String mUrl;
+	protected String mOriginUrl;
 
-	private Point mRequestSize = new Point();
-	protected Point mOriginSize = new Point();
+	protected Point mRequestSize = new Point();
+	protected Point mBitmapOriginSize = new Point();
 
-	private static final String SIZE_SP = "_";
+	private final static String SIZE_SP = "_";
 	private final static int STATUS_PRE_LOAD = 0x01;
 	private final static int STATUS_LOADING = 0x02;
 	private final static int STATUS_DONE = 0x04;
 	private final static int STATUS_CANCELED = 0x08;
 
-	protected SparseArray<String> mReuseCacheKeys = new SparseArray<String>();
-
-	private String mIndentityKey;
+	private String mIdentityKey;
 	private String mStr;
 
 	private ImageViewHolder mFirstImageViewHolder;
 	protected ImageReuseInfo mImageReuseInfo;
-	protected ScaleType mScaleType;
-	protected boolean mAdjustBounds = false;
 
-	public ImageTask(String url, int requestWidth, int requestHeight, ImageReuseInfo imageReuseInfo) {
+	public ImageTask(String originUrl, int requestWidth, int requestHeight, ImageReuseInfo imageReuseInfo) {
 
 		mId = ++sId;
 
-		mUrl = url;
+		mOriginUrl = originUrl;
+		mRequestSize = new Point(requestWidth, requestHeight);
 		if (imageReuseInfo != null) {
 			mImageReuseInfo = imageReuseInfo;
 		}
-		mRequestSize = new Point(requestWidth, requestHeight);
-		mIndentityKey = genSizeKey(mUrl, mRequestSize.x, mRequestSize.y);
 	}
 
-	public void setCacleType(ScaleType scaleType) {
-		mScaleType = scaleType;
-	}
-
-	public ScaleType getScaleType() {
-		return mScaleType;
-	}
-
-	public boolean isAdjustBounds() {
-		return mAdjustBounds;
-	}
-
-	public void setAdjustBound(boolean adjust) {
-		mAdjustBounds = adjust;
+	/**
+	 * Generate the identity key.
+	 * 
+	 * @return
+	 */
+	protected String genIdentityKey() {
+		return joinSizeInfo(mOriginUrl, mRequestSize.x, mRequestSize.y);
 	}
 
 	public boolean isPreLoad() {
@@ -83,6 +69,15 @@ public class ImageTask {
 		return (mFlag & STATUS_LOADING) != 0;
 	}
 
+	public boolean isLoadingThisUrl(String url) {
+		return mOriginUrl.equals(url);
+	}
+
+	/**
+	 * Bind ImageView with ImageTask
+	 * 
+	 * @param imageView
+	 */
 	public void addImageView(CubeImageView imageView) {
 		if (null == imageView) {
 			return;
@@ -138,6 +133,11 @@ public class ImageTask {
 		} while ((holder = holder.mNext) != null);
 	}
 
+	/**
+	 * Check if this ImageTask has any related ImageViews.
+	 * 
+	 * @return
+	 */
 	public boolean stillHasRelatedImageView() {
 		if (null == mFirstImageViewHolder || mFirstImageViewHolder.getImageView() == null) {
 			return false;
@@ -186,33 +186,37 @@ public class ImageTask {
 		} while ((holder = holder.mNext) != null);
 	}
 
-	public CubeImageView getAImageView() {
-		ImageViewHolder holder = mFirstImageViewHolder;
-
-		CubeImageView imageView = null;
-		do {
-			if ((imageView = holder.getImageView()) != null) {
-				return imageView;
-			}
-		} while ((holder = holder.mNext) != null);
-		return null;
-	}
-
 	public void onCancel() {
 		mFlag &= ~STATUS_LOADING;
 		mFlag |= STATUS_CANCELED;
 	}
 
+	/**
+	 * If you have a thumbnail web service which can return multiple size image according the url,
+	 * 
+	 * you can implements this method to return the specified url according the request size.
+	 * 
+	 * @return
+	 */
 	public String getRemoteUrl() {
-		return mUrl;
+		return mOriginUrl;
 	}
 
-	public void setOriginSize(int width, int height) {
-		mOriginSize = new Point(width, height);
+	/**
+	 * Return the origin request url
+	 * 
+	 * @return
+	 */
+	public String getOriginUrl() {
+		return mOriginUrl;
 	}
 
-	public Point getOriginSize() {
-		return mOriginSize;
+	public void setBitmapOriginSize(int width, int height) {
+		mBitmapOriginSize = new Point(width, height);
+	}
+
+	public Point getBitmapOriginSize() {
+		return mBitmapOriginSize;
 	}
 
 	public Point getRequestSize() {
@@ -223,21 +227,52 @@ public class ImageTask {
 	 * Return the key which identifies this Image Wrapper object.
 	 */
 	public String getIdentityKey() {
-		return mIndentityKey;
+		if (mIdentityKey == null) {
+			mIdentityKey = genIdentityKey();
+		}
+		return mIdentityKey;
 	}
 
-	protected static String genSizeKey(String key, int w, int h) {
+	/**
+	 * Join the key and the size information.
+	 * 
+	 * @param key
+	 * @param w
+	 * @param h
+	 * @return
+	 */
+	public static String joinSizeInfo(String key, int w, int h) {
 		if (w > 0 && h != Integer.MAX_VALUE && h > 0 && h != Integer.MAX_VALUE) {
 			return new StringBuilder(key).append(SIZE_SP).append(w).append(SIZE_SP).append(h).toString();
 		}
 		return key;
 	}
 
-	public String genFileCacheKey(String sizeTag) {
-		if (TextUtils.isEmpty(sizeTag)) {
-			return Encrypt.md5(mUrl);
+	/**
+	 * Generate the file cache key, just using the md5 algorithm.
+	 * 
+	 * @param key
+	 * @param part2
+	 * @return
+	 */
+	public static String genFileCacheKey(String key, String part2) {
+		if (TextUtils.isEmpty(part2)) {
+			return Encrypt.md5(key);
 		} else {
-			return Encrypt.md5(new StringBuilder(mUrl).append(SIZE_SP).append(sizeTag).toString());
+			return Encrypt.md5(new StringBuilder(key).append(SIZE_SP).append(part2).toString());
+		}
+	}
+
+	/**
+	 * Return the cache key for file cache.
+	 * 
+	 * @return
+	 */
+	public String getFileCacheKey() {
+		if (mImageReuseInfo != null) {
+			return genFileCacheKey(mOriginUrl, mImageReuseInfo.getIdentitySize());
+		} else {
+			return genFileCacheKey(getIdentityKey(), null);
 		}
 	}
 
@@ -245,6 +280,7 @@ public class ImageTask {
 		return mImageReuseInfo;
 	}
 
+	@Override
 	public boolean equals(Object object) {
 		if (object != null && object instanceof ImageTask) {
 			return ((ImageTask) object).getIdentityKey().equals(getIdentityKey());
@@ -255,13 +291,13 @@ public class ImageTask {
 	@Override
 	public String toString() {
 		if (mStr == null) {
-			mStr = String.format("%s %sx%s", mId, mRequestSize.x, mRequestSize.y);
+			mStr = String.format("%s %sx%s %s", mId, mRequestSize.x, mRequestSize.y, getIdentityKey());
 		}
 		return mStr;
 	}
 
 	/**
-	 * A tiny and light linked list like container to hold all the ImageView related to ImageTask
+	 * A tiny and light linked-list like container to hold all the ImageViews related to the ImageTask.
 	 */
 	private static class ImageViewHolder {
 		private WeakReference<CubeImageView> mImageViewRef;

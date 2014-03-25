@@ -7,7 +7,7 @@ import com.srain.cube.app.lifecycle.LifeCycleComponentManager;
 /**
  * 1. manager the components when move from a lifetime to another
  * 
- * @author huqiu.lhq
+ * @author http://www.liaohuqiu.net
  */
 public abstract class XActivity extends CubeFragmentActivity implements IComponentContainer {
 

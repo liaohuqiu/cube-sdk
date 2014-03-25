@@ -23,7 +23,7 @@ import com.srain.cube.util.Version;
  * 
  * This loader will put a background to ImageView when the image is loading.
  * 
- * @author huqiu.lhq
+ * @author http://www.liaohuqiu.net
  */
 public class DefaultImageLoadHandler implements ImageLoadHandler {
 

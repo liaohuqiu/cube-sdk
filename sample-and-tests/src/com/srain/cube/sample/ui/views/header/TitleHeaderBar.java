@@ -20,7 +20,7 @@ import com.srain.cube.sample.R;
  * <p>
  * <a href="http://www.liaohuqiu.net/unified-title-header/">http://www.liaohuqiu.net/unified-title-header/</a>
  * 
- * @author huqiu.lhq
+ * @author http://www.liaohuqiu.net
  */
 public class TitleHeaderBar extends HeaderBarBase {
 

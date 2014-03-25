@@ -12,7 +12,7 @@ import android.os.Message;
 
 /**
  * 
- * @author huqiu.lhq
+ * @author http://www.liaohuqiu.net
  */
 public class SimpleRequestManager {
 

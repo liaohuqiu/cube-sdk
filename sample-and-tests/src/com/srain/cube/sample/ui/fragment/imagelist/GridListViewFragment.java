@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import com.srain.cube.image.CubeImageView;
 import com.srain.cube.image.ImageLoader;
 import com.srain.cube.image.ImageLoaderFactory;
+import com.srain.cube.image.ImageReuseInfo;
 import com.srain.cube.sample.R;
 import com.srain.cube.sample.activity.TitleBaseFragment;
 import com.srain.cube.sample.data.Images;
@@ -25,6 +26,8 @@ public class GridListViewFragment extends TitleBaseFragment {
 
 	private static final int sGirdImageSize = (LocalDisplay.SCREEN_WIDTH_PIXELS - LocalDisplay.dp2px(10 + 10 + 10)) / 2;
 	private ImageLoader mImageLoader;
+
+	private static final ImageReuseInfo sGridImageReuseInfo = Images.sImageReuseInfoManger.create("big_360");
 
 	@Override
 	public View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -70,7 +73,7 @@ public class GridListViewFragment extends TitleBaseFragment {
 
 				}
 			}
-			mImageView.loadImage(mImageLoader, itemData);
+			mImageView.loadImage(mImageLoader, itemData, sGridImageReuseInfo);
 		}
 	}
 }

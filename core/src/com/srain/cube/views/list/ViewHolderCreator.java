@@ -3,7 +3,7 @@ package com.srain.cube.views.list;
 /**
  * A interface that defines what a View Holder Creator should do.
  * 
- * @author huqiu.lhq
+ * @author http://www.liaohuqiu.net
  * 
  * @param <ItemDataType>
  *            the generic type of the data in each item of a list.

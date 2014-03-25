@@ -16,7 +16,7 @@ import com.srain.cube.R;
 
 /**
  * 
- * @author huqiu.lhq
+ * @author http://www.liaohuqiu.net
  */
 public class ScrollHeaderFrame extends RelativeLayout {
 

@@ -8,7 +8,7 @@ import com.srain.cube.image.iface.ImageResizer;
 /**
  * A default implementation of {@link ImageResizer}
  * 
- * @author huqiu.lhq
+ * @author http://www.liaohuqiu.net
  * 
  */
 public class DefaultResizer implements ImageResizer {
@@ -24,7 +24,7 @@ public class DefaultResizer implements ImageResizer {
 
 	@Override
 	public int getInSampleSize(ImageTask imageTask) {
-		int size = calculateInSampleSize(imageTask.getOriginSize().x, imageTask.getOriginSize().y, imageTask.getRequestSize().x, imageTask.getRequestSize().y);
+		int size = calculateInSampleSize(imageTask.getBitmapOriginSize().x, imageTask.getBitmapOriginSize().y, imageTask.getRequestSize().x, imageTask.getRequestSize().y);
 		return size;
 	}
 
@@ -53,10 +53,5 @@ public class DefaultResizer implements ImageResizer {
 			}
 		}
 		return inSampleSize;
-	}
-
-	@Override
-	public String getResizedUrl(ImageTask imageTask) {
-		return imageTask.getRemoteUrl();
 	}
 }

@@ -47,6 +47,7 @@ public class BigListViewFragment extends TitleBaseFragment {
 			}
 		});
 		listView.setAdapter(adpter);
+		String[] urls = { "http://wwc.taobaocdn.com/avatar/get_avatar.do?userId=35805952&width=160&height=160&type=sns" };
 		adpter.getDataList().addAll(Arrays.asList(Images.imageUrls));
 		adpter.notifyDataSetChanged();
 

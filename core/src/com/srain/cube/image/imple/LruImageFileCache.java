@@ -25,7 +25,7 @@ import com.srain.cube.util.CLog;
  * 
  * Most of the code is taken from the Android best practice of displaying Bitmaps <a href="http://developer.android.com/training/displaying-bitmaps/index.html">Displaying Bitmaps Efficiently</a>.
  * 
- * @author huqiu.lhq
+ * @author http://www.liaohuqiu.net
  */
 public class LruImageFileCache {
 
@@ -192,8 +192,10 @@ public class LruImageFileCache {
 	public Editor open(String key) throws IOException {
 		if (null != mDiskLruCache) {
 			return mDiskLruCache.edit(key);
+		} else {
+			Log.e(TAG, "mDiskLruCache is null");
+			return null;
 		}
-		return null;
 	}
 
 	/**
@@ -268,7 +270,7 @@ public class LruImageFileCache {
 	/**
 	 * A helper class to encapsulate the operate into a Work which will be executed by the Worker.
 	 * 
-	 * @author huqiu.lhq
+	 * @author http://www.liaohuqiu.net
 	 * 
 	 */
 	private class FileCacheTask extends SimpleTask {

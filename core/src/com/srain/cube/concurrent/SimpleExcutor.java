@@ -16,7 +16,7 @@ import android.os.Build;
  * 
  * Use a Thead pool to manager the thread.
  * 
- * @author huqiu.lhq
+ * @author http://www.liaohuqiu.net
  * 
  */
 public class SimpleExcutor {

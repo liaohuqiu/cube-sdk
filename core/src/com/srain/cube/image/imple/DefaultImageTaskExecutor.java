@@ -17,7 +17,7 @@ import com.srain.cube.util.Version;
  * 
  * Use a Thread pool to manager the thread.
  * 
- * @author huqiu.lhq
+ * @author http://www.liaohuqiu.net
  * 
  */
 public class DefaultImageTaskExecutor implements ImageTaskExcutor {

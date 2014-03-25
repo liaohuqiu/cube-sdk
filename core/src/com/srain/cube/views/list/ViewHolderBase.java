@@ -12,7 +12,7 @@ import android.view.View;
  * 
  * This class encapsulate the base operate of a View Holder: createView / showData
  * 
- * @author huqiu.lhq
+ * @author http://www.liaohuqiu.net
  * 
  * @param <ItemDataType>
  *            the generic type of the data in each item

@@ -14,7 +14,7 @@ import android.widget.RelativeLayout;
  * <p>
  * <a href="http://www.liaohuqiu.net/unified-title-header/">http://www.liaohuqiu.net/unified-title-header/</a>
  * 
- * @author huqiu.lhq
+ * @author http://www.liaohuqiu.net
  */
 public class HeaderBarBase extends RelativeLayout {
 

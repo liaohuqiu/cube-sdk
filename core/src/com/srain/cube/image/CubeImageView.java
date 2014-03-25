@@ -123,6 +123,10 @@ public class CubeImageView extends ImageView {
 	public void onLoadFinish() {
 	}
 
+	private void clearLoadTask() {
+		mImageTask = null;
+	}
+
 	public void loadImage(ImageLoader imageLoader, String url) {
 		loadImage(imageLoader, url, 0, 0, null);
 	}
@@ -141,10 +145,6 @@ public class CubeImageView extends ImageView {
 
 	public void loadImage(ImageLoader imageLoader, String url, int specifiedWidth, int specifieHeight) {
 		loadImage(imageLoader, url, specifiedWidth, specifieHeight, null);
-	}
-
-	private void clearLoadTask() {
-		mImageTask = null;
 	}
 
 	public void loadImage(ImageLoader imageLoader, String url, int specifiedWidth, int specifieHeight, ImageReuseInfo imageReuseInfo) {
@@ -191,7 +191,7 @@ public class CubeImageView extends ImageView {
 		if (null != mImageTask) {
 
 			// duplicated ImageTask, return directly.
-			if (mImageTask.getRemoteUrl().equals(mUrl)) {
+			if (mImageTask.isLoadingThisUrl(mUrl)) {
 				return;
 			}
 			// ImageView is reused, detach it from the related ImageViews of the previous ImageTask.

@@ -8,7 +8,7 @@ import android.os.Message;
 /**
  * A class which encapsulate a task that can execute in background thread and can be cancelled.
  * 
- * @author huqiu.lhq
+ * @author http://www.liaohuqiu.net
  */
 public abstract class SimpleTask implements Runnable {
 

@@ -15,7 +15,7 @@ import com.srain.cube.file.FileUtil;
 
 /**
  * 
- * @author huqiu.lhq
+ * @author http://www.liaohuqiu.net
  */
 public class RequestCache {
 
