@@ -33,7 +33,7 @@ public class SmallListViewFragment extends TitleBaseFragment {
 	public View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
 		mImageLoader = ImageLoaderFactory.create(getActivity());
-		((DefaultImageLoadHandler) mImageLoader.getImageLoadHandler()).setImageRounded(true, 15);
+		((DefaultImageLoadHandler) mImageLoader.getImageLoadHandler()).setImageRounded(true, 25);
 
 		final View v = inflater.inflate(R.layout.fragment_image_list_small, container, false);
 

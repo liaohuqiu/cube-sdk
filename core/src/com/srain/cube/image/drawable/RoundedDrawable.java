@@ -14,7 +14,7 @@ import android.graphics.drawable.Drawable;
 /**
  * A drawable with rounded corners;
  * 
- * @author srain
+ * @author http://www.liaohuqiu.net
  */
 public class RoundedDrawable extends Drawable {
 

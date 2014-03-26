@@ -12,7 +12,7 @@ import com.srain.cube.image.imple.DefaultResizer;
 /**
  * Manager the ImageTask loading list,
  * 
- * @author srain
+ * @author http://www.liaohuqiu.net
  */
 public class ImageLoaderFactory {
 

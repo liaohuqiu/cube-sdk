@@ -39,9 +39,14 @@ public class ImageProvider {
 
 	protected static final String TAG = "image_provider";
 
-	private static final String MSG_FETCH_BEGIN = "%s fetchBitmapData, file cache key: %s";
+	private static final String MSG_FETCH_BEGIN = "%s fetchBitmapData";
+	private static final String MSG_FETCH_BEGIN_IDENTITY_KEY = "%s identityKey: %s";
+	private static final String MSG_FETCH_BEGIN_FILE_CACHE_KEY = "%s fileCacheKey: %s";
+	private static final String MSG_FETCH_BEGIN_IDENTITY_URL = "%s identityUrl: %s";
+	private static final String MSG_FETCH_BEGIN_ORIGIN_URL = "%s originUrl: %s";
+
 	private static final String MSG_FETCH_TRY_REUSE = "%s Disk Cache not hit. Try to reuse";
-	private static final String MSG_FETCH_HIT_DISK_CACHE = "%s Disk Cache hit %s";
+	private static final String MSG_FETCH_HIT_DISK_CACHE = "%s Disk Cache hit";
 	private static final String MSG_FETCH_REUSE_SUCC = "%s reuse size: %s";
 	private static final String MSG_FETCH_REUSE_FAIL = "%s reuse fail: %s, %s";
 	private static final String MSG_FETCH_DOWNLOAD = "%s downloading: %s";
@@ -134,7 +139,11 @@ public class ImageProvider {
 			ImageReuseInfo reuseInfo = imageTask.getImageReuseInfo();
 
 			if (DEBUG) {
-				Log.d(TAG, String.format(MSG_FETCH_BEGIN, imageTask, fileCacheKey));
+				Log.d(TAG, String.format(MSG_FETCH_BEGIN, imageTask));
+				Log.d(TAG, String.format(MSG_FETCH_BEGIN_IDENTITY_KEY, imageTask, imageTask.getIdentityKey()));
+				Log.d(TAG, String.format(MSG_FETCH_BEGIN_FILE_CACHE_KEY, imageTask, fileCacheKey));
+				Log.d(TAG, String.format(MSG_FETCH_BEGIN_ORIGIN_URL, imageTask, imageTask.getOriginUrl()));
+				Log.d(TAG, String.format(MSG_FETCH_BEGIN_IDENTITY_URL, imageTask, imageTask.getIdentityUrl()));
 			}
 
 			// read from file cache
@@ -150,7 +159,7 @@ public class ImageProvider {
 					final String[] sizeKeyList = reuseInfo.getReuseSizeList();
 					for (int i = 0; i < sizeKeyList.length; i++) {
 						String size = sizeKeyList[i];
-						final String key = ImageTask.genFileCacheKey(imageTask.getOriginUrl(), size);
+						final String key = imageTask.generateFileCacheKeyForReuse(size);
 						inputStream = mFileCache.read(key);
 
 						if (inputStream != null) {
@@ -167,19 +176,20 @@ public class ImageProvider {
 				}
 			} else {
 				if (DEBUG) {
-					Log.d(TAG, String.format(MSG_FETCH_HIT_DISK_CACHE, imageTask, fileCacheKey));
+					Log.d(TAG, String.format(MSG_FETCH_HIT_DISK_CACHE, imageTask));
 				}
 			}
 
 			// We've got nothing from file cache
 			try {
 				if (inputStream == null) {
+					String url = imageTask.getRemoteUrl();
 					if (DEBUG) {
-						Log.d(TAG, String.format(MSG_FETCH_DOWNLOAD, imageTask, fileCacheKey));
+						Log.d(TAG, String.format(MSG_FETCH_DOWNLOAD, imageTask, url));
 					}
 					DiskLruCache.Editor editor = mFileCache.open(fileCacheKey);
 					if (editor != null) {
-						if (Downloader.downloadUrlToStream(imageTask.getRemoteUrl(), editor.newOutputStream(0))) {
+						if (Downloader.downloadUrlToStream(url, editor.newOutputStream(0))) {
 							editor.commit();
 						} else {
 							editor.abort();

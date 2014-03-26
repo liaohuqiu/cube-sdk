@@ -76,8 +76,6 @@ public abstract class TitleBaseFragment extends CubeFragment {
 
 	/**
 	 * 设置标题
-	 * 
-	 * @param id
 	 */
 	protected void setHeaderTitle(String title) {
 		mTitleHeaderBar.getTitleTextView().setText(title);

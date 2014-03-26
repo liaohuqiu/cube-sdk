@@ -4,7 +4,6 @@ import java.lang.ref.WeakReference;
 
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
-import android.text.TextUtils;
 
 import com.srain.cube.image.iface.ImageLoadHandler;
 import com.srain.cube.util.Encrypt;
@@ -20,7 +19,18 @@ public class ImageTask {
 
 	private int mFlag;
 	protected int mId;
+
+	// the origin request url for the image.
 	protected String mOriginUrl;
+
+	// In some situations, we may store the same image in some different servers. So the same image will related to some different urls.
+	private String mIdentityUrl;
+
+	// The key related to the image this ImageTask is requesting.
+	private String mIdentityKey;
+
+	// cache for toString();
+	private String mStr;
 
 	protected Point mRequestSize = new Point();
 	protected Point mBitmapOriginSize = new Point();
@@ -31,11 +41,8 @@ public class ImageTask {
 	private final static int STATUS_DONE = 0x04;
 	private final static int STATUS_CANCELED = 0x08;
 
-	private String mIdentityKey;
-	private String mStr;
-
 	private ImageViewHolder mFirstImageViewHolder;
-	protected ImageReuseInfo mImageReuseInfo;
+	protected ImageReuseInfo mReuseInfo;
 
 	public ImageTask(String originUrl, int requestWidth, int requestHeight, ImageReuseInfo imageReuseInfo) {
 
@@ -44,24 +51,57 @@ public class ImageTask {
 		mOriginUrl = originUrl;
 		mRequestSize = new Point(requestWidth, requestHeight);
 		if (imageReuseInfo != null) {
-			mImageReuseInfo = imageReuseInfo;
+			mReuseInfo = imageReuseInfo;
 		}
+	}
+
+	/**
+	 * For accessing the identity url
+	 * 
+	 * @return
+	 */
+	public String getIdentityUrl() {
+		if (null == mIdentityUrl) {
+			mIdentityUrl = generateIdentityUrl(mOriginUrl);
+		}
+		return mIdentityUrl;
+	}
+
+	/**
+	 * 
+	 * In some situations, we may store the same image in some different servers. So the same image will related to some different urls.
+	 * <p>
+	 * Generate the identity url according your situation.
+	 * 
+	 * {@link #mIdentityUrl}
+	 * 
+	 * @return
+	 */
+	protected String generateIdentityUrl(String originUrl) {
+		return originUrl;
+
 	}
 
 	/**
 	 * Generate the identity key.
 	 * 
+	 * This key should be related to the unique image this task is requesting: the size, the remote url.
+	 * 
 	 * @return
 	 */
-	protected String genIdentityKey() {
-		return joinSizeInfo(mOriginUrl, mRequestSize.x, mRequestSize.y);
+	protected String genertateIdentityKey() {
+		if (mReuseInfo == null) {
+			return joinSizeInfoToKey(getIdentityUrl(), mRequestSize.x, mRequestSize.y);
+		} else {
+			return joinSizeTagToKey(getIdentityUrl(), mReuseInfo.getIdentitySize());
+		}
 	}
 
 	public boolean isPreLoad() {
 		return (mFlag & STATUS_PRE_LOAD) == STATUS_PRE_LOAD;
 	}
 
-	public void setPreLoad(boolean preload) {
+	public void setIsPreLoad() {
 		mFlag = mFlag | STATUS_PRE_LOAD;
 	}
 
@@ -69,8 +109,14 @@ public class ImageTask {
 		return (mFlag & STATUS_LOADING) != 0;
 	}
 
+	/**
+	 * Check the given url is loading.
+	 * 
+	 * @param url
+	 * @return Identify the given url, if same to {@link #mIdentityUrl} return true.
+	 */
 	public boolean isLoadingThisUrl(String url) {
-		return mOriginUrl.equals(url);
+		return getIdentityUrl().equals(generateIdentityUrl(url));
 	}
 
 	/**
@@ -228,7 +274,7 @@ public class ImageTask {
 	 */
 	public String getIdentityKey() {
 		if (mIdentityKey == null) {
-			mIdentityKey = genIdentityKey();
+			mIdentityKey = genertateIdentityKey();
 		}
 		return mIdentityKey;
 	}
@@ -239,9 +285,9 @@ public class ImageTask {
 	 * @param key
 	 * @param w
 	 * @param h
-	 * @return
+	 * @return "$key" + "_" + "$w" + "_" + "$h"
 	 */
-	public static String joinSizeInfo(String key, int w, int h) {
+	public static String joinSizeInfoToKey(String key, int w, int h) {
 		if (w > 0 && h != Integer.MAX_VALUE && h > 0 && h != Integer.MAX_VALUE) {
 			return new StringBuilder(key).append(SIZE_SP).append(w).append(SIZE_SP).append(h).toString();
 		}
@@ -249,35 +295,36 @@ public class ImageTask {
 	}
 
 	/**
-	 * Generate the file cache key, just using the md5 algorithm.
+	 * Join the tag with the key.
 	 * 
 	 * @param key
-	 * @param part2
-	 * @return
+	 * @param tag
+	 * @return "$key" + "_" + "$tag"
 	 */
-	public static String genFileCacheKey(String key, String part2) {
-		if (TextUtils.isEmpty(part2)) {
-			return Encrypt.md5(key);
-		} else {
-			return Encrypt.md5(new StringBuilder(key).append(SIZE_SP).append(part2).toString());
-		}
+	public static String joinSizeTagToKey(String key, String tag) {
+		return new StringBuilder(key).append(SIZE_SP).append(tag).toString();
 	}
 
 	/**
 	 * Return the cache key for file cache.
 	 * 
-	 * @return
+	 * @return the cache key for file cache.
 	 */
 	public String getFileCacheKey() {
-		if (mImageReuseInfo != null) {
-			return genFileCacheKey(mOriginUrl, mImageReuseInfo.getIdentitySize());
-		} else {
-			return genFileCacheKey(getIdentityKey(), null);
-		}
+		return Encrypt.md5(getIdentityKey());
+	}
+
+	/**
+	 * 
+	 * @param sizeKey
+	 * @return
+	 */
+	public String generateFileCacheKeyForReuse(String sizeKey) {
+		return Encrypt.md5(joinSizeTagToKey(getIdentityUrl(), sizeKey));
 	}
 
 	public ImageReuseInfo getImageReuseInfo() {
-		return mImageReuseInfo;
+		return mReuseInfo;
 	}
 
 	@Override
@@ -291,7 +338,7 @@ public class ImageTask {
 	@Override
 	public String toString() {
 		if (mStr == null) {
-			mStr = String.format("%s %sx%s %s", mId, mRequestSize.x, mRequestSize.y, getIdentityKey());
+			mStr = String.format("%s %sx%s", mId, mRequestSize.x, mRequestSize.y);
 		}
 		return mStr;
 	}

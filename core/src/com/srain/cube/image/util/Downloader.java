@@ -10,14 +10,11 @@ import java.net.URL;
 import android.os.Build;
 import android.util.Log;
 
-import com.srain.cube.util.CLog;
-
 /**
  * A simple class that fetches images from a URL.
  */
 public class Downloader {
 
-	private static final boolean DEBUG = CLog.DEBUG_IMAGE;
 	private static final String TAG = "image_provider";
 	private static final int IO_BUFFER_SIZE = 8 * 1024;
 
@@ -29,9 +26,6 @@ public class Downloader {
 	 * @return true if successful, false otherwise
 	 */
 	public static boolean downloadUrlToStream(String urlString, OutputStream outputStream) {
-		if (DEBUG) {
-			Log.d(TAG, String.format("downloadUrlToStream:  %s", urlString));
-		}
 		disableConnectionReuseIfNecessary();
 		HttpURLConnection urlConnection = null;
 		BufferedOutputStream out = null;

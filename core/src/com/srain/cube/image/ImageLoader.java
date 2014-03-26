@@ -22,7 +22,7 @@ import com.srain.cube.util.CLog;
 /**
  * Manager the ImageTask loading list,
  * 
- * @author srain
+ * @author http://www.liaohuqiu.net
  */
 public class ImageLoader {
 
