@@ -89,6 +89,14 @@ public class JsonData {
 		return optArrayOrNew().optBoolean(index);
 	}
 
+	public double optDouble(String name) {
+		return optMapOrNew().optDouble(name);
+	}
+
+	public double optDouble(int index) {
+		return optArrayOrNew().optDouble(index);
+	}
+
 	public boolean has(String name) {
 		return optMapOrNew().has(name);
 	}
