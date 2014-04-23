@@ -98,7 +98,7 @@ public class NetworkStatusManager {
 		ConnectivityManager connectivity = (ConnectivityManager) (context.getSystemService(Context.CONNECTIVITY_SERVICE));
 		if (connectivity != null) {
 			NetworkInfo networkInfo = connectivity.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-			if (networkInfo.isConnectedOrConnecting()) {
+			if (networkInfo != null && networkInfo.isConnectedOrConnecting()) {
 				return true;
 			}
 		}
