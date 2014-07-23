@@ -12,7 +12,6 @@ public class MainActivity extends XActivity {
 	protected void onCreate(Bundle arg0) {
 		super.onCreate(arg0);
 		setContentView(R.layout.activity_main);
-		// addFragment(BitmapFragment.class, null);
 		addFragment(HomeFragment.class, null);
 	}
 

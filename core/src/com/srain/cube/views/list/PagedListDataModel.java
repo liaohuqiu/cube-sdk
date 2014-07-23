@@ -9,7 +9,7 @@ public abstract class PagedListDataModel<T> {
 	private PagedListDataHandler mPagedListDataHandler;
 
 	public interface PagedListDataHandler {
-		public void onPageDataLoaed(ListPageInfo<?> listPageInfo);
+		public void onPageDataLoaded(ListPageInfo<?> listPageInfo);
 	}
 
 	public void setPageListDataHandler(PagedListDataHandler handler) {
@@ -39,15 +39,15 @@ public abstract class PagedListDataModel<T> {
 		if (!mListPageInfo.tryEnterLock()) {
 			return;
 		}
-		doQeuryData();
+		doQueryData();
 	}
 
-	protected abstract void doQeuryData();
+	protected abstract void doQueryData();
 
 	protected void setRequestResult(List<T> list, int total) {
 		mListPageInfo.updateListInfo(list, total);
 		if (null != mPagedListDataHandler) {
-			mPagedListDataHandler.onPageDataLoaed(mListPageInfo);
+			mPagedListDataHandler.onPageDataLoaded(mListPageInfo);
 		}
 	}
 

@@ -33,7 +33,6 @@ public class SampleRequest {
 	public static void reverse(final String str, final JsonRequestSuccHandler handler) {
 		new SimpleRequest<JsonData>(new BeforeRequestHandler() {
 
-			@Override
 			public <T> void beforeRequest(SimpleRequest<T> request) {
 
 				String url = "http://cube-server.liaohuqiu.net/api_demo/reverse.php?str=" + str;
@@ -49,7 +48,6 @@ public class SampleRequest {
 
 		new SimpleCacheableRequest<JsonData>(new CacheableRequestPreHandler() {
 
-			@Override
 			public <T> void beforeRequest(SimpleRequest<T> request) {
 				String url = "http://cube-server.liaohuqiu.net/api_demo/request.php";
 				request.setRequestUrl(url);

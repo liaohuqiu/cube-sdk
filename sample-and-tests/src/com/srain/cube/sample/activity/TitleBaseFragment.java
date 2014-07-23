@@ -13,13 +13,13 @@ import com.srain.cube.sample.ui.views.header.TitleHeaderBar;
 
 /**
  * 带页头的 页面基类
- * 
- * <p>
+ * <p/>
+ * <p/>
  * 使用一个orientation="vertical", LinearLayout，包含一个统一的页头{@link TitleHeaderBar} , 内容置于页头下部
- * 
- * <p>
+ * <p/>
+ * <p/>
  * <a href="http://www.liaohuqiu.net/unified-title-header/">http://www.liaohuqiu.net/unified-title-header/</a>
- * 
+ *
  * @author http://www.liaohuqiu.net
  */
 public abstract class TitleBaseFragment extends CubeFragment {
@@ -29,7 +29,8 @@ public abstract class TitleBaseFragment extends CubeFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-		LinearLayout view = (LinearLayout) inflater.inflate(R.layout.fragment_title_base, null);
+		View view = inflater.inflate(R.layout.fragment_title_base, null);
+		LinearLayout contentContainer = (LinearLayout) view.findViewById(R.id.ly_main_content_container);
 
 		// 页头逻辑处理
 		mTitleHeaderBar = (TitleHeaderBar) view.findViewById(R.id.ly_header_bar_title_wrap);
@@ -48,7 +49,7 @@ public abstract class TitleBaseFragment extends CubeFragment {
 
 		View contentView = createView(inflater, container, savedInstanceState);
 		contentView.setLayoutParams(new LinearLayout.LayoutParams(-1, -1));
-		view.addView(contentView);
+		contentContainer.addView(contentView);
 		return view;
 	}
 
@@ -58,7 +59,7 @@ public abstract class TitleBaseFragment extends CubeFragment {
 
 	/**
 	 * 是否使用默认的返回处理
-	 * 
+	 *
 	 * @return
 	 */
 	protected boolean enableDefaultBack() {
@@ -67,7 +68,7 @@ public abstract class TitleBaseFragment extends CubeFragment {
 
 	/**
 	 * 设置标题
-	 * 
+	 *
 	 * @param id
 	 */
 	protected void setHeaderTitle(int id) {

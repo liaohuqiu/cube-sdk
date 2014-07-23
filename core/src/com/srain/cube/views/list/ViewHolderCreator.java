@@ -9,5 +9,5 @@ package com.srain.cube.views.list;
  *            the generic type of the data in each item of a list.
  */
 public interface ViewHolderCreator<ItemDataType> {
-	public ViewHolderBase<ItemDataType> createViewHodler();
+	public ViewHolderBase<ItemDataType> createViewHolder();
 }

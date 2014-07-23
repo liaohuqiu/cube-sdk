@@ -50,7 +50,7 @@ public abstract class ListViewDataAdapterBase<ItemDataType> extends BaseAdapter 
 		ItemDataType itemData = getItem(position);
 		if (convertView == null) {
 			LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-			ViewHolderBase<ItemDataType> holderBase = mViewHolderCreator.createViewHodler();
+			ViewHolderBase<ItemDataType> holderBase = mViewHolderCreator.createViewHolder();
 
 			if (holderBase != null) {
 				convertView = holderBase.createView(inflater);

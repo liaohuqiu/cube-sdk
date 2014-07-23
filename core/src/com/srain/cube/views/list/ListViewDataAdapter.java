@@ -4,9 +4,9 @@ import java.util.ArrayList;
 
 /**
  * A adapter using View Holder to display the item of a list view;
- * 
+ *
  * @author http://www.liaohuqiu.net
- * 
+ *
  * @param <ItemDataType>
  */
 public class ListViewDataAdapter<ItemDataType> extends ListViewDataAdapterBase<ItemDataType> {
@@ -14,7 +14,7 @@ public class ListViewDataAdapter<ItemDataType> extends ListViewDataAdapterBase<I
 	protected ArrayList<ItemDataType> mItemDataList = new ArrayList<ItemDataType>();
 
 	/**
-	 * 
+	 *
 	 * @param viewHolderCreator
 	 *            The view holder creator will create a View Holder that extends {@link ViewHolderBase}
 	 */

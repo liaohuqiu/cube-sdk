@@ -10,31 +10,27 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
-import android.widget.RelativeLayout;
+import android.widget.FrameLayout;
 
 import com.srain.cube.R;
 
 /**
- * 
  * @author http://www.liaohuqiu.net
  */
-public class ScrollHeaderFrame extends RelativeLayout {
+public class ScrollHeaderFrame extends FrameLayout {
 
-	private static final boolean DEBUG = false;
+	private static final boolean DEBUG = true;
 	private static final String LOG_TAG = ScrollHeaderFrame.class.getName();
 
 	private int mHeaderHeight;
-	private int mLastTop = 0;
+	private int mCurrentTop = 0;
 	private int mHeaderId = 0;
 	private int mContainerId = 0;
-	private int mFooterId = 0;
 
 	private ViewGroup mContentViewContainer;
 	private View mHeaderContainer;
-	private View mFooterContainer;
 
 	private GestureDetector mDetector;
-	private Boolean mContentIsInVisibale = true;
 
 	public ScrollHeaderFrame(Context context) {
 		this(context, null);
@@ -55,20 +51,12 @@ public class ScrollHeaderFrame extends RelativeLayout {
 			if (arr.hasValue(R.styleable.ScrollHeaderFrame_scrollheaderframe_conent_container)) {
 				mContainerId = arr.getResourceId(R.styleable.ScrollHeaderFrame_scrollheaderframe_conent_container, 0);
 			}
-
-			if (arr.hasValue(R.styleable.ScrollHeaderFrame_scrollheaderframe_footer)) {
-				mFooterId = arr.getResourceId(R.styleable.ScrollHeaderFrame_scrollheaderframe_footer, 0);
-			}
 			arr.recycle();
 		}
 	}
 
 	public View getContentView() {
 		return mContentViewContainer;
-	}
-
-	public View getFooterView() {
-		return mFooterContainer;
 	}
 
 	public View getHeaderView() {
@@ -79,7 +67,6 @@ public class ScrollHeaderFrame extends RelativeLayout {
 	protected void onFinishInflate() {
 		super.onFinishInflate();
 		mHeaderContainer = findViewById(mHeaderId);
-		mFooterContainer = findViewById(mFooterId);
 		mContentViewContainer = (ViewGroup) findViewById(mContainerId);
 		doLayout();
 	}
@@ -100,12 +87,12 @@ public class ScrollHeaderFrame extends RelativeLayout {
 
 	@Override
 	protected void onLayout(boolean changed, int l, int t, int r, int b) {
+		super.onLayout(changed, l, t, r, b);
+		if (DEBUG) {
+			Log.d(LOG_TAG, String.format("onLayout: %s, %s %s %s", l, t, r, b));
+		}
 
 		int headerHeight = mHeaderContainer.getMeasuredHeight();
-		int footerHeight = 0;
-		if (mFooterContainer != null) {
-			footerHeight = mFooterContainer.getMeasuredHeight();
-		}
 		if (headerHeight == 0) {
 			return;
 		}
@@ -113,83 +100,88 @@ public class ScrollHeaderFrame extends RelativeLayout {
 		int w = getMeasuredWidth();
 		int h = getMeasuredHeight();
 
-		int headerOffset = mLastTop;
 
-		mHeaderContainer.layout(0, headerOffset, w, headerHeight + headerOffset);
+		int lastTop = mHeaderContainer.getTop();
+		int change = mCurrentTop - lastTop;
+		mHeaderContainer.offsetTopAndBottom(change);
+		mContentViewContainer.offsetTopAndBottom(change);
 
-		if (mContentViewContainer.getVisibility() == VISIBLE) {
-			mContentIsInVisibale = true;
-			if (mFooterContainer != null && mFooterContainer.getVisibility() == VISIBLE) {
-				mContentViewContainer.measure(MeasureSpec.makeMeasureSpec(w, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(h - footerHeight, MeasureSpec.EXACTLY));
-				mContentViewContainer.layout(0, headerHeight + headerOffset, w, h - footerHeight);
-				mFooterContainer.layout(0, h - footerHeight, w, h);
-			} else {
-				mContentViewContainer.measure(MeasureSpec.makeMeasureSpec(w, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(h, MeasureSpec.EXACTLY));
-				mContentViewContainer.layout(0, headerHeight + headerOffset, w, h);
-				if (null != mFooterContainer) {
-					mFooterContainer.layout(0, 0, 0, 0);
-				}
-			}
-		} else {
-			mContentIsInVisibale = false;
-			mContentViewContainer.layout(0, 0, 0, 0);
+		int containerOffset = headerHeight + mCurrentTop;
+		mContentViewContainer.layout(0, containerOffset, w, h);
 
-			if (mFooterContainer != null) {
-				if (mFooterContainer.getVisibility() == VISIBLE) {
-					mFooterContainer.layout(0, headerHeight + headerOffset, w, headerHeight + headerOffset + footerHeight);
-				} else {
-					mFooterContainer.layout(0, 0, 0, 0);
-				}
-			}
+		if (DEBUG) {
+			Log.d(LOG_TAG, String.format("onLayout: w:%s h:%s mCurrentTop: %s change:%s containerOffset: %s", w, h, mCurrentTop, change, containerOffset));
 		}
 	}
 
 	/**
 	 * if deltaY > 0, move the content up
 	 */
-	private boolean move(float deltaY) {
+	private void move(float deltaY) {
 
-		int top = mHeaderContainer.getTop();
 		// has reached the top
-		if ((deltaY > 0 && top == -mHeaderHeight)) {
-			return false;
+		if ((deltaY > 0 && mCurrentTop == -mHeaderHeight)) {
+			if (DEBUG) {
+				Log.d(LOG_TAG, String.format("has reached the top"));
+			}
+			return;
 		}
 
 		// has reached the bottom
-		if ((deltaY < 0 && top == 0)) {
-			return false;
+		if ((deltaY < 0 && mCurrentTop == 0)) {
+			if (DEBUG) {
+				Log.d(LOG_TAG, String.format("has reached the bottom"));
+			}
+			return;
 		}
 
-		moveUp(deltaY);
+		int to = mCurrentTop - (int) deltaY;
 
-		// adjust
-		top = mHeaderContainer.getTop();
-		if (top < -mHeaderHeight) {
-			deltaY = top - (-mHeaderHeight);
-			moveUp(deltaY);
+		// over top
+		if (to < -mHeaderHeight) {
+			if (DEBUG) {
+				Log.d(LOG_TAG, String.format("over top"));
+			}
+			to = -mHeaderHeight;
 		}
 
-		top = mHeaderContainer.getTop();
-		if (top > 0) {
-			deltaY = top - 0;
-			moveUp(deltaY);
+		// over bottom
+		if (to > 0) {
+			if (DEBUG) {
+				Log.d(LOG_TAG, String.format("over bottom"));
+			}
+			to = 0;
 		}
-		invalidate();
-
-		top = mHeaderContainer.getTop();
-		mLastTop = top;
-		return false;
+		moveTo(to);
 	}
 
-	private void moveUp(float deltaY) {
-		mHeaderContainer.offsetTopAndBottom((int) -deltaY);
-		mContentViewContainer.offsetTopAndBottom((int) -deltaY);
+	private void moveTo(int to) {
+		if (DEBUG) {
+			Log.d(LOG_TAG, String.format("moveTo: %s %s, %s", to, mCurrentTop, mHeaderHeight));
+		}
+		mCurrentTop = to;
+		invalidate();
+		requestLayout();
+	}
+
+	@Override
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+		int w = getMeasuredWidth();
+		int h = getMeasuredHeight();
+		h = h - (mHeaderHeight + mCurrentTop);
+
+		if (DEBUG) {
+			Log.d(LOG_TAG, String.format("onMeasure %s", h));
+		}
+		mContentViewContainer.measure(MeasureSpec.makeMeasureSpec(w, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(h, MeasureSpec.EXACTLY));
 	}
 
 	@Override
 	public boolean dispatchTouchEvent(MotionEvent e) {
-		if (mContentIsInVisibale) {
-			mDetector.onTouchEvent(e);
+		boolean handled = mDetector.onTouchEvent(e);
+		if (handled) {
+			return true;
 		}
 		return super.dispatchTouchEvent(e);
 	}
@@ -211,26 +203,21 @@ public class ScrollHeaderFrame extends RelativeLayout {
 		 * if deltaY > 0, the finger is move forward to the top of the screen
 		 */
 		public boolean onScroll(MotionEvent curdown, MotionEvent cur, float deltaX, float deltaY) {
-			if (!mContentIsInVisibale) {
-				return false;
-			}
 
 			float speed = Math.abs(deltaY) / (cur.getEventTime() - curdown.getEventTime());
 			boolean fastMove = speed > 0.8;
 
-			int top = mHeaderContainer.getTop();
-
 			// more readable code for develop
 			boolean moveUp = deltaY > 0;
-			boolean canMoveUp = top > -mHeaderHeight;
+			boolean canMoveUp = mCurrentTop > -mHeaderHeight;
 			boolean moveDown = !moveUp;
-			boolean canMoveDown = top < 0;
+			boolean canMoveDown = mCurrentTop < 0;
 
 			if (DEBUG) {
-				Log.d(LOG_TAG, String.format("moveUp: %s, canMoveUp: %s, moveDown: %s, canMoveDown: %s", moveUp, canMoveUp, moveDown, canMoveDown));
+				// Log.d(LOG_TAG, String.format("moveUp: %s, canMoveUp: %s, moveDown: %s, canMoveDown: %s", moveUp, canMoveUp, moveDown, canMoveDown));
 			}
-			if (fastMove && moveDown && top < 0) {
-				move(top);
+			if (fastMove && moveDown && mCurrentTop < 0) {
+				moveTo(0);
 			} else {
 				if ((moveUp && canMoveUp) || (moveDown && canMoveDown)) {
 					move(deltaY);
@@ -250,12 +237,11 @@ public class ScrollHeaderFrame extends RelativeLayout {
 	private class PTROnGlobalLayoutListener implements OnGlobalLayoutListener {
 
 		@SuppressWarnings("deprecation")
-		@Override
 		public void onGlobalLayout() {
 			int initialHeaderHeight = mHeaderContainer.getHeight();
 			if (initialHeaderHeight > 0) {
 				mHeaderHeight = initialHeaderHeight;
-				mLastTop = 0;
+				mCurrentTop = 0;
 				requestLayout();
 			}
 			getViewTreeObserver().removeGlobalOnLayoutListener(this);
