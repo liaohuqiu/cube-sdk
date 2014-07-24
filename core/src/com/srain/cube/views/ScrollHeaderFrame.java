@@ -214,7 +214,7 @@ public class ScrollHeaderFrame extends FrameLayout {
 			boolean canMoveDown = mCurrentTop < 0;
 
 			if (DEBUG) {
-				// Log.d(LOG_TAG, String.format("moveUp: %s, canMoveUp: %s, moveDown: %s, canMoveDown: %s", moveUp, canMoveUp, moveDown, canMoveDown));
+				Log.d(LOG_TAG, String.format("moveUp: %s, canMoveUp: %s, moveDown: %s, canMoveDown: %s", moveUp, canMoveUp, moveDown, canMoveDown));
 			}
 			if (fastMove && moveDown && mCurrentTop < 0) {
 				moveTo(0);

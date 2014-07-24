@@ -42,7 +42,7 @@ public class BigListViewFragment extends TitleBaseFragment {
 
 		ListViewDataAdapter<String> adpter = new ListViewDataAdapter<String>(new ViewHolderCreator<String>() {
 			@Override
-			public ViewHolderBase<String> createViewHodler() {
+			public ViewHolderBase<String> createViewHolder() {
 				return new ViewHodler();
 			}
 		});
