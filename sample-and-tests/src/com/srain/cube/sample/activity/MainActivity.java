@@ -8,19 +8,19 @@ import com.srain.cube.sample.ui.fragment.HomeFragment;
 
 public class MainActivity extends XActivity {
 
-	@Override
-	protected void onCreate(Bundle arg0) {
-		super.onCreate(arg0);
-		setContentView(R.layout.activity_main);
-		addFragment(HomeFragment.class, null);
-	}
+    @Override
+    protected void onCreate(Bundle arg0) {
+        super.onCreate(arg0);
+        setContentView(R.layout.activity_main);
+        addFragment(HomeFragment.class, null);
+    }
 
-	protected String getCloseWarning() {
-		return "Tap back to exit";
-	}
+    protected String getCloseWarning() {
+        return "Tap back to exit";
+    }
 
-	@Override
-	protected int getFragmentContianerId() {
-		return R.id.id_fragment;
-	}
+    @Override
+    protected int getFragmentContianerId() {
+        return R.id.id_fragment;
+    }
 }

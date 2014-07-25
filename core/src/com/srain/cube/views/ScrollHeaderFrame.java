@@ -65,18 +65,10 @@ public class ScrollHeaderFrame extends FrameLayout {
         super.onFinishInflate();
         mHeaderContainer = findViewById(mHeaderId);
         mContentViewContainer = (ViewGroup) findViewById(mContainerId);
-        doLayout();
-    }
-
-    @SuppressWarnings("deprecation")
-    protected void doLayout() {
 
         setDrawingCacheEnabled(false);
         setBackgroundDrawable(null);
         setClipChildren(false);
-
-        ViewTreeObserver vto = mHeaderContainer.getViewTreeObserver();
-        vto.addOnGlobalLayoutListener(new PTROnGlobalLayoutListener());
     }
 
     @Override
@@ -171,11 +163,14 @@ public class ScrollHeaderFrame extends FrameLayout {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         int w = getMeasuredWidth();
         int h = getMeasuredHeight();
+        mHeaderHeight = mHeaderContainer.getMeasuredHeight();
+
         h = h - (mHeaderHeight + mCurrentTop);
 
         if (DEBUG) {
-            Log.d(LOG_TAG, String.format("onMeasure %s", h));
+            Log.d(LOG_TAG, String.format("onMeasure %s getMeasuredHeight: %s, %s", h, mHeaderContainer.getMeasuredHeight(), this));
         }
+
         mContentViewContainer.measure(MeasureSpec.makeMeasureSpec(w, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(h, MeasureSpec.EXACTLY));
     }
 
@@ -192,6 +187,9 @@ public class ScrollHeaderFrame extends FrameLayout {
                 mPtLastMove.set(e.getX(), e.getY());
                 break;
             case MotionEvent.ACTION_MOVE:
+                if (mHeaderHeight == 0) {
+                    break;
+                }
 
                 float offsetX = mPtLastMove.x - e.getX();
                 float deltaY = (int) (mPtLastMove.y - e.getY());
@@ -201,7 +199,7 @@ public class ScrollHeaderFrame extends FrameLayout {
                 boolean moveDown = !moveUp;
                 boolean canMoveDown = mCurrentTop < 0;
                 if (DEBUG) {
-                    Log.d(LOG_TAG, String.format("ACTION_MOVE: %s, moveUp: %s, canMoveUp: %s, moveDown: %s, canMoveDown: %s", deltaY, moveUp, canMoveUp, moveDown, canMoveDown));
+                    Log.d(LOG_TAG, String.format("ACTION_MOVE: %s, moveUp: %s, canMoveUp: %s, moveDown: %s, canMoveDown: %s %s", deltaY, moveUp, canMoveUp, moveDown, canMoveDown, this));
                 }
                 if ((moveUp && canMoveUp) || (moveDown && canMoveDown)) {
                     boolean containerCanMove = tryToMoveAndCheckContainerCanMove(deltaY);
@@ -214,19 +212,5 @@ public class ScrollHeaderFrame extends FrameLayout {
                 break;
         }
         return super.dispatchTouchEvent(e);
-    }
-
-    private class PTROnGlobalLayoutListener implements OnGlobalLayoutListener {
-
-        @SuppressWarnings("deprecation")
-        public void onGlobalLayout() {
-            int initialHeaderHeight = mHeaderContainer.getHeight();
-            if (initialHeaderHeight > 0) {
-                mHeaderHeight = initialHeaderHeight;
-                mCurrentTop = 0;
-                requestLayout();
-            }
-            getViewTreeObserver().removeGlobalOnLayoutListener(this);
-        }
     }
 }
