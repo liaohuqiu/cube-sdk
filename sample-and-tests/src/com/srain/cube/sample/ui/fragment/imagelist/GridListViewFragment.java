@@ -24,56 +24,56 @@ import com.srain.cube.views.list.ViewHolderCreator;
 
 public class GridListViewFragment extends TitleBaseFragment {
 
-	private static final int sGirdImageSize = (LocalDisplay.SCREEN_WIDTH_PIXELS - LocalDisplay.dp2px(10 + 10 + 10)) / 2;
-	private ImageLoader mImageLoader;
+    private static final int sGirdImageSize = (LocalDisplay.SCREEN_WIDTH_PIXELS - LocalDisplay.dp2px(10 + 10 + 10)) / 2;
+    private ImageLoader mImageLoader;
 
-	private static final ImageReuseInfo sGridImageReuseInfo = Images.sImageReuseInfoManger.create("big_360");
+    private static final ImageReuseInfo sGridImageReuseInfo = Images.sImageReuseInfoManger.create("big_360");
 
-	@Override
-	public View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    @Override
+    public View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-		mImageLoader = ImageLoaderFactory.create(getActivity());
+        mImageLoader = ImageLoaderFactory.create(getActivity());
 
-		final View v = inflater.inflate(R.layout.fragment_image_gird, container, false);
-		GridView gridListView = (GridView) v.findViewById(R.id.ly_image_list_grid);
+        final View v = inflater.inflate(R.layout.fragment_image_gird, container, false);
+        GridView gridListView = (GridView) v.findViewById(R.id.ly_image_list_grid);
 
-		ListViewDataAdapter<String> adpter = new ListViewDataAdapter<String>(new ViewHolderCreator<String>() {
-			@Override
-			public ViewHolderBase<String> createViewHolder() {
-				return new ViewHolder();
-			}
-		});
-		gridListView.setAdapter(adpter);
-		adpter.getDataList().addAll(Arrays.asList(Images.imageUrls));
-		adpter.notifyDataSetChanged();
-		setHeaderTitle("Grid");
-		return v;
-	}
+        ListViewDataAdapter<String> adapter = new ListViewDataAdapter<String>(new ViewHolderCreator<String>() {
+            @Override
+            public ViewHolderBase<String> createViewHolder() {
+                return new ViewHolder();
+            }
+        });
+        gridListView.setAdapter(adapter);
+        adapter.getDataList().addAll(Arrays.asList(Images.imageUrls));
+        adapter.notifyDataSetChanged();
+        setHeaderTitle("Grid");
+        return v;
+    }
 
-	private class ViewHolder extends ViewHolderBase<String> {
+    private class ViewHolder extends ViewHolderBase<String> {
 
-		private CubeImageView mImageView;
+        private CubeImageView mImageView;
 
-		@Override
-		public View createView(LayoutInflater inflater) {
-			View view = LayoutInflater.from(getActivity()).inflate(R.layout.item_image_list_grid, null);
-			mImageView = (CubeImageView) view.findViewById(R.id.iv_item_iamge_list_grid);
-			mImageView.setScaleType(ScaleType.CENTER_CROP);
+        @Override
+        public View createView(LayoutInflater inflater) {
+            View view = LayoutInflater.from(getActivity()).inflate(R.layout.item_image_list_grid, null);
+            mImageView = (CubeImageView) view.findViewById(R.id.iv_item_iamge_list_grid);
+            mImageView.setScaleType(ScaleType.CENTER_CROP);
 
-			LinearLayout.LayoutParams lyp = new LinearLayout.LayoutParams(sGirdImageSize, sGirdImageSize);
-			mImageView.setLayoutParams(lyp);
-			return view;
-		}
+            LinearLayout.LayoutParams lyp = new LinearLayout.LayoutParams(sGirdImageSize, sGirdImageSize);
+            mImageView.setLayoutParams(lyp);
+            return view;
+        }
 
-		@Override
-		public void showData(int position, String itemData) {
-			if (position == 0) {
-				int a = 0;
-				if (a == 0) {
+        @Override
+        public void showData(int position, String itemData) {
+            if (position == 0) {
+                int a = 0;
+                if (a == 0) {
 
-				}
-			}
-			mImageView.loadImage(mImageLoader, itemData, sGridImageReuseInfo);
-		}
-	}
+                }
+            }
+            mImageView.loadImage(mImageLoader, itemData, sGridImageReuseInfo);
+        }
+    }
 }

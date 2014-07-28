@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-
 import com.srain.cube.app.CubeFragment;
 import com.srain.cube.sample.R;
 import com.srain.cube.sample.ui.views.header.TitleHeaderBar;
@@ -25,6 +24,7 @@ import com.srain.cube.sample.ui.views.header.TitleHeaderBar;
 public abstract class TitleBaseFragment extends CubeFragment {
 
     protected TitleHeaderBar mTitleHeaderBar;
+    protected LinearLayout mContentContainer;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -47,6 +47,7 @@ public abstract class TitleBaseFragment extends CubeFragment {
             mTitleHeaderBar.getLeftViewContainer().setVisibility(View.INVISIBLE);
         }
 
+        mContentContainer = contentContainer;
         View contentView = createView(inflater, container, savedInstanceState);
         contentView.setLayoutParams(new LinearLayout.LayoutParams(-1, -1));
         contentContainer.addView(contentView);

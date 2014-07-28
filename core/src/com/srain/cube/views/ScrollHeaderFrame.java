@@ -6,7 +6,6 @@ import android.graphics.PointF;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.*;
-import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.FrameLayout;
 
 import com.srain.cube.R;
@@ -27,9 +26,10 @@ public class ScrollHeaderFrame extends FrameLayout {
 
     private ViewGroup mContentViewContainer;
     private View mHeaderContainer;
+    private long mLastTime;
 
     private PointF mPtLastMove = new PointF();
-    private IScrollHideHeader mIScrollHideHeader;
+    private IScrollHeaderFrameHandler mIScrollHeaderFrameHandler;
 
     public ScrollHeaderFrame(Context context) {
         this(context, null);
@@ -62,15 +62,15 @@ public class ScrollHeaderFrame extends FrameLayout {
         return mHeaderContainer;
     }
 
+    public void setHandler(IScrollHeaderFrameHandler handler) {
+        mIScrollHeaderFrameHandler = handler;
+    }
+
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
         mHeaderContainer = findViewById(mHeaderId);
         mContentViewContainer = (ViewGroup) findViewById(mContainerId);
-        if (mContentViewContainer instanceof IScrollHideHeader) {
-            mIScrollHideHeader = (IScrollHideHeader) mContentViewContainer;
-        }
-
         setDrawingCacheEnabled(false);
         setBackgroundDrawable(null);
         setClipChildren(false);
@@ -181,7 +181,6 @@ public class ScrollHeaderFrame extends FrameLayout {
     @Override
     public boolean dispatchTouchEvent(MotionEvent e) {
         boolean handled = super.dispatchTouchEvent(e);
-        boolean reachTop = mIScrollHideHeader != null && mIScrollHideHeader.reachTop();
         int action = e.getAction();
         switch (action) {
             case MotionEvent.ACTION_UP:
@@ -189,6 +188,7 @@ public class ScrollHeaderFrame extends FrameLayout {
             case MotionEvent.ACTION_CANCEL:
                 break;
             case MotionEvent.ACTION_DOWN:
+                mLastTime = e.getEventTime();
                 mPtLastMove.set(e.getX(), e.getY());
                 break;
             case MotionEvent.ACTION_MOVE:
@@ -199,21 +199,29 @@ public class ScrollHeaderFrame extends FrameLayout {
                 float offsetX = mPtLastMove.x - e.getX();
                 float deltaY = (int) (mPtLastMove.y - e.getY());
                 mPtLastMove.set(e.getX(), e.getY());
+                float speed = Math.abs(deltaY / (mLastTime - e.getEventTime()));
+                mLastTime = e.getEventTime();
                 boolean moveUp = deltaY > 0;
                 boolean canMoveUp = mCurrentTop > -mHeaderHeight;
                 boolean moveDown = !moveUp;
                 boolean canMoveDown = mCurrentTop < 0;
                 if (DEBUG) {
-                    Log.d(LOG_TAG, String.format("ACTION_MOVE: %s, moveUp: %s, canMoveUp: %s, moveDown: %s, canMoveDown: %s", deltaY, moveUp, canMoveUp, moveDown, canMoveDown));
+                    Log.d(LOG_TAG, String.format("ACTION_MOVE: %s, speed: %s, moveUp: %s, canMoveUp: %s, moveDown: %s, canMoveDown: %s", speed, deltaY, moveUp, canMoveUp, moveDown, canMoveDown));
                 }
+
+                if (speed >= 10 && moveDown && mIScrollHeaderFrameHandler != null) {
+                    moveTo(0);
+                }
+                // disable move when header not reach top
+                if (moveDown && mIScrollHeaderFrameHandler != null && !mIScrollHeaderFrameHandler.hasReachTop()) {
+                    return handled;
+                }
+
                 if ((moveUp && canMoveUp) || (moveDown && canMoveDown)) {
-                    if (moveDown) {
+                    if (moveDown && mIScrollHeaderFrameHandler == null) {
                         deltaY = deltaY * 0.3f;
                     }
-                    boolean containerCanMove = tryToMoveAndCheckContainerCanMove(deltaY);
-                    if (!containerCanMove) {
-                        // return true;
-                    }
+                    tryToMoveAndCheckContainerCanMove(deltaY);
                 }
                 break;
             default:
