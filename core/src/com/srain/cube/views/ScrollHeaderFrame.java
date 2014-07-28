@@ -10,13 +10,14 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.FrameLayout;
 
 import com.srain.cube.R;
+import com.srain.cube.util.CLog;
 
 /**
  * @author http://www.liaohuqiu.net
  */
 public class ScrollHeaderFrame extends FrameLayout {
 
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = CLog.DEBUG_SCROLL_HEADER_FRAME;
     private static final String LOG_TAG = ScrollHeaderFrame.class.getName();
 
     private int mHeaderHeight;
@@ -168,7 +169,7 @@ public class ScrollHeaderFrame extends FrameLayout {
         h = h - (mHeaderHeight + mCurrentTop);
 
         if (DEBUG) {
-            Log.d(LOG_TAG, String.format("onMeasure %s getMeasuredHeight: %s, %s", h, mHeaderContainer.getMeasuredHeight(), this));
+            Log.d(LOG_TAG, String.format("onMeasure %s getMeasuredHeight: %s", h, mHeaderContainer.getMeasuredHeight()));
         }
 
         mContentViewContainer.measure(MeasureSpec.makeMeasureSpec(w, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(h, MeasureSpec.EXACTLY));
@@ -199,7 +200,7 @@ public class ScrollHeaderFrame extends FrameLayout {
                 boolean moveDown = !moveUp;
                 boolean canMoveDown = mCurrentTop < 0;
                 if (DEBUG) {
-                    Log.d(LOG_TAG, String.format("ACTION_MOVE: %s, moveUp: %s, canMoveUp: %s, moveDown: %s, canMoveDown: %s %s", deltaY, moveUp, canMoveUp, moveDown, canMoveDown, this));
+                    Log.d(LOG_TAG, String.format("ACTION_MOVE: %s, moveUp: %s, canMoveUp: %s, moveDown: %s, canMoveDown: %s", deltaY, moveUp, canMoveUp, moveDown, canMoveDown));
                 }
                 if ((moveUp && canMoveUp) || (moveDown && canMoveDown)) {
                     boolean containerCanMove = tryToMoveAndCheckContainerCanMove(deltaY);
