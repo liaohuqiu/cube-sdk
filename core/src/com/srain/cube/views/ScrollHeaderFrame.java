@@ -29,6 +29,7 @@ public class ScrollHeaderFrame extends FrameLayout {
     private View mHeaderContainer;
 
     private PointF mPtLastMove = new PointF();
+    private IScrollHideHeader mIScrollHideHeader;
 
     public ScrollHeaderFrame(Context context) {
         this(context, null);
@@ -66,6 +67,9 @@ public class ScrollHeaderFrame extends FrameLayout {
         super.onFinishInflate();
         mHeaderContainer = findViewById(mHeaderId);
         mContentViewContainer = (ViewGroup) findViewById(mContainerId);
+        if (mContentViewContainer instanceof IScrollHideHeader) {
+            mIScrollHideHeader = (IScrollHideHeader) mContentViewContainer;
+        }
 
         setDrawingCacheEnabled(false);
         setBackgroundDrawable(null);
@@ -86,7 +90,6 @@ public class ScrollHeaderFrame extends FrameLayout {
 
         int w = getMeasuredWidth();
         int h = getMeasuredHeight();
-
 
         int lastTop = mHeaderContainer.getTop();
         int change = mCurrentTop - lastTop;
@@ -177,7 +180,8 @@ public class ScrollHeaderFrame extends FrameLayout {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent e) {
-
+        boolean handled = super.dispatchTouchEvent(e);
+        boolean reachTop = mIScrollHideHeader != null && mIScrollHideHeader.reachTop();
         int action = e.getAction();
         switch (action) {
             case MotionEvent.ACTION_UP:
@@ -203,15 +207,18 @@ public class ScrollHeaderFrame extends FrameLayout {
                     Log.d(LOG_TAG, String.format("ACTION_MOVE: %s, moveUp: %s, canMoveUp: %s, moveDown: %s, canMoveDown: %s", deltaY, moveUp, canMoveUp, moveDown, canMoveDown));
                 }
                 if ((moveUp && canMoveUp) || (moveDown && canMoveDown)) {
+                    if (moveDown) {
+                        deltaY = deltaY * 0.3f;
+                    }
                     boolean containerCanMove = tryToMoveAndCheckContainerCanMove(deltaY);
                     if (!containerCanMove) {
-                        return true;
+                        // return true;
                     }
                 }
                 break;
             default:
                 break;
         }
-        return super.dispatchTouchEvent(e);
+        return handled;
     }
 }

@@ -7,24 +7,25 @@ import com.srain.cube.util.CLog;
 
 public class CubeApplication extends Application {
 
-	@Override
-	public void onCreate() {
-		super.onCreate();
+    @Override
+    public void onCreate() {
+        super.onCreate();
 
-		// other code
-		// ..
+        // other code
+        // ..
 
-		CLog.DEBUG_IMAGE = true;
-		Cube.onCreate(this);
-	}
+        CLog.DEBUG_IMAGE = true;
+        CLog.DEBUG_SCROLL_HEADER_FRAME = true;
+        Cube.onCreate(this);
+    }
 
-	@Override
-	public void onTerminate() {
-		super.onTerminate();
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
 
-		// other code
-		// ...
+        // other code
+        // ...
 
-		Cube.onTerminate();
-	}
+        Cube.onTerminate();
+    }
 }

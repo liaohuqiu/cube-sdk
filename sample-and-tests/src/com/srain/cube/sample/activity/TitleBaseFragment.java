@@ -24,65 +24,65 @@ import com.srain.cube.sample.ui.views.header.TitleHeaderBar;
  */
 public abstract class TitleBaseFragment extends CubeFragment {
 
-	protected TitleHeaderBar mTitleHeaderBar;
+    protected TitleHeaderBar mTitleHeaderBar;
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-		View view = inflater.inflate(R.layout.fragment_title_base, null);
-		LinearLayout contentContainer = (LinearLayout) view.findViewById(R.id.ly_main_content_container);
+        View view = inflater.inflate(R.layout.fragment_title_base, null);
+        LinearLayout contentContainer = (LinearLayout) view.findViewById(R.id.ly_main_content_container);
 
-		// 页头逻辑处理
-		mTitleHeaderBar = (TitleHeaderBar) view.findViewById(R.id.ly_header_bar_title_wrap);
-		if (enableDefaultBack()) {
-			mTitleHeaderBar.getLeftTextView().setText(R.string.base_title_return);
-			mTitleHeaderBar.setLeftOnClickListener(new OnClickListener() {
+        // 页头逻辑处理
+        mTitleHeaderBar = (TitleHeaderBar) view.findViewById(R.id.ly_header_bar_title_wrap);
+        if (enableDefaultBack()) {
+            mTitleHeaderBar.getLeftTextView().setText(R.string.base_title_return);
+            mTitleHeaderBar.setLeftOnClickListener(new OnClickListener() {
 
-				@Override
-				public void onClick(View v) {
-					onBackPressed();
-				}
-			});
-		} else {
-			mTitleHeaderBar.getLeftViewContainer().setVisibility(View.INVISIBLE);
-		}
+                @Override
+                public void onClick(View v) {
+                    onBackPressed();
+                }
+            });
+        } else {
+            mTitleHeaderBar.getLeftViewContainer().setVisibility(View.INVISIBLE);
+        }
 
-		View contentView = createView(inflater, container, savedInstanceState);
-		contentView.setLayoutParams(new LinearLayout.LayoutParams(-1, -1));
-		contentContainer.addView(contentView);
-		return view;
-	}
+        View contentView = createView(inflater, container, savedInstanceState);
+        contentView.setLayoutParams(new LinearLayout.LayoutParams(-1, -1));
+        contentContainer.addView(contentView);
+        return view;
+    }
 
-	private void onBackPressed() {
-		getContext().onBackPressed();
-	}
+    private void onBackPressed() {
+        getContext().onBackPressed();
+    }
 
-	/**
-	 * 是否使用默认的返回处理
-	 *
-	 * @return
-	 */
-	protected boolean enableDefaultBack() {
-		return true;
-	}
+    /**
+     * 是否使用默认的返回处理
+     *
+     * @return
+     */
+    protected boolean enableDefaultBack() {
+        return true;
+    }
 
-	/**
-	 * 设置标题
-	 *
-	 * @param id
-	 */
-	protected void setHeaderTitle(int id) {
-		mTitleHeaderBar.getTitleTextView().setText(id);
-	}
+    /**
+     * 设置标题
+     *
+     * @param id
+     */
+    protected void setHeaderTitle(int id) {
+        mTitleHeaderBar.getTitleTextView().setText(id);
+    }
 
-	/**
-	 * 设置标题
-	 */
-	protected void setHeaderTitle(String title) {
-		mTitleHeaderBar.getTitleTextView().setText(title);
-	}
+    /**
+     * 设置标题
+     */
+    protected void setHeaderTitle(String title) {
+        mTitleHeaderBar.getTitleTextView().setText(title);
+    }
 
-	public TitleHeaderBar getTitleHeaderBar() {
-		return mTitleHeaderBar;
-	}
+    public TitleHeaderBar getTitleHeaderBar() {
+        return mTitleHeaderBar;
+    }
 }
