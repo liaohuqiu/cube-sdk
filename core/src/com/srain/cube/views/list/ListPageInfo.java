@@ -1,5 +1,6 @@
 package com.srain.cube.views.list;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ListPageInfo<T> {
@@ -17,10 +18,9 @@ public class ListPageInfo<T> {
 
 	public void updateListInfo(List<T> dataList, int total) {
 		if (mStart == 0 || mDataList == null) {
-			mDataList = dataList;
-		} else {
-			mDataList.addAll(dataList);
+			mDataList = new ArrayList<T>();
 		}
+		mDataList.addAll(dataList);
 		mTotal = total;
 		mIsBusy = false;
 	}

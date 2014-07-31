@@ -14,7 +14,6 @@ import com.srain.cube.concurrent.SimpleExcutor;
 import com.srain.cube.file.FileUtil;
 
 /**
- * 
  * @author http://www.liaohuqiu.net
  */
 public class RequestCache {
@@ -45,7 +44,7 @@ public class RequestCache {
 
 		/**
 		 * We need to process the data from data source, do some filter of convert the structure.
-		 * 
+		 * <p/>
 		 * As the "Assert Data" is a special data source, we also need to do the same work.
 		 */
 		public T processRawDataFromCache(JsonData jsonData);
@@ -64,19 +63,19 @@ public class RequestCache {
 			public void handleMessage(Message msg) {
 				ReadCacheTask<?> task = null;
 				switch (msg.what) {
-				case AFTER_READ_FROM_FILE:
-				case AFTER_READ_FROM_ASSERT:
-					task = (ReadCacheTask<?>) msg.obj;
-					task.processRawCacheData();
-					break;
+					case AFTER_READ_FROM_FILE:
+					case AFTER_READ_FROM_ASSERT:
+						task = (ReadCacheTask<?>) msg.obj;
+						task.processRawCacheData();
+						break;
 
-				case AFTER_CONVERT:
-					task = (ReadCacheTask<?>) msg.obj;
-					task.done();
-					break;
+					case AFTER_CONVERT:
+						task = (ReadCacheTask<?>) msg.obj;
+						task.done();
+						break;
 
-				default:
-					break;
+					default:
+						break;
 				}
 			}
 		};
@@ -149,7 +148,7 @@ public class RequestCache {
 
 			// try to find in runtime cache
 			if (mCacheList.containsKey(cacheKey)) {
-				showStatus(String.format("exsit in list, key:%s", mCacheable.getCacheKey()));
+				showStatus(String.format("exist in list, key:%s", mCacheable.getCacheKey()));
 				mRawData = mCacheList.get(cacheKey);
 				processRawCacheData();
 				return;
@@ -179,20 +178,20 @@ public class RequestCache {
 
 			switch (mWorkType) {
 
-			case DO_READ_FROM_FILE:
-				doQueryFromCacheFileInBackground();
-				break;
+				case DO_READ_FROM_FILE:
+					doQueryFromCacheFileInBackground();
+					break;
 
-			case DO_READ_FROM_ASSERT:
-				queryFromAssertCacheFileInBackground();
-				break;
+				case DO_READ_FROM_ASSERT:
+					queryFromAssertCacheFileInBackground();
+					break;
 
-			case DO_CONVERT:
-				doConvertInBackground();
-				break;
+				case DO_CONVERT:
+					doConvertInBackground();
+					break;
 
-			default:
-				break;
+				default:
+					break;
 			}
 		}
 

@@ -31,10 +31,13 @@ public abstract class BlockListAdapter<T> {
 	}
 
 	public void displayBlocks(List<T> itemList) {
+		if (null == itemList) {
+			return;
+		}
 		mItemList = itemList;
 
 		if (null == mView) {
-			throw new IllegalArgumentException("Apater has not been atatch to any BlockListView");
+			throw new IllegalArgumentException("Adapter has not been attached to any BlockListView");
 		}
 		mView.onDataListChange();
 	}
