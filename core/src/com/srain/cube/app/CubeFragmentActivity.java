@@ -24,7 +24,7 @@ public abstract class CubeFragmentActivity extends FragmentActivity {
 	 */
 	protected abstract String getCloseWarning();
 
-	protected abstract int getFragmentContianerId();
+	protected abstract int getFragmentContainerId();
 
 	protected CubeFragment currentFragment;
 	private boolean mCloseWarned;
@@ -65,7 +65,7 @@ public abstract class CubeFragmentActivity extends FragmentActivity {
 	}
 
 	private void processFragement(FragmentParam param) {
-		int containerId = getFragmentContianerId();
+		int containerId = getFragmentContainerId();
 		Class<?> cls = param.cls;
 		if (cls == null) {
 			return;

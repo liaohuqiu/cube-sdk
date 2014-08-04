@@ -6,7 +6,7 @@ import com.srain.cube.app.XActivity;
 import com.srain.cube.sample.R;
 import com.srain.cube.sample.ui.fragment.HomeFragment;
 
-public class MainActivity extends XActivity {
+public class HomeActivity extends XActivity {
 
     @Override
     protected void onCreate(Bundle arg0) {
@@ -20,7 +20,7 @@ public class MainActivity extends XActivity {
     }
 
     @Override
-    protected int getFragmentContianerId() {
+    protected int getFragmentContainerId() {
         return R.id.id_fragment;
     }
 }

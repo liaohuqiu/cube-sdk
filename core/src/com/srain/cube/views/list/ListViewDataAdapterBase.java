@@ -12,10 +12,9 @@ import com.srain.cube.util.CLog;
 
 /**
  * A adapter using View Holder to display the item of a list view;
- * 
- * @author http://www.liaohuqiu.net
- * 
+ *
  * @param <ItemDataType>
+ * @author http://www.liaohuqiu.net
  */
 public abstract class ListViewDataAdapterBase<ItemDataType> extends BaseAdapter {
 
@@ -26,9 +25,7 @@ public abstract class ListViewDataAdapterBase<ItemDataType> extends BaseAdapter 
 	private boolean mEnableCreateViewForMeasure = true;
 
 	/**
-	 * 
-	 * @param viewHolderCreator
-	 *            The view holder creator will create a View Holder that extends {@link ViewHolderBase}
+	 * @param viewHolderCreator The view holder creator will create a View Holder that extends {@link ViewHolderBase}
 	 */
 	public ListViewDataAdapterBase(ViewHolderCreator<ItemDataType> viewHolderCreator) {
 		mViewHolderCreator = viewHolderCreator;

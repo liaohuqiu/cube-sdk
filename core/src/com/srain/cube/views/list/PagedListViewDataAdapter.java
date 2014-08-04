@@ -2,46 +2,43 @@ package com.srain.cube.views.list;
 
 /**
  * A adapter using View Holder to display the item of a list view;
- * 
- * @author http://www.liaohuqiu.net
- * 
+ *
  * @param <ItemDataType>
+ * @author http://www.liaohuqiu.net
  */
 public class PagedListViewDataAdapter<ItemDataType> extends ListViewDataAdapterBase<ItemDataType> {
 
-	protected ListPageInfo<ItemDataType> mListPageInfo;
+    protected ListPageInfo<ItemDataType> mListPageInfo;
 
-	/**
-	 * 
-	 * @param viewHolderCreator
-	 *            The view holder creator will create a View Holder that extends {@link ViewHolderBase}
-	 */
-	public PagedListViewDataAdapter(ViewHolderCreator<ItemDataType> viewHolderCreator) {
-		super(viewHolderCreator);
-	}
+    /**
+     * @param viewHolderCreator The view holder creator will create a View Holder that extends {@link ViewHolderBase}
+     */
+    public PagedListViewDataAdapter(ViewHolderCreator<ItemDataType> viewHolderCreator) {
+        super(viewHolderCreator);
+    }
 
-	public void setListPageInfo(ListPageInfo<ItemDataType> listPageInfo) {
-		mListPageInfo = listPageInfo;
-	}
+    public void setListPageInfo(ListPageInfo<ItemDataType> listPageInfo) {
+        mListPageInfo = listPageInfo;
+    }
 
-	@Override
-	public int getCount() {
-		if (null == mListPageInfo) {
-			return 0;
-		}
-		return mListPageInfo.getListLength();
-	}
+    @Override
+    public int getCount() {
+        if (null == mListPageInfo) {
+            return 0;
+        }
+        return mListPageInfo.getListLength();
+    }
 
-	@Override
-	public ItemDataType getItem(int position) {
-		if (null == mListPageInfo) {
-			return null;
-		}
-		return mListPageInfo.getItem(position);
-	}
+    @Override
+    public ItemDataType getItem(int position) {
+        if (null == mListPageInfo) {
+            return null;
+        }
+        return mListPageInfo.getItem(position);
+    }
 
-	@Override
-	public long getItemId(int position) {
-		return position;
-	}
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
 }
