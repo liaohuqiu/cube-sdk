@@ -1,5 +1,5 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:cube_dotview="http://schemas.android.com/apk/res/net.liaohuqiu.cube.sample"
+    xmlns:cube_dotview="http://schemas.android.com/apk/res/in.srain.cube.sample"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="200dp" >
 
-        <net.liaohuqiu.cube.views.DotView
+        <in.srain.cube.views.DotView
             android:id="@+id/dot_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

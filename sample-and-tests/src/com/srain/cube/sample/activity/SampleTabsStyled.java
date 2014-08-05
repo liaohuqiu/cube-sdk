@@ -1,4 +1,4 @@
-package net.liaohuqiu.cube.sample.activity;
+package in.srain.cube.sample.activity;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -10,10 +10,10 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
-import net.liaohuqiu.cube.sample.R;
-import net.liaohuqiu.cube.sample.ui.fragment.TestFragment;
-import net.liaohuqiu.cube.util.CLog;
-import net.liaohuqiu.cube.views.pager.TabPageIndicator;
+import in.srain.cube.sample.R;
+import in.srain.cube.sample.ui.fragment.TestFragment;
+import in.srain.cube.util.CLog;
+import in.srain.cube.views.pager.TabPageIndicator;
 
 public class SampleTabsStyled extends FragmentActivity {
     private static final String[] CONTENT = new String[]{"Recent", "Artists", "Albums", "Songs", "Playlists", "Genres"};

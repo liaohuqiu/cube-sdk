@@ -1,10 +1,10 @@
-package net.liaohuqiu.cube.sample.activity;
+package in.srain.cube.sample.activity;
 
 import android.os.Bundle;
 
-import net.liaohuqiu.cube.app.XActivity;
-import net.liaohuqiu.cube.sample.R;
-import net.liaohuqiu.cube.sample.ui.fragment.HomeFragment;
+import in.srain.cube.app.XActivity;
+import in.srain.cube.sample.R;
+import in.srain.cube.sample.ui.fragment.HomeFragment;
 
 public class HomeActivity extends XActivity {
 

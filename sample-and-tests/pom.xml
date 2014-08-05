@@ -3,13 +3,25 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>net.liaohuqiu.cube.demo</groupId>
+    <parent>
+        <groupId>in.srain</groupId>
+        <artifactId>parent</artifactId>
+        <version>1.1.0</version>
+    </parent>
+
+    <groupId>in.srain.cube</groupId>
     <artifactId>cube-sdk-demo</artifactId>
     <packaging>apk</packaging>
     <name>CUBE DEMO</name>
     <version>1.0.13-SNAPSHOT</version>
 
     <dependencies>
+        <dependency>
+            <groupId>in.srain.cube</groupId>
+            <artifactId>cube-sdk</artifactId>
+            <type>apklib</type>
+            <version>1.0.21-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>com.google.android</groupId>
             <artifactId>android</artifactId>
