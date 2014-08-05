@@ -1,4 +1,4 @@
-package com.srain.cube.sample.ui.fragment;
+package in.srain.cube.sample.ui.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;

@@ -12,7 +12,7 @@
         android:orientation="horizontal"
         android:padding="1dp" >
 
-        <com.srain.cube.image.CubeImageView
+        <in.srain.cube.image.CubeImageView
             android:id="@+id/iv_item_iamge_list_grid"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

@@ -1,4 +1,4 @@
-package com.srain.cube.sample.ui.fragment;
+package in.srain.cube.sample.ui.fragment;
 
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -18,8 +18,8 @@ import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 
-import com.srain.cube.sample.R;
-import com.srain.cube.sample.activity.TitleBaseFragment;
+import in.srain.cube.sample.R;
+import in.srain.cube.sample.activity.TitleBaseFragment;
 
 public class BitmapFragment extends TitleBaseFragment {
 

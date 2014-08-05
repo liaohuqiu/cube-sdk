@@ -1,4 +1,4 @@
-package com.srain.cube.sample.ui.fragment.imagelist;
+package in.srain.cube.sample.ui.fragment.imagelist;
 
 import java.util.Arrays;
 
@@ -10,17 +10,17 @@ import android.widget.GridView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 
-import com.srain.cube.image.CubeImageView;
-import com.srain.cube.image.ImageLoader;
-import com.srain.cube.image.ImageLoaderFactory;
-import com.srain.cube.image.ImageReuseInfo;
-import com.srain.cube.sample.R;
-import com.srain.cube.sample.activity.TitleBaseFragment;
-import com.srain.cube.sample.data.Images;
-import com.srain.cube.util.LocalDisplay;
-import com.srain.cube.views.list.ListViewDataAdapter;
-import com.srain.cube.views.list.ViewHolderBase;
-import com.srain.cube.views.list.ViewHolderCreator;
+import in.srain.cube.image.CubeImageView;
+import in.srain.cube.image.ImageLoader;
+import in.srain.cube.image.ImageLoaderFactory;
+import in.srain.cube.image.ImageReuseInfo;
+import in.srain.cube.sample.R;
+import in.srain.cube.sample.activity.TitleBaseFragment;
+import in.srain.cube.sample.data.Images;
+import in.srain.cube.util.LocalDisplay;
+import in.srain.cube.views.list.ListViewDataAdapter;
+import in.srain.cube.views.list.ViewHolderBase;
+import in.srain.cube.views.list.ViewHolderCreator;
 
 public class GridListViewFragment extends TitleBaseFragment {
 

@@ -1,4 +1,4 @@
-package com.srain.cube.sample.activity;
+package in.srain.cube.sample.activity;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -6,9 +6,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import com.srain.cube.app.CubeFragment;
-import com.srain.cube.sample.R;
-import com.srain.cube.sample.ui.views.header.TitleHeaderBar;
+import in.srain.cube.app.CubeFragment;
+import in.srain.cube.sample.R;
+import in.srain.cube.sample.ui.views.header.TitleHeaderBar;
 
 /**
  * 带页头的 页面基类

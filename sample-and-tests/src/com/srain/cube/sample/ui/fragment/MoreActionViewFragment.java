@@ -1,12 +1,12 @@
-package com.srain.cube.sample.ui.fragment;
+package in.srain.cube.sample.ui.fragment;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.srain.cube.sample.R;
-import com.srain.cube.sample.activity.TitleBaseFragment;
+import in.srain.cube.sample.R;
+import in.srain.cube.sample.activity.TitleBaseFragment;
 
 public class MoreActionViewFragment extends TitleBaseFragment {
 

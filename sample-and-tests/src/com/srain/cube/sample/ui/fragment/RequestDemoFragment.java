@@ -1,4 +1,4 @@
-package com.srain.cube.sample.ui.fragment;
+package in.srain.cube.sample.ui.fragment;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,11 +10,11 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.srain.cube.request.JsonData;
-import com.srain.cube.request.JsonRequestSuccHandler;
-import com.srain.cube.sample.R;
-import com.srain.cube.sample.activity.TitleBaseFragment;
-import com.srain.cube.sample.data.SampleRequest;
+import in.srain.cube.request.JsonData;
+import in.srain.cube.request.JsonRequestSuccHandler;
+import in.srain.cube.sample.R;
+import in.srain.cube.sample.activity.TitleBaseFragment;
+import in.srain.cube.sample.data.SampleRequest;
 
 public class RequestDemoFragment extends TitleBaseFragment {
 

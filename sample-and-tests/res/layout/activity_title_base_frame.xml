@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="#ffffff">
 
-    <com.srain.cube.views.ScrollHeaderFrame
+    <in.srain.cube.views.ScrollHeaderFrame
         xmlns:cube="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -14,12 +14,12 @@
 
         <!-- 统一的页头 -->
 
-        <com.srain.cube.sample.ui.views.header.TitleHeaderBar
+        <in.srain.cube.sample.ui.views.header.TitleHeaderBar
             android:id="@+id/ly_header_bar_title_wrap"
             android:layout_width="match_parent"
             android:layout_height="44dp"
             android:background="@color/base_background">
-        </com.srain.cube.sample.ui.views.header.TitleHeaderBar>
+        </in.srain.cube.sample.ui.views.header.TitleHeaderBar>
 
         <LinearLayout
             android:id="@+id/ly_main_content_container"
@@ -28,6 +28,6 @@
             android:background="#ffffff"
             android:orientation="vertical">
         </LinearLayout>
-    </com.srain.cube.views.ScrollHeaderFrame>
+    </in.srain.cube.views.ScrollHeaderFrame>
 
 </LinearLayout>

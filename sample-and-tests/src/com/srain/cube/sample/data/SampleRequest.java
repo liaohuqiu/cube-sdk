@@ -1,12 +1,12 @@
-package com.srain.cube.sample.data;
+package in.srain.cube.sample.data;
 
-import com.srain.cube.request.BeforeRequestHandler;
-import com.srain.cube.request.CacheableRequestPreHandler;
-import com.srain.cube.request.JsonCacheableRequestSuccHandler;
-import com.srain.cube.request.JsonData;
-import com.srain.cube.request.JsonRequestSuccHandler;
-import com.srain.cube.request.SimpleCacheableRequest;
-import com.srain.cube.request.SimpleRequest;
+import in.srain.cube.request.BeforeRequestHandler;
+import in.srain.cube.request.CacheableRequestPreHandler;
+import in.srain.cube.request.JsonCacheableRequestSuccHandler;
+import in.srain.cube.request.JsonData;
+import in.srain.cube.request.JsonRequestSuccHandler;
+import in.srain.cube.request.SimpleCacheableRequest;
+import in.srain.cube.request.SimpleRequest;
 
 /**
  * <p>

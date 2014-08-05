@@ -9,7 +9,7 @@
         <version>1.1.0</version>
     </parent>
 
-    <groupId>com.srain.cube</groupId>
+    <groupId>net.liaohuqiu.cube</groupId>
     <artifactId>cube-sdk</artifactId>
     <packaging>apklib</packaging>
     <name>CUBE</name>

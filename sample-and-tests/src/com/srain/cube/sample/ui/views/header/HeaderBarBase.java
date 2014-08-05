@@ -1,6 +1,6 @@
-package com.srain.cube.sample.ui.views.header;
+package in.srain.cube.sample.ui.views.header;
 
-import com.srain.cube.sample.R;
+import in.srain.cube.sample.R;
 
 import android.content.Context;
 import android.util.AttributeSet;

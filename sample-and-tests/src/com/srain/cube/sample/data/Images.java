@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.srain.cube.sample.data;
+package in.srain.cube.sample.data;
 
-import com.srain.cube.image.ImageReuseInfoManger;
+import in.srain.cube.image.ImageReuseInfoManger;
 
 /**
  * Some simple test data to use for this sample app.

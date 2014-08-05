@@ -1,4 +1,4 @@
-package com.srain.cube.sample.ui.fragment;
+package in.srain.cube.sample.ui.fragment;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -7,9 +7,9 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.srain.cube.sample.R;
-import com.srain.cube.sample.activity.TitleBaseFragment;
-import com.srain.cube.views.DotView;
+import in.srain.cube.sample.R;
+import in.srain.cube.sample.activity.TitleBaseFragment;
+import in.srain.cube.views.DotView;
 
 public class DotViewFragment extends TitleBaseFragment {
 

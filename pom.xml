@@ -14,7 +14,7 @@
     <description>Cube SDK</description>
     <url>http://cube-sdk.liaohuqiu.net</url>
     <version>1.1.0</version>
-    <inceptionYear>2011</inceptionYear>
+    <inceptionYear>2014</inceptionYear>
 
     <modules>
         <module>core</module>
