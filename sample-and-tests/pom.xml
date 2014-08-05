@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.srain.cube.demo</groupId>
@@ -20,12 +20,6 @@
             <artifactId>support-v4</artifactId>
             <version>r6</version>
         </dependency>
-<!--        <dependency>
-            <groupId>com.srain.cube</groupId>
-            <artifactId>cube-sdk</artifactId>
-            <type>apklib</type>
-            <version>1.0.16-SNAPSHOT</version>
-        </dependency>-->
     </dependencies>
 
     <properties>
