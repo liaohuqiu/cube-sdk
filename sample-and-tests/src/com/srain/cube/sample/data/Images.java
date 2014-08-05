@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package in.srain.cube.sample.data;
+package net.liaohuqiu.cube.sample.data;
 
-import in.srain.cube.image.ImageReuseInfoManger;
+import net.liaohuqiu.cube.image.ImageReuseInfoManger;
 
 /**
  * Some simple test data to use for this sample app.

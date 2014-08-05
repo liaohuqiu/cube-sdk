@@ -1,0 +1,30 @@
+package net.liaohuqiu.cube.image.iface;
+
+import android.graphics.drawable.BitmapDrawable;
+
+import net.liaohuqiu.cube.image.CubeImageView;
+import net.liaohuqiu.cube.image.ImageTask;
+
+/**
+ * A handler that used in loading a image.
+ * 
+ * <p>
+ * {@link ImageLoadHandler#onLoading(ImageTask)} will be called when begin to load the image.
+ * </p>
+ * 
+ * <p>
+ * {@link ImageLoadHandler#onLoadFinish(ImageTask, BitmapDrawable)} will be called after the image is loaded.
+ * </p>
+ */
+public interface ImageLoadHandler {
+
+	/**
+	 * When begin to load the image from disk or network.
+	 */
+	void onLoading(ImageTask imageTask, CubeImageView cubeImageView);
+
+	/**
+	 * After image is loaded.
+	 */
+	void onLoadFinish(ImageTask imageTask, CubeImageView cubeImageView, BitmapDrawable drawable);
+}

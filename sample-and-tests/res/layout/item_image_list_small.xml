@@ -9,7 +9,7 @@
         android:layout_marginBottom="15dp"
         android:background="@drawable/bg_border_normal" >
 
-        <in.srain.cube.image.CubeImageView
+        <net.liaohuqiu.cube.image.CubeImageView
             android:id="@+id/tv_item_image_list_small"
             android:layout_width="100dp"
             android:layout_height="100dp"

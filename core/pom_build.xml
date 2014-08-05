@@ -5,7 +5,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>in.srain.cube</groupId>
+    <groupId>net.liaohuqiu.cube</groupId>
     <artifactId>cube-sdk</artifactId>
     <packaging>apklib</packaging>
     <name>CUBE: Library for Android development</name>

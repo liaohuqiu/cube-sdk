@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
 
-        <in.srain.cube.views.block.BlockListView
+        <net.liaohuqiu.cube.views.block.BlockListView
             android:id="@+id/ly_home_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

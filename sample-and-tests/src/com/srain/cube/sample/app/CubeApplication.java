@@ -1,9 +1,9 @@
-package in.srain.cube.sample.app;
+package net.liaohuqiu.cube.sample.app;
 
 import android.app.Application;
 
-import in.srain.cube.Cube;
-import in.srain.cube.util.CLog;
+import net.liaohuqiu.cube.Cube;
+import net.liaohuqiu.cube.util.CLog;
 
 public class CubeApplication extends Application {
 

@@ -1,11 +1,11 @@
-package in.srain.cube.sample.ui.views.header;
+package net.liaohuqiu.cube.sample.ui.views.header;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TextView;
 
-import in.srain.cube.sample.R;
+import net.liaohuqiu.cube.sample.R;
 
 /**
  * 普通标题头部的实现：

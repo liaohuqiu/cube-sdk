@@ -12,7 +12,7 @@
         android:orientation="horizontal"
         android:padding="1dp" >
 
-        <in.srain.cube.image.CubeImageView
+        <net.liaohuqiu.cube.image.CubeImageView
             android:id="@+id/iv_item_image_list_big"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

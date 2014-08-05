@@ -1,12 +1,12 @@
-package in.srain.cube.sample.data;
+package net.liaohuqiu.cube.sample.data;
 
-import in.srain.cube.request.BeforeRequestHandler;
-import in.srain.cube.request.CacheableRequestPreHandler;
-import in.srain.cube.request.JsonCacheableRequestSuccHandler;
-import in.srain.cube.request.JsonData;
-import in.srain.cube.request.JsonRequestSuccHandler;
-import in.srain.cube.request.SimpleCacheableRequest;
-import in.srain.cube.request.SimpleRequest;
+import net.liaohuqiu.cube.request.BeforeRequestHandler;
+import net.liaohuqiu.cube.request.CacheableRequestPreHandler;
+import net.liaohuqiu.cube.request.JsonCacheableRequestSuccHandler;
+import net.liaohuqiu.cube.request.JsonData;
+import net.liaohuqiu.cube.request.JsonRequestSuccHandler;
+import net.liaohuqiu.cube.request.SimpleCacheableRequest;
+import net.liaohuqiu.cube.request.SimpleRequest;
 
 /**
  * <p>

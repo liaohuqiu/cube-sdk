@@ -1,4 +1,4 @@
-package in.srain.cube.sample.ui.fragment;
+package net.liaohuqiu.cube.sample.ui.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
