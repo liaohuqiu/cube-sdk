@@ -3,6 +3,12 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>com.srain</groupId>
+        <artifactId>parent</artifactId>
+        <version>1.0.2</version>
+    </parent>
+
     <groupId>com.srain.cube</groupId>
     <artifactId>cube-sdk</artifactId>
     <packaging>apklib</packaging>
