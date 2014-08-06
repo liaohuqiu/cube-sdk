@@ -21,7 +21,6 @@
 
     <modules>
         <module>core</module>
-        <module>sample-and-tests</module>
     </modules>
 
     <scm>
