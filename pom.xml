@@ -26,7 +26,7 @@
         <url>https://github.com/etao-open-source/cube-sdk</url>
         <connection>scm:git:git:@github.com:etao-open-source/cube-sdk.git</connection>
         <developerConnection>scm:git:git@github.com:etao-open-source/cube-sdk.git</developerConnection>
-      <tag>parent-1.1.0</tag>
+      <tag>cube-parent-1.1.0</tag>
   </scm>
 
     <developers>
