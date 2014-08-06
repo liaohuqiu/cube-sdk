@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="PtrFrame">
+        <attr name="ptr_header" format="reference" />
+        <attr name="ptr_reverse_view" format="reference" />
+        <attr name="ptr_content" format="reference" />
+    </declare-styleable>
+
+</resources>

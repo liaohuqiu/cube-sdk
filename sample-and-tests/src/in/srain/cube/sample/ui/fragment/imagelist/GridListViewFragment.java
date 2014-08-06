@@ -21,6 +21,7 @@ import in.srain.cube.util.LocalDisplay;
 import in.srain.cube.views.list.ListViewDataAdapter;
 import in.srain.cube.views.list.ViewHolderBase;
 import in.srain.cube.views.list.ViewHolderCreator;
+import in.srain.cube.views.ptr.PtrFrame;
 
 public class GridListViewFragment extends TitleBaseFragment {
 
@@ -35,7 +36,7 @@ public class GridListViewFragment extends TitleBaseFragment {
         mImageLoader = ImageLoaderFactory.create(getActivity());
 
         final View v = inflater.inflate(R.layout.fragment_image_gird, container, false);
-        GridView gridListView = (GridView) v.findViewById(R.id.ly_image_list_grid);
+        final GridView gridListView = (GridView) v.findViewById(R.id.ly_image_list_grid);
 
         ListViewDataAdapter<String> adapter = new ListViewDataAdapter<String>(new ViewHolderCreator<String>() {
             @Override
@@ -47,6 +48,18 @@ public class GridListViewFragment extends TitleBaseFragment {
         adapter.getDataList().addAll(Arrays.asList(Images.imageUrls));
         adapter.notifyDataSetChanged();
         setHeaderTitle("Grid");
+
+        ((PtrFrame) v.findViewById(R.id.ly_ptr_frame)).setContentChecker(new PtrFrame.ContentChecker() {
+            @Override
+            public boolean contentIsEmptyOrFirstChildInView() {
+                return gridListView.getFirstVisiblePosition() <= 1;
+            }
+
+            @Override
+            public boolean contentItemIsLongPressing() {
+                return false;
+            }
+        });
         return v;
     }
 

@@ -1,39 +1,41 @@
-package in.srain.cube.views;
+package in.srain.cube.views.ptr;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.PointF;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewConfiguration;
-import android.view.ViewTreeObserver;
-import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.util.AttributeSet;
+import android.view.*;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Scroller;
+import in.srain.cube.R;
+import in.srain.cube.util.CLog;
 
-public abstract class KBPtrLayoutFrame extends FrameLayout {
+public class PtrFrame extends FrameLayout {
+
+    private static final boolean DEBUG = CLog.DEBUG_SCROLL_HEADER_FRAME;
+    private static final String LOG_TAG = PtrFrame.class.getName();
 
     // ===========================================================
     // Interface
     // ===========================================================
-    public interface OnRefreshHandler {
+    public interface RefreshHandler {
         public void onRefresh();
     }
 
-    /**
-     * if content is empty or the first child is in view, should do refresh
-     * after release
-     */
-    protected abstract Boolean contentIsEmptyOrFirstChildInView();
+    public interface ContentChecker {
+        /**
+         * if content is empty or the first child is in view, should do refresh
+         * after release
+         */
+        public boolean contentIsEmptyOrFirstChildInView();
 
-    /**
-     * if the item in the content is long pressing, cancel move
-     */
-    protected abstract Boolean contentItemIsLongPressing();
+        /**
+         * if the item in the content is long pressing, cancel move
+         */
+        public boolean contentItemIsLongPressing();
+    }
 
     // ===========================================================
     // enumeration
@@ -54,13 +56,16 @@ public abstract class KBPtrLayoutFrame extends FrameLayout {
     private RotateAnimation mFlipAnimation;
     private RotateAnimation mReverseFlipAnimation;
 
-    private LinearLayout mHeaderContainer;
-    private FrameLayout mHeader;
-    private ImageView mArrowImage;
+    private int mHeaderId = 0;
+    private int mContainerId = 0;
+    private int mReverseViewId = 0;
+
+    private ViewGroup mContentViewContainer;
+    private View mHeaderContainer;
+    private View mReverseView;
 
     private State mState;
     private int mHeaderHeight;
-    private View mContentView;
 
     private GestureDetector mDetector;
     private FlingRunnable mFlinger;
@@ -68,32 +73,46 @@ public abstract class KBPtrLayoutFrame extends FrameLayout {
     private int mLastTop;
     private int mPagingTouchSlop;
 
-    private OnRefreshHandler mContentProvider;
+    private RefreshHandler mRefreshHandler;
+    private ContentChecker mContentChecker;
 
     private MotionEvent mDownEvent;
     private PointF mPtLastMove = new PointF();
 
-    private CheckForLongPress mPendingCheckForLongPress = new CheckForLongPress();
-    private CheckForLongPress2 mPendingCheckForLongPress2 = new CheckForLongPress2();
     private float lastY;
-
-    private boolean mlistviewDoScrollL = false;
-    private boolean mLongPressing;
-    private boolean mPendingRemoved = false;
 
     private boolean isRefreshing = false;
 
     private boolean mPreventForHorizontal = false;
 
-    public KBPtrLayoutFrame(Context context, View contentView) {
-        super(context);
-        mContentView = contentView;
-        mFlinger = new FlingRunnable();
-        mDetector = new GestureDetector(context, new MyOnGestureListener());
-        doLayout();
+    public PtrFrame(Context context) {
+        this(context, null);
     }
 
-    protected void doLayout() {
+    public PtrFrame(Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
+    }
+
+    public PtrFrame(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+
+        TypedArray arr = context.obtainStyledAttributes(attrs, R.styleable.PtrFrame, 0, 0);
+        if (arr != null) {
+            if (arr.hasValue(R.styleable.PtrFrame_ptr_header)) {
+                mHeaderId = arr.getResourceId(R.styleable.PtrFrame_ptr_header, 0);
+            }
+            if (arr.hasValue(R.styleable.PtrFrame_ptr_content)) {
+                mContainerId = arr.getResourceId(R.styleable.PtrFrame_ptr_content, 0);
+            }
+            if (arr.hasValue(R.styleable.PtrFrame_ptr_reverse_view)) {
+                mReverseViewId = arr.getResourceId(R.styleable.PtrFrame_ptr_reverse_view, 0);
+            }
+            arr.recycle();
+        }
+
+        mFlinger = new FlingRunnable();
+        mDetector = new GestureDetector(context, new MyOnGestureListener());
+        mDetector.setIsLongpressEnabled(false);
 
         final ViewConfiguration conf = ViewConfiguration.get(getContext());
         mPagingTouchSlop = conf.getScaledTouchSlop() * 2;
@@ -101,7 +120,6 @@ public abstract class KBPtrLayoutFrame extends FrameLayout {
         setDrawingCacheEnabled(false);
         setBackgroundDrawable(null);
         setClipChildren(false);
-        mDetector.setIsLongpressEnabled(false);
 
         mFlipAnimation = new RotateAnimation(0, -180, RotateAnimation.RELATIVE_TO_SELF, 0.5f, RotateAnimation.RELATIVE_TO_SELF, 0.5f);
         mFlipAnimation.setInterpolator(new LinearInterpolator());
@@ -113,17 +131,15 @@ public abstract class KBPtrLayoutFrame extends FrameLayout {
         mReverseFlipAnimation.setDuration(ROTATE_ARROW_ANIMATION_DURATION);
         mReverseFlipAnimation.setFillAfter(true);
 
-/*		mHeaderContainer = (LinearLayout) LayoutInflater.from(getContext()).inflate(R.layout.ptr_header, null);
-        mHeader = (FrameLayout) mHeaderContainer.findViewById(R.id.ptr_id_header);
-		mArrowImage = (ImageView) mHeader.findViewById(R.id.ptr_id_image);*/
-        ViewTreeObserver vto = mHeader.getViewTreeObserver();
-        vto.addOnGlobalLayoutListener(new PTROnGlobalLayoutListener());
+    }
 
-        addView(mHeaderContainer);
+    @Override
+    protected void onFinishInflate() {
+        super.onFinishInflate();
 
-        LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-        setLayoutParams(layoutParams);
-        addView(mContentView);
+        mHeaderContainer = findViewById(mHeaderId);
+        mContentViewContainer = (ViewGroup) findViewById(mContainerId);
+        mReverseView = findViewById(mReverseViewId);
     }
 
     @Override
@@ -135,7 +151,7 @@ public abstract class KBPtrLayoutFrame extends FrameLayout {
         int h = getMeasuredHeight();
 
         mHeaderContainer.layout(0, -mHeaderHeight, w, 0);
-        mContentView.layout(0, 0, w, h);
+        mContentViewContainer.layout(0, 0, w, h);
     }
 
     /**
@@ -179,27 +195,36 @@ public abstract class KBPtrLayoutFrame extends FrameLayout {
         return true;
     }
 
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        if (mHeaderContainer != null) {
+            mHeaderHeight = mHeaderContainer.getMeasuredHeight();
+        }
+
+        if (DEBUG) {
+            CLog.d(LOG_TAG, "onMeasure, mHeaderHeight: %s", mHeaderHeight);
+        }
+    }
+
     private void moveUp(float deltaY) {
         mHeaderContainer.offsetTopAndBottom((int) -deltaY);
-        mContentView.offsetTopAndBottom((int) -deltaY);
+        mContentViewContainer.offsetTopAndBottom((int) -deltaY);
     }
 
     private void updateArrowImage() {
         if (mHeaderContainer.getTop() < HEADER_OFFSET_TO_TOP && mLastTop >= HEADER_OFFSET_TO_TOP) {
-            mArrowImage.clearAnimation();
-            mArrowImage.startAnimation(mReverseFlipAnimation);
+            mReverseView.clearAnimation();
+            mReverseView.startAnimation(mReverseFlipAnimation);
         } else if (mHeaderContainer.getTop() > HEADER_OFFSET_TO_TOP && mLastTop <= HEADER_OFFSET_TO_TOP) {
-            mArrowImage.clearAnimation();
-            mArrowImage.startAnimation(mFlipAnimation);
+            mReverseView.clearAnimation();
+            mReverseView.startAnimation(mFlipAnimation);
         }
         mLastTop = mHeaderContainer.getTop();
     }
 
     private boolean release() {
-        if (mlistviewDoScrollL) {
-            mlistviewDoScrollL = false;
-            return true;
-        }
         if (mHeaderContainer.getTop() > HEADER_OFFSET_TO_TOP) {
             mState = State.PREPARE_REFRESH;
         }
@@ -226,10 +251,10 @@ public abstract class KBPtrLayoutFrame extends FrameLayout {
     }
 
     private void onRefresh() {
-        if (mContentProvider != null) {
+        if (mRefreshHandler != null) {
             if (!entryLock())
                 return;
-            mContentProvider.onRefresh();
+            mRefreshHandler.onRefresh();
         }
     }
 
@@ -238,21 +263,17 @@ public abstract class KBPtrLayoutFrame extends FrameLayout {
     }
 
     public View getContent() {
-        return mContentView;
+        return mContentViewContainer;
     }
 
     public boolean dispatchTouchEvent(MotionEvent e) {
         int action;
         float y = e.getY();
         action = e.getAction();
-        if (mLongPressing && action != MotionEvent.ACTION_DOWN) {
-            return false;
-        }
-        boolean handled = true;
-        handled = mDetector.onTouchEvent(e);
+        boolean handled = mDetector.onTouchEvent(e);
         switch (action) {
             case MotionEvent.ACTION_UP:
-                boolean f1 = mContentView.getTop() <= e.getY() && e.getY() <= mContentView.getBottom();
+                boolean f1 = mContentViewContainer.getTop() <= e.getY() && e.getY() <= mContentViewContainer.getBottom();
                 if (!handled && mHeaderContainer.getTop() == -mHeaderHeight && f1) {
                     super.dispatchTouchEvent(e);
                 } else {
@@ -267,9 +288,6 @@ public abstract class KBPtrLayoutFrame extends FrameLayout {
 
                 mPtLastMove.set(e.getX(), e.getY());
                 mDownEvent = e;
-                mLongPressing = false;
-                postDelayed(mPendingCheckForLongPress, ViewConfiguration.getLongPressTimeout() + 100);
-                mPendingRemoved = false;
                 mPreventForHorizontal = false;
                 super.dispatchTouchEvent(e);
                 break;
@@ -288,10 +306,6 @@ public abstract class KBPtrLayoutFrame extends FrameLayout {
                 }
                 float deltaY = lastY - y;
                 lastY = y;
-                if (!mPendingRemoved) {
-                    removeCallbacks(mPendingCheckForLongPress);
-                    mPendingRemoved = true;
-                }
                 if (!handled && mHeaderContainer.getTop() == -mHeaderHeight) {
                     try {
                         return super.dispatchTouchEvent(e);
@@ -299,7 +313,7 @@ public abstract class KBPtrLayoutFrame extends FrameLayout {
                         e2.printStackTrace();
                         return true;
                     }
-                } else if (handled && mContentView.getTop() > 0 && deltaY < 0) {
+                } else if (handled && mContentViewContainer.getTop() > 0 && deltaY < 0) {
                     e.setAction(MotionEvent.ACTION_CANCEL);
                     super.dispatchTouchEvent(e);
                 }
@@ -310,8 +324,12 @@ public abstract class KBPtrLayoutFrame extends FrameLayout {
         return true;
     }
 
-    public void setOnRefreshHandler(OnRefreshHandler handler) {
-        mContentProvider = handler;
+    public void setRefreshHandler(RefreshHandler handler) {
+        mRefreshHandler = handler;
+    }
+
+    public void setContentChecker(ContentChecker contentChecker) {
+        mContentChecker = contentChecker;
     }
 
     // ===========================================================
@@ -338,7 +356,7 @@ public abstract class KBPtrLayoutFrame extends FrameLayout {
                 return false;
             deltaY = (float) ((double) deltaY / PULL_RESISTANCE);
             boolean handled = false;
-            boolean flag = contentIsEmptyOrFirstChildInView();
+            boolean flag = mContentChecker != null && mContentChecker.contentIsEmptyOrFirstChildInView();
             if (deltaY < 0F && flag || mHeaderContainer.getTop() > -mHeaderHeight) {
                 handled = move(deltaY, false);
             } else
@@ -351,40 +369,6 @@ public abstract class KBPtrLayoutFrame extends FrameLayout {
 
         public boolean onSingleTapUp(MotionEvent motionevent) {
             return false;
-        }
-
-    }
-
-    private class PTROnGlobalLayoutListener implements OnGlobalLayoutListener {
-
-        @SuppressWarnings("deprecation")
-        public void onGlobalLayout() {
-            int initialHeaderHeight = mHeader.getHeight();
-
-            if (initialHeaderHeight > 0) {
-                mHeaderHeight = initialHeaderHeight;
-                requestLayout();
-            }
-            getViewTreeObserver().removeGlobalOnLayoutListener(this);
-        }
-    }
-
-    /**
-     * if the some of the items in the content, set mLongPressing to true
-     */
-    private class CheckForLongPress implements Runnable {
-        public void run() {
-            if (contentItemIsLongPressing()) {
-                postDelayed(mPendingCheckForLongPress2, 100);
-            }
-        }
-    }
-
-    private class CheckForLongPress2 implements Runnable {
-        public void run() {
-            mLongPressing = true;
-            MotionEvent e = MotionEvent.obtain(mDownEvent.getDownTime(), mDownEvent.getEventTime() + ViewConfiguration.getLongPressTimeout(), MotionEvent.ACTION_CANCEL, mDownEvent.getX(), mDownEvent.getY(), mDownEvent.getMetaState());
-            KBPtrLayoutFrame.super.dispatchTouchEvent(e);
         }
     }
 
