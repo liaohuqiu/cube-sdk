@@ -13,8 +13,8 @@
     <version>1.1.0</version>
     <packaging>pom</packaging>
 
-    <name>Cube (Parent)</name>
-    <description>Cube SDK</description>
+    <name>Cube SDK Parent</name>
+    <description>Cube SDK, library for Android development</description>
     <url>http://cube-sdk.liaohuqiu.net</url>
     <inceptionYear>2014</inceptionYear>
 

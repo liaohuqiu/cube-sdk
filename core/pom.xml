@@ -11,7 +11,7 @@
     <groupId>in.srain.cube</groupId>
     <artifactId>cube-sdk</artifactId>
     <packaging>apklib</packaging>
-    <name>CUBE</name>
+    <name>Cube SDK</name>
     <version>1.0.21</version>
 
     <dependencies>
@@ -28,7 +28,6 @@
             <version>r18</version>
         </dependency>
     </dependencies>
-
 
     <properties>
         <android.maven.plugin.version>3.7.0</android.maven.plugin.version>
