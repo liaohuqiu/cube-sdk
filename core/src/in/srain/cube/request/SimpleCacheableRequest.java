@@ -47,19 +47,19 @@ public class SimpleCacheableRequest<T> extends SimpleRequest<T> implements ICach
 
     @Override
     public String getCacheKey() {
-        String cachKey = mCacheableRequestPreHandler.getSpecificCacheKey();
-        if (cachKey != null && cachKey.length() > 0)
-            return cachKey;
+        String cacheKey = mCacheableRequestPreHandler.getSpecificCacheKey();
+        if (cacheKey != null && cacheKey.length() > 0)
+            return cacheKey;
 
         String url = getRequestUrl();
         try {
             URI uri = null;
             uri = new URI(url);
-            cachKey = uri.getPath();
-            if (cachKey.startsWith("/"))
-                cachKey = cachKey.substring(1);
-            cachKey = cachKey.replace("/", "-");
-            return cachKey;
+            cacheKey = uri.getPath();
+            if (cacheKey.startsWith("/"))
+                cacheKey = cacheKey.substring(1);
+            cacheKey = cacheKey.replace("/", "-");
+            return cacheKey;
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
