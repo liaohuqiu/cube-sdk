@@ -20,17 +20,18 @@
             <groupId>in.srain.cube</groupId>
             <artifactId>cube-sdk</artifactId>
             <type>apklib</type>
-            <version>1.0.21-SNAPSHOT</version>
+            <version>1.0.22-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.google.android</groupId>
             <artifactId>android</artifactId>
             <version>4.4.0</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.android</groupId>
             <artifactId>support-v4</artifactId>
-            <version>r6</version>
+            <version>r18</version>
         </dependency>
     </dependencies>
 

@@ -23,6 +23,7 @@ public class ScrollHeaderFrame extends FrameLayout {
     private int mCurrentTop = 0;
     private int mHeaderId = 0;
     private int mContainerId = 0;
+    private boolean mDisabled = false;
 
     private ViewGroup mContentViewContainer;
     private View mHeaderContainer;
@@ -49,6 +50,9 @@ public class ScrollHeaderFrame extends FrameLayout {
             }
             if (arr.hasValue(R.styleable.ScrollHeaderFrame_scrollheaderframe_conent_container)) {
                 mContainerId = arr.getResourceId(R.styleable.ScrollHeaderFrame_scrollheaderframe_conent_container, 0);
+            }
+            if (arr.hasValue(R.styleable.ScrollHeaderFrame_scrollheaderframe_disable)) {
+                mDisabled = arr.getBoolean(R.styleable.ScrollHeaderFrame_scrollheaderframe_disable, false);
             }
             arr.recycle();
         }
@@ -180,6 +184,9 @@ public class ScrollHeaderFrame extends FrameLayout {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent e) {
+        if (mDisabled) {
+            return super.dispatchTouchEvent(e);
+        }
         boolean handled = super.dispatchTouchEvent(e);
         int action = e.getAction();
         switch (action) {

@@ -3,8 +3,12 @@
 
     <declare-styleable name="PtrFrame">
         <attr name="ptr_header" format="reference" />
-        <attr name="ptr_reverse_view" format="reference" />
+        <attr name="ptr_rotate_view" format="reference" />
         <attr name="ptr_content" format="reference" />
+        <attr name="ptr_resistance" format="float" />
+        <attr name="ptr_close_delay" format="integer" />
+        <attr name="ptr_rotate_ani_time" format="integer" />
+        <attr name="ptr_ratio_of_header_to_rotate" format="float" />
     </declare-styleable>
 
 </resources>

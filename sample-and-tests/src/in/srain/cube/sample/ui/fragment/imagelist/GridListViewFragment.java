@@ -17,6 +17,7 @@ import in.srain.cube.image.ImageReuseInfo;
 import in.srain.cube.sample.R;
 import in.srain.cube.sample.activity.TitleBaseFragment;
 import in.srain.cube.sample.data.Images;
+import in.srain.cube.util.CLog;
 import in.srain.cube.util.LocalDisplay;
 import in.srain.cube.views.list.ListViewDataAdapter;
 import in.srain.cube.views.list.ViewHolderBase;
@@ -49,16 +50,29 @@ public class GridListViewFragment extends TitleBaseFragment {
         adapter.notifyDataSetChanged();
         setHeaderTitle("Grid");
 
-        ((PtrFrame) v.findViewById(R.id.ly_ptr_frame)).setContentChecker(new PtrFrame.ContentChecker() {
+        ((PtrFrame) v.findViewById(R.id.ly_ptr_frame)).setPtrHandler(new PtrFrame.PtrHandler() {
             @Override
-            public boolean contentIsEmptyOrFirstChildInView() {
-                return gridListView.getFirstVisiblePosition() <= 1;
+            public boolean canDoRefresh() {
+                View view = gridListView.getChildAt(0);
+                return view.getTop() == 0;
             }
 
             @Override
-            public boolean contentItemIsLongPressing() {
-                return false;
+            public void onRefresh() {
+
             }
+
+            @Override
+            public void crossRotateLineFromTop() {
+
+                CLog.d("test", "crossRotateLineFromTop");
+            }
+
+            @Override
+            public void crossRotateLineFromBottom() {
+                CLog.d("test", "crossRotateLineFromBottom");
+            }
+
         });
         return v;
     }

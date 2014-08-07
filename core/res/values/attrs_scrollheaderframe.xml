@@ -5,6 +5,7 @@
         <attr name="scrollheaderframe_header" format="reference" />
         <attr name="scrollheaderframe_conent_container" format="reference" />
         <attr name="scrollheaderframe_footer" format="reference" />
+        <attr name="scrollheaderframe_disable" format="boolean" />
     </declare-styleable>
 
 </resources>

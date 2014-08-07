@@ -6,8 +6,8 @@
     <in.srain.cube.views.ptr.PtrFrame xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/ly_ptr_frame"
         android:layout_width="match_parent"
-        app:ptr_reverse_view="@+id/ptr_id_image"
         app:ptr_header="@+id/ptr_id_header"
+        app:ptr_rotate_view="@+id/ptr_id_image"
         app:ptr_content="@+id/ly_image_list_grid"
         android:layout_height="match_parent">
 
