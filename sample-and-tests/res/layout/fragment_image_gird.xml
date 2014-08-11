@@ -1,36 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+    android:background="#f1f1f1"
     android:layout_height="match_parent">
 
-    <in.srain.cube.views.ptr.PtrFrame xmlns:app="http://schemas.android.com/apk/res-auto"
+    <in.srain.cube.sample.ui.views.header.ptr.PtrFrameDemo xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/ly_ptr_frame"
+        android:layout_height="match_parent"
         android:layout_width="match_parent"
-        app:ptr_header="@+id/ptr_id_header"
-        app:ptr_rotate_view="@+id/ptr_id_image"
-        app:ptr_content="@+id/ly_image_list_grid"
-        android:layout_height="match_parent">
-
-        <FrameLayout
-            android:id="@+id/ptr_id_header"
-            android:layout_width="fill_parent"
-            android:layout_height="50dp"
-            android:gravity="center_vertical"
-            android:background="#ff5500"
-            android:padding="5dp">
-
-            <ImageView
-                android:id="@+id/ptr_id_image"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:padding="5dp"
-                android:src="@drawable/ptr_pulltorefresh_arrow"></ImageView>
-        </FrameLayout>
-
+        app:ptr_content="@+id/ly_image_list_grid">
 
         <GridView
             android:id="@+id/ly_image_list_grid"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fadingEdge="none"
@@ -41,5 +24,5 @@
             android:scrollbarStyle="outsideOverlay"
             android:stretchMode="columnWidth" />
 
-    </in.srain.cube.views.ptr.PtrFrame>
+    </in.srain.cube.sample.ui.views.header.ptr.PtrFrameDemo>
 </RelativeLayout>

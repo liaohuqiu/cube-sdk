@@ -15,7 +15,8 @@ import in.srain.cube.util.CLog;
 public class PtrFrame extends FrameLayout {
 
     private static final boolean DEBUG = CLog.DEBUG_PTR_FRAME;
-    private static final String LOG_TAG = "PtrFrame";
+    private static int ID = 1;
+    private final String LOG_TAG = "PtrFrame" + ++ID;
 
     // ===========================================================
     // Interface
@@ -25,13 +26,17 @@ public class PtrFrame extends FrameLayout {
          * if content is empty or the first child is in view, should do refresh
          * after release
          */
-        public boolean canDoRefresh();
+        public boolean checkCanDoRefresh();
 
         public void onRefresh();
 
-        public void crossRotateLineFromTop();
+        public void onBackToTop();
 
-        public void crossRotateLineFromBottom();
+        public void onRelease();
+
+        public void crossRotateLineFromTop(boolean isInTouching);
+
+        public void crossRotateLineFromBottom(boolean isInTouching);
     }
 
     // ===========================================================
@@ -44,27 +49,34 @@ public class PtrFrame extends FrameLayout {
     // ===========================================================
     // Fields
     // ===========================================================
-    private int mCloseDelay = 300;
-    private double mResistance = 1.5;
-    private int mRotateAniTime = 250;
-    private int mOffsetToRotateView = 0;
-    private float mRationOfHeightToRotate = 1.2f;
-
     private int mHeaderId = 0;
     private int mContainerId = 0;
     private int mRotateViewId = 0;
 
+    private float mResistance = 1.5f;
+
+    private int mDurationClose = 300;
+    private int mDurationToCloseHeader = 300;
+    private int mRotateAniTime = 250;
+
+    private float mRatioOfHeaderToRotate = 1.2f;
+    private float mRatioOfHeaderToRefresh = 1.2f;
+    private boolean mKeepHeaderWhenRefresh = false;
+
+    private int mOffsetToRotateView = 0;
+    private int mOffsetToRefresh = 0;
+
     private RotateAnimation mFlipAnimation;
     private RotateAnimation mReverseFlipAnimation;
 
-    private View mHeaderContainer;
-    private View mRotateView;
-    private ViewGroup mContentViewContainer;
+    protected View mRotateView;
+    protected View mHeaderContainer;
+    protected ViewGroup mContentViewContainer;
 
     private State mState;
     private int mHeaderHeight;
 
-    private FlingRunnable mFlingRunnable;
+    private ScrollChecker mScrollChecker;
 
     private int mCurrentPos = 0;
     private int mLastPos = 0;
@@ -75,8 +87,8 @@ public class PtrFrame extends FrameLayout {
     private PointF mPtLastMove = new PointF();
 
     private boolean isRefreshing = false;
-
     private boolean mPreventForHorizontal = false;
+    private boolean mIsInTouching = false;
 
     public PtrFrame(Context context) {
         this(context, null);
@@ -89,32 +101,30 @@ public class PtrFrame extends FrameLayout {
     public PtrFrame(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
 
+        if (DEBUG) {
+            CLog.d(LOG_TAG, "PtrFrame(Context context, AttributeSet attrs, int defStyle)");
+        }
+
         TypedArray arr = context.obtainStyledAttributes(attrs, R.styleable.PtrFrame, 0, 0);
         if (arr != null) {
-            if (arr.hasValue(R.styleable.PtrFrame_ptr_header)) {
-                mHeaderId = arr.getResourceId(R.styleable.PtrFrame_ptr_header, 0);
-            }
-            if (arr.hasValue(R.styleable.PtrFrame_ptr_content)) {
-                mContainerId = arr.getResourceId(R.styleable.PtrFrame_ptr_content, 0);
-            }
-            if (arr.hasValue(R.styleable.PtrFrame_ptr_rotate_view)) {
-                mRotateViewId = arr.getResourceId(R.styleable.PtrFrame_ptr_rotate_view, 0);
-            }
 
-            if (arr.hasValue(R.styleable.PtrFrame_ptr_close_delay)) {
-                mCloseDelay = arr.getInt(R.styleable.PtrFrame_ptr_close_delay, 300);
-            }
-            if (arr.hasValue(R.styleable.PtrFrame_ptr_resistance)) {
-                mResistance = arr.getFloat(R.styleable.PtrFrame_ptr_resistance, 1.5f);
-            }
-            if (arr.hasValue(R.styleable.PtrFrame_ptr_rotate_ani_time)) {
-                mRotateAniTime = arr.getInt(R.styleable.PtrFrame_ptr_rotate_ani_time, 250);
-            }
-            mRationOfHeightToRotate = arr.getFloat(R.styleable.PtrFrame_ptr_ratio_of_header_to_rotate, 0.9f);
+            mHeaderId = arr.getResourceId(R.styleable.PtrFrame_ptr_header, mHeaderId);
+            mContainerId = arr.getResourceId(R.styleable.PtrFrame_ptr_content, mContainerId);
+            mRotateViewId = arr.getResourceId(R.styleable.PtrFrame_ptr_rotate_view, mRotateViewId);
+
+            mResistance = arr.getFloat(R.styleable.PtrFrame_ptr_resistance, mResistance);
+
+            mDurationClose = arr.getInt(R.styleable.PtrFrame_ptr_duration_to_close, mDurationClose);
+            mDurationToCloseHeader = arr.getInt(R.styleable.PtrFrame_ptr_duration_to_close_header, mDurationToCloseHeader);
+            mRotateAniTime = arr.getInt(R.styleable.PtrFrame_ptr_rotate_ani_time, mRotateAniTime);
+
+            mRatioOfHeaderToRotate = arr.getFloat(R.styleable.PtrFrame_ptr_ratio_of_header_to_rotate, mRatioOfHeaderToRotate);
+            mRatioOfHeaderToRefresh = arr.getFloat(R.styleable.PtrFrame_ptr_ratio_of_header_to_refresh, mRatioOfHeaderToRefresh);
+            mKeepHeaderWhenRefresh = arr.getBoolean(R.styleable.PtrFrame_ptr_keep_header_when_refresh, mKeepHeaderWhenRefresh);
             arr.recycle();
         }
 
-        mFlingRunnable = new FlingRunnable();
+        mScrollChecker = new ScrollChecker();
 
         final ViewConfiguration conf = ViewConfiguration.get(getContext());
         mPagingTouchSlop = conf.getScaledTouchSlop() * 2;
@@ -138,9 +148,35 @@ public class PtrFrame extends FrameLayout {
     protected void onFinishInflate() {
         super.onFinishInflate();
 
-        mHeaderContainer = findViewById(mHeaderId);
-        mContentViewContainer = (ViewGroup) findViewById(mContainerId);
-        mRotateView = findViewById(mRotateViewId);
+        if (mHeaderId != 0) {
+            mHeaderContainer = findViewById(mHeaderId);
+        }
+        if (mContainerId != 0) {
+            mContentViewContainer = (ViewGroup) findViewById(mContainerId);
+        }
+        if (mRotateViewId != 0) {
+            mRotateView = findViewById(mRotateViewId);
+        }
+
+        if (DEBUG) {
+            CLog.d(LOG_TAG, "onFinishInflate");
+        }
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        if (mHeaderContainer != null && mHeaderHeight != mHeaderContainer.getMeasuredHeight()) {
+            mHeaderHeight = mHeaderContainer.getMeasuredHeight();
+            mCurrentPos = mHeaderContainer.getBottom();
+            mOffsetToRotateView = (int) (mHeaderHeight * mRatioOfHeaderToRotate);
+            mOffsetToRefresh = (int) (mHeaderHeight * mRatioOfHeaderToRefresh);
+        }
+
+        if (DEBUG) {
+            CLog.d(LOG_TAG, "onMeasure, mHeaderHeight: %s, mCurrentPos: %s", mHeaderHeight, mCurrentPos);
+        }
     }
 
     @Override
@@ -150,119 +186,23 @@ public class PtrFrame extends FrameLayout {
         int h = getMeasuredHeight();
 
         if (DEBUG) {
-            CLog.d(LOG_TAG, "onLayout %s", mHeaderHeight);
+            CLog.d(LOG_TAG, "onLayout mHeaderHeight: %s, mCurrentPos: %s", mHeaderHeight, mCurrentPos);
         }
-        mHeaderContainer.layout(0, -mHeaderHeight, w, 0);
-        mContentViewContainer.layout(0, 0, w, h);
-    }
-
-    /**
-     * if deltaY > 0, move the content down
-     */
-    private boolean move(float deltaY) {
-
-        // has reached the top
-        if ((deltaY < 0 && mCurrentPos == 0)) {
-            if (DEBUG) {
-                CLog.d(LOG_TAG, String.format("has reached the top"));
-            }
-            return true;
+        if (mHeaderContainer != null) {
+            mHeaderContainer.layout(0, -mHeaderHeight + mCurrentPos, w, mCurrentPos);
         }
-
-        int to = mCurrentPos + (int) deltaY;
-
-        // over top
-        if (to < 0) {
-            if (DEBUG) {
-                CLog.d(LOG_TAG, String.format("over top"));
-            }
-            to = 0;
+        if (mContentViewContainer != null) {
+            mContentViewContainer.layout(0, mCurrentPos, w, h + mCurrentPos);
         }
-
-        mLastPos = mCurrentPos;
-        mCurrentPos = to;
-        invalidate();
-        updatePos();
-        return true;
     }
 
     @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-
-        if (mHeaderContainer != null) {
-            mHeaderHeight = mHeaderContainer.getMeasuredHeight();
-            mCurrentPos = mHeaderContainer.getBottom();
-            mOffsetToRotateView = (int) (mHeaderHeight * mRationOfHeightToRotate);
-        }
-
-        if (DEBUG) {
-            CLog.d(LOG_TAG, "onMeasure, mHeaderHeight: %s, mCurrentPos: %s", mHeaderHeight, mCurrentPos);
-        }
-    }
-
-    private void updatePos() {
-        int lastPos = mHeaderContainer.getBottom();
-        int change = mCurrentPos - lastPos;
-        mHeaderContainer.offsetTopAndBottom(change);
-        mContentViewContainer.offsetTopAndBottom(change);
-
-        if (mCurrentPos < mOffsetToRotateView && mLastPos >= mOffsetToRotateView) {
-            if (null != mPtrHandler) {
-                mPtrHandler.crossRotateLineFromBottom();
-            }
-            mRotateView.clearAnimation();
-            mRotateView.startAnimation(mReverseFlipAnimation);
-        } else if (mCurrentPos > mOffsetToRotateView && mLastPos <= mOffsetToRotateView) {
-            if (null != mPtrHandler) {
-                mPtrHandler.crossRotateLineFromTop();
-            }
-            mRotateView.clearAnimation();
-            mRotateView.startAnimation(mFlipAnimation);
-        }
-    }
-
-    private boolean release() {
-        if (mHeaderContainer.getTop() > mOffsetToRotateView) {
-            mState = State.PREPARE_REFRESH;
-        }
-        mFlingRunnable.startUsingDistance();
-        return false;
-    }
-
-    protected boolean entryLock() {
-        if (isRefreshing) {
-            return false;
-        }
-        isRefreshing = true;
-        return true;
-    }
-
-    protected void unlock() {
-        isRefreshing = false;
-    }
-
-    private void notifyRefresh() {
-        if (mPtrHandler != null) {
-            if (!entryLock())
-                return;
-            mPtrHandler.onRefresh();
-        }
-    }
-
-    public void onRefreshComplete() {
-        unlock();
-    }
-
-    public View getContent() {
-        return mContentViewContainer;
-    }
-
     public boolean dispatchTouchEvent(MotionEvent e) {
         int action = e.getAction();
         switch (action) {
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
+                mIsInTouching = false;
                 if (mCurrentPos > 0) {
                     release();
                     return true;
@@ -271,6 +211,7 @@ public class PtrFrame extends FrameLayout {
                 }
 
             case MotionEvent.ACTION_DOWN:
+                mIsInTouching = true;
                 mPtLastMove.set(e.getX(), e.getY());
                 mPreventForHorizontal = false;
                 return super.dispatchTouchEvent(e);
@@ -288,86 +229,234 @@ public class PtrFrame extends FrameLayout {
                     return super.dispatchTouchEvent(e);
                 }
 
-                mFlingRunnable.checkStop();
+                mScrollChecker.abortIfWorking();
 
                 boolean moveDown = offsetY > 0;
                 boolean moveUp = !moveDown;
                 boolean canMoveUp = mCurrentPos > 0;
 
                 if (DEBUG) {
-                    CLog.d(LOG_TAG, "ACTION_MOVE: offsetY:%s, mCurrentPos: %s, moveUp: %s, canMoveUp: %s, moveDown: %s", offsetY, mCurrentPos, moveUp, canMoveUp, moveDown);
+                    // CLog.d(LOG_TAG, "ACTION_MOVE: offsetY:%s, mCurrentPos: %s, moveUp: %s, canMoveUp: %s, moveDown: %s", offsetY, mCurrentPos, moveUp, canMoveUp, moveDown);
                 }
 
                 // disable move when header not reach top
-                if (moveDown && mPtrHandler != null && !mPtrHandler.canDoRefresh()) {
+                if (moveDown && mPtrHandler != null && !mPtrHandler.checkCanDoRefresh()) {
                     return super.dispatchTouchEvent(e);
                 }
 
                 if ((moveUp && canMoveUp) || moveDown) {
                     offsetY = (float) ((double) offsetY / mResistance);
-                    move(offsetY);
+                    movePos(offsetY);
                     return true;
                 }
         }
         return super.dispatchTouchEvent(e);
     }
 
-    public void setPtrHandler(PtrHandler ptrHandler) {
-        mPtrHandler = ptrHandler;
+    /**
+     * if deltaY > 0, move the content down
+     */
+    private void movePos(float deltaY) {
+        // has reached the top
+        if ((deltaY < 0 && mCurrentPos == 0)) {
+            if (DEBUG) {
+                CLog.e(LOG_TAG, String.format("has reached the top"));
+            }
+            return;
+        }
+
+        int to = mCurrentPos + (int) deltaY;
+
+        // over top
+        if (to < 0) {
+            if (DEBUG) {
+                CLog.e(LOG_TAG, String.format("over top"));
+            }
+            to = 0;
+        }
+
+        mLastPos = mCurrentPos;
+        mCurrentPos = to;
+        updatePos();
+    }
+
+    private void updatePos() {
+        int lastPos = mHeaderContainer.getBottom();
+        int change = mCurrentPos - lastPos;
+        mHeaderContainer.offsetTopAndBottom(change);
+        mContentViewContainer.offsetTopAndBottom(change);
+
+        if (mCurrentPos < mOffsetToRotateView && mLastPos >= mOffsetToRotateView) {
+            if (null != mPtrHandler) {
+                mPtrHandler.crossRotateLineFromBottom(mIsInTouching);
+            }
+            if (mRotateView != null) {
+                mRotateView.clearAnimation();
+                if (mIsInTouching) {
+                    mRotateView.startAnimation(mReverseFlipAnimation);
+                }
+            }
+        } else if (mCurrentPos > mOffsetToRotateView && mLastPos <= mOffsetToRotateView) {
+            if (null != mPtrHandler) {
+                mPtrHandler.crossRotateLineFromTop(mIsInTouching);
+            }
+            if (mRotateView != null) {
+                mRotateView.clearAnimation();
+                if (mIsInTouching) {
+                    mRotateView.startAnimation(mFlipAnimation);
+                }
+            }
+        }
+    }
+
+    private void release() {
+        if (mPtrHandler != null) {
+            mPtrHandler.onRelease();
+        }
+        if (mCurrentPos >= mOffsetToRefresh) {
+            mState = State.PREPARE_REFRESH;
+        }
+        if (mKeepHeaderWhenRefresh && mCurrentPos >= mOffsetToRefresh) {
+            mScrollChecker.scrollTo(mHeaderHeight, mDurationClose);
+        } else {
+            mScrollChecker.scrollTo(0, mDurationClose);
+        }
+    }
+
+    private void notifyRefresh() {
+        if (mPtrHandler != null && !isRefreshing) {
+            isRefreshing = true;
+            mPtrHandler.onRefresh();
+        }
+    }
+
+    private void notifyBackToTop() {
+        if (mPtrHandler != null) {
+            mPtrHandler.onBackToTop();
+        }
+    }
+
+    private void notifyScrollFinish() {
+        if (mState == State.PREPARE_REFRESH) {
+            mState = State.FREE;
+            notifyRefresh();
+        }
+        if (mCurrentPos == 0) {
+            notifyBackToTop();
+        }
     }
 
     private boolean frameIsMoved() {
         return mLastPos == -mHeaderHeight;
     }
 
-    class FlingRunnable implements Runnable {
+    public void onRefreshComplete() {
+        if (isRefreshing) {
+            isRefreshing = false;
+            if (mKeepHeaderWhenRefresh) {
+                mScrollChecker.scrollTo(0, mDurationToCloseHeader);
+            }
+        }
+    }
+
+    public View getContent() {
+        return mContentViewContainer;
+    }
+
+    public void setPtrHandler(PtrHandler ptrHandler) {
+        mPtrHandler = ptrHandler;
+    }
+
+    public void setRotateView(int id) {
+        mRotateView = findViewById(id);
+    }
+
+    public void setRotateView(View view) {
+        mRotateView = view;
+    }
+
+    public void setResistance(float resistance) {
+        mResistance = resistance;
+    }
+
+    public void setDurationClose(int duration) {
+        mDurationClose = duration;
+    }
+
+    public void setDurationToCloseHeader(int duration) {
+        mDurationToCloseHeader = duration;
+    }
+
+    public void setKeepHeaderWhenRefresh(boolean keepOrNot) {
+        mKeepHeaderWhenRefresh = keepOrNot;
+    }
+
+    class ScrollChecker implements Runnable {
 
         private int mLastFlingY;
         private Scroller mScroller;
         private boolean mIsRunning = false;
+        private int mStart;
+        private int mTo;
 
-        public FlingRunnable() {
-            mScroller = new Scroller(getContext());
+        public ScrollChecker() {
+            mScroller = new android.widget.Scroller(getContext());
         }
 
         public void run() {
-            boolean noFinish = mScroller.computeScrollOffset() && !mScroller.isFinished();
-            CLog.d(LOG_TAG, "mIsRunning: %s, noFinish: %s", mIsRunning, noFinish);
-            if (noFinish) {
-                int curY = mScroller.getCurrY();
-                int deltaY = curY - mLastFlingY;
-                move(deltaY);
-                if (mCurrentPos == 0 && mState == State.PREPARE_REFRESH) {
-                    mState = State.FREE;
-                    notifyRefresh();
-                }
+            boolean finish = !mScroller.computeScrollOffset() || mScroller.isFinished();
+            int curY = mScroller.getCurrY();
+            int deltaY = curY - mLastFlingY;
+            if (DEBUG) {
+                CLog.d(LOG_TAG, "scroll: %s, start: %s, to: %s, mCurrentPos: %s, current :%s, last: %s, delta: %s", finish, mStart, mTo, mCurrentPos, curY, mLastFlingY, deltaY);
+            }
+            if (!finish) {
                 mLastFlingY = curY;
+                movePos(deltaY);
                 post(this);
             } else {
-                removeCallbacks(this);
-                mState = State.FREE;
-                mIsRunning = false;
+                finish();
             }
         }
 
-        public void checkStop() {
-            if (!mScroller.isFinished()) {
-                mScroller.forceFinished(true);
+        private void finish() {
+            if (DEBUG) {
+                CLog.d(LOG_TAG, "finish, mCurrentPos:%s", mCurrentPos);
             }
+            reset();
+            notifyScrollFinish();
+        }
+
+        private void reset() {
+            mIsRunning = false;
+            mLastFlingY = 0;
+            removeCallbacks(this);
+        }
+
+        public void abortIfWorking() {
             if (mIsRunning) {
-                removeCallbacks(this);
-                mIsRunning = false;
+                if (!mScroller.isFinished()) {
+                    mScroller.forceFinished(true);
+                }
+                reset();
             }
         }
 
-        public void startUsingDistance() {
+        public void scrollTo(int to, int duration) {
+            mStart = mCurrentPos;
+            mTo = to;
+            int distance = to - mStart;
+            if (DEBUG) {
+                CLog.d(LOG_TAG, "scrollTo: start: %s, distance:%s, to:%s", mStart, distance, to);
+            }
             if (mCurrentPos == 0) {
                 return;
             }
-            int distance = -mCurrentPos;
             removeCallbacks(this);
+
             mLastFlingY = 0;
-            mScroller.startScroll(0, 0, 0, distance, mCloseDelay);
+            mScroller = new android.widget.Scroller(getContext());
+            mScroller.startScroll(0, 0, 0, distance, duration);
             post(this);
             mIsRunning = true;
         }

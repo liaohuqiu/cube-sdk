@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<in.srain.cube.views.ScrollHeaderFrame xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:cube="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    cube:scrollheaderframe_disable="true"
+    cube:scrollheaderframe_disable="false"
     cube:scrollheaderframe_conent_container="@+id/ly_main_content_container"
     cube:scrollheaderframe_header="@+id/ly_header_bar_title_wrap">
 
@@ -21,4 +21,4 @@
         android:background="#ffffff"
         android:orientation="vertical" />
 
-</LinearLayout>
+</in.srain.cube.views.ScrollHeaderFrame>

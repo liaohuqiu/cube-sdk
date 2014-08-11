@@ -17,6 +17,7 @@ import in.srain.cube.image.ImageReuseInfo;
 import in.srain.cube.sample.R;
 import in.srain.cube.sample.activity.TitleBaseFragment;
 import in.srain.cube.sample.data.Images;
+import in.srain.cube.sample.ui.views.header.ptr.PtrFrameDemo;
 import in.srain.cube.util.CLog;
 import in.srain.cube.util.LocalDisplay;
 import in.srain.cube.views.list.ListViewDataAdapter;
@@ -26,7 +27,7 @@ import in.srain.cube.views.ptr.PtrFrame;
 
 public class GridListViewFragment extends TitleBaseFragment {
 
-    private static final int sGirdImageSize = (LocalDisplay.SCREEN_WIDTH_PIXELS - LocalDisplay.dp2px(10 + 10 + 10)) / 2;
+    private static final int sGirdImageSize = (LocalDisplay.SCREEN_WIDTH_PIXELS - LocalDisplay.dp2px(12 + 12 + 10)) / 2;
     private ImageLoader mImageLoader;
 
     private static final ImageReuseInfo sGridImageReuseInfo = Images.sImageReuseInfoManger.create("big_360");
@@ -50,29 +51,26 @@ public class GridListViewFragment extends TitleBaseFragment {
         adapter.notifyDataSetChanged();
         setHeaderTitle("Grid");
 
-        ((PtrFrame) v.findViewById(R.id.ly_ptr_frame)).setPtrHandler(new PtrFrame.PtrHandler() {
+        final PtrFrameDemo ptrFrame = (PtrFrameDemo) v.findViewById(R.id.ly_ptr_frame);
+        ptrFrame.setKeepHeaderWhenRefresh(true);
+        ptrFrame.setHandler(new PtrFrameDemo.Handler() {
+            @Override
+            public void onRefresh() {
+                CLog.d("test", "onRefresh");
+                ptrFrame.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        ptrFrame.onRefreshComplete();
+                    }
+                }, 1000);
+            }
+
             @Override
             public boolean canDoRefresh() {
                 View view = gridListView.getChildAt(0);
                 return view.getTop() == 0;
             }
-
-            @Override
-            public void onRefresh() {
-
-            }
-
-            @Override
-            public void crossRotateLineFromTop() {
-
-                CLog.d("test", "crossRotateLineFromTop");
-            }
-
-            @Override
-            public void crossRotateLineFromBottom() {
-                CLog.d("test", "crossRotateLineFromBottom");
-            }
-
         });
         return v;
     }

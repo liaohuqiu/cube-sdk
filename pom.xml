@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -26,7 +27,6 @@
         <url>https://github.com/etao-open-source/cube-sdk</url>
         <connection>scm:git:git:@github.com:etao-open-source/cube-sdk.git</connection>
         <developerConnection>scm:git:git@github.com:etao-open-source/cube-sdk.git</developerConnection>
-        <tag>parent-1.1.0</tag>
     </scm>
 
     <developers>
@@ -73,15 +73,6 @@
         <android.version>4.0.1.2</android.version>
         <android-support.version>r7</android-support.version>
         <fest.android.version>1.0.5</fest.android.version>
-
-        <!-- Sample dependencies -->
-        <nineoldandroids.version>2.4.0</nineoldandroids.version>
-        <roboguice-sherlock.version>1.5</roboguice-sherlock.version>
-
-        <!-- Test dependencies -->
-        <junit.version>4.10</junit.version>
-        <fest.version>2.0M10</fest.version>
-        <robolectric.version>2.0</robolectric.version>
     </properties>
 
     <dependencyManagement>
