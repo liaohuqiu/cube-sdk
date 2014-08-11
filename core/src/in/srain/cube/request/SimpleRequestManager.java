@@ -15,7 +15,7 @@ import android.os.Message;
  */
 public class SimpleRequestManager {
 
-    private final static int REQUEST_SUCC = 0x01;
+    private final static int REQUEST_SUCCESS = 0x01;
 
     private final static int REQUEST_FAILED = 0x02;
 
@@ -26,8 +26,8 @@ public class SimpleRequestManager {
             @Override
             public void handleMessage(Message msg) {
                 switch (msg.what) {
-                    case REQUEST_SUCC:
-                        request.onRequestSucc((T) msg.obj);
+                    case REQUEST_SUCCESS:
+                        request.onRequestSuccess((T) msg.obj);
                         break;
 
                     default:
@@ -41,7 +41,7 @@ public class SimpleRequestManager {
             public void run() {
                 JsonData json = null;
                 try {
-                    URL url = new URL(request.getRequestUrl());
+                    URL url = new URL(request.getRequestData().getRequestUrl());
                     URLConnection urlConnection = url.openConnection();
                     InputStream ips = new BufferedInputStream(urlConnection.getInputStream());
                     BufferedReader buf = new BufferedReader(new InputStreamReader(ips, "UTF-8"));
@@ -69,7 +69,7 @@ public class SimpleRequestManager {
                     handler.sendMessage(msg);
                 } else {
                     Message msg = Message.obtain();
-                    msg.what = REQUEST_SUCC;
+                    msg.what = REQUEST_SUCCESS;
                     msg.obj = data;
                     handler.sendMessage(msg);
                 }

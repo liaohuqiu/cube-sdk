@@ -4,8 +4,10 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils;
 import in.srain.cube.concurrent.SimpleExcutor;
 import in.srain.cube.file.FileUtil;
+import in.srain.cube.util.CLog;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -15,6 +17,11 @@ import java.util.HashMap;
  * @author http://www.liaohuqiu.net
  */
 public class RequestCache {
+
+    private static final boolean DEBUG = CLog.DEBUG_REQUEST_CACHE;
+    private static final String LOG_TAG = "cube_request_cache";
+
+    private static final String THREAD_NAME = "Cube-Request-Cache";
 
     private static RequestCache mInstance;
     private String mCacheDir;
@@ -32,7 +39,7 @@ public class RequestCache {
     private Context mContext;
     private static Handler sHandler;
 
-    public interface ICacheable<T> {
+    public interface ICacheAbleRequest<T> extends IRequest<T> {
 
         public int getCacheTime();
 
@@ -47,9 +54,9 @@ public class RequestCache {
          */
         public T processRawDataFromCache(JsonData jsonData);
 
-        public void onNoCacheDataAvailable();
+        public void onCacheData(T previousJsonData, boolean outOfDate);
 
-        public void onCacheData(T previousJsonData, boolean outofDate);
+        public void queryFromServer();
     }
 
     @SuppressLint("HandlerLeak")
@@ -83,7 +90,9 @@ public class RequestCache {
         mContext = content;
         mCacheDir = cacheDir;
         mCacheList = new HashMap<String, JsonData>();
-        showStatus(String.format("init, cache dir::%s", mCacheDir));
+        if (DEBUG) {
+            CLog.d(LOG_TAG, "init, cache dir::%s", mCacheDir);
+        }
     }
 
     public static RequestCache getInstance() {
@@ -92,22 +101,24 @@ public class RequestCache {
         return mInstance;
     }
 
-    public <T> void requestCache(ICacheable<T> cacheable) {
-        ReadCacheTask<T> task = new ReadCacheTask<T>(cacheable);
+    public <T> void requestCache(ICacheAbleRequest<T> cacheAbleRequest) {
+        ReadCacheTask<T> task = new ReadCacheTask<T>(cacheAbleRequest);
         task.query();
     }
 
-    public <T> void cacheRequest(final ICacheable<T> cacheable, final JsonData data) {
-        showStatus(String.format("cacheRequest, key:%s", cacheable.getCacheKey()));
+    public <T> void cacheRequest(final ICacheAbleRequest<T> cacheAble, final JsonData data) {
+        if (DEBUG) {
+            CLog.d(LOG_TAG, "cacheRequest, key:%s", cacheAble.getCacheKey());
+        }
         new Thread(new Runnable() {
             @Override
             public void run() {
-                String filePath = mCacheDir + "/ " + cacheable.getCacheKey();
+                String filePath = mCacheDir + "/ " + cacheAble.getCacheKey();
                 JsonData jsonData = makeCacheFormatJsonData(data, 0);
-                setCacheData(cacheable.getCacheKey(), jsonData);
+                setCacheData(cacheAble.getCacheKey(), jsonData);
                 FileUtil.write(filePath, jsonData.toString());
             }
-        }, "SimpleRequestBase-Cache").start();
+        }, THREAD_NAME).start();
     }
 
     private JsonData makeCacheFormatJsonData(JsonData data, int time) {
@@ -123,7 +134,9 @@ public class RequestCache {
     }
 
     public void invalidateCache(String key) {
-        showStatus(String.format("invalidateCache, key:%s", key));
+        if (DEBUG) {
+            CLog.d(LOG_TAG, "invalidateCache, key:%s", key);
+        }
         String filePath = mCacheDir + "/ " + key;
         new File(filePath).delete();
         mCacheList.remove(key);
@@ -131,29 +144,31 @@ public class RequestCache {
 
     private class ReadCacheTask<T1> implements Runnable {
 
-        private ICacheable<T1> mCacheable;
+        private ICacheAbleRequest<T1> mCacheAble;
 
         private JsonData mRawData;
         private T1 mResult;
         private int mWorkType = 0;
 
-        public ReadCacheTask(ICacheable<T1> cacheable) {
-            mCacheable = cacheable;
+        public ReadCacheTask(ICacheAbleRequest<T1> cacheAble) {
+            mCacheAble = cacheAble;
         }
 
         void query() {
-            String cacheKey = mCacheable.getCacheKey();
+            String cacheKey = mCacheAble.getCacheKey();
 
             // try to find in runtime cache
             if (mCacheList.containsKey(cacheKey)) {
-                showStatus(String.format("exist in list, key:%s", mCacheable.getCacheKey()));
+                if (DEBUG) {
+                    CLog.d(LOG_TAG, "exist in list, key:%s", mCacheAble.getCacheKey());
+                }
                 mRawData = mCacheList.get(cacheKey);
                 processRawCacheData();
                 return;
             }
 
             // try read from cache data
-            String filePath = mCacheDir + "/ " + mCacheable.getCacheKey();
+            String filePath = mCacheDir + "/ " + mCacheAble.getCacheKey();
             File file = new File(filePath);
             if (file.exists()) {
                 queryFromCacheFile();
@@ -161,14 +176,16 @@ public class RequestCache {
             }
 
             // try to read from assert cache file
-            String assertInitDataPath = mCacheable.getAssertInitDataPath();
+            String assertInitDataPath = mCacheAble.getAssertInitDataPath();
             if (assertInitDataPath != null && assertInitDataPath.length() > 0) {
                 queryFromAssertCacheFile();
                 return;
             }
 
-            showStatus(String.format("cache file not exist, key:%s", mCacheable.getCacheKey()));
-            mCacheable.onNoCacheDataAvailable();
+            if (DEBUG) {
+                CLog.d(LOG_TAG, "cache file not exist, key:%s", mCacheAble.getCacheKey());
+            }
+            mCacheAble.queryFromServer();
         }
 
         @Override
@@ -200,8 +217,10 @@ public class RequestCache {
 
         private void doQueryFromCacheFileInBackground() {
 
-            showStatus(String.format("try read cache data from file, key:%s", mCacheable.getCacheKey()));
-            String filePath = mCacheDir + "/ " + mCacheable.getCacheKey();
+            if (DEBUG) {
+                CLog.d(LOG_TAG, "try read cache data from file, key:%s", mCacheAble.getCacheKey());
+            }
+            String filePath = mCacheDir + "/ " + mCacheAble.getCacheKey();
             String cacheContent = FileUtil.read(filePath);
             mRawData = JsonData.create(cacheContent);
 
@@ -217,12 +236,15 @@ public class RequestCache {
         }
 
         private void queryFromAssertCacheFileInBackground() {
-            showStatus(String.format("try read cache data from assert file: %s", mCacheable.getCacheKey()));
 
-            String cacheContent = FileUtil.readAssert(mContext, mCacheable.getAssertInitDataPath());
+            if (DEBUG) {
+                CLog.d(LOG_TAG, "try read cache data from assert file: %s", mCacheAble.getCacheKey());
+            }
+
+            String cacheContent = FileUtil.readAssert(mContext, mCacheAble.getAssertInitDataPath());
             JsonData rawData = JsonData.create(cacheContent);
             mRawData = makeCacheFormatJsonData(rawData, -2);
-            setCacheData(mCacheable.getCacheKey(), mRawData);
+            setCacheData(mCacheAble.getCacheKey(), mRawData);
 
             Message msg = Message.obtain();
             msg.what = AFTER_READ_FROM_ASSERT;
@@ -233,7 +255,7 @@ public class RequestCache {
         void doConvertInBackground() {
 
             JsonData data = mRawData.optJson("data");
-            mResult = mCacheable.processRawDataFromCache(data);
+            mResult = mCacheAble.processRawDataFromCache(data);
 
             Message msg = Message.obtain();
             msg.what = AFTER_CONVERT;
@@ -246,8 +268,10 @@ public class RequestCache {
                 mWorkType = DO_CONVERT;
                 new Thread(this).start();
             } else {
-                showStatus(String.format("onNoCacheDataAvailable, key:%s", mCacheable.getCacheKey()));
-                mCacheable.onNoCacheDataAvailable();
+                if (DEBUG) {
+                    CLog.d(LOG_TAG, "onNoCacheDataAvailable, key:%s", mCacheAble.getCacheKey());
+                }
+                mCacheAble.queryFromServer();
             }
         }
 
@@ -255,16 +279,21 @@ public class RequestCache {
 
             int lastTime = mRawData.optInt("time");
             long timeInterval = System.currentTimeMillis() / 1000 - lastTime;
-            boolean outOfDate = timeInterval > mCacheable.getCacheTime() || timeInterval < 0;
-            mCacheable.onCacheData(mResult, outOfDate);
+            boolean outOfDate = timeInterval > mCacheAble.getCacheTime() || timeInterval < 0;
+            mCacheAble.onCacheData(mResult, outOfDate);
+            if (outOfDate) {
+                mCacheAble.queryFromServer();
+            }
         }
     }
 
     private void setCacheData(String key, JsonData data) {
-        showStatus(String.format("set cache to runtime cache list, key:%s", key));
+        if (TextUtils.isEmpty(key)) {
+            return;
+        }
+        if (DEBUG) {
+            CLog.d(LOG_TAG, "set cache to runtime cache list, key:%s", key);
+        }
         mCacheList.put(key, data);
-    }
-
-    private void showStatus(String msg) {
     }
 }

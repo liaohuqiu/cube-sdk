@@ -2,15 +2,21 @@ package in.srain.cube.request;
 
 public interface IRequest<T> {
 
-	public String getRequestUrl();
+    public RequestData getRequestData();
 
-	public void onRequestSucc(T data);
+    public void onRequestSuccess(T data);
 
-	/**
-	 * filter the origin data or convert its structure.
-	 * 
-	 * @param jsonData
-	 * @return
-	 */
-	T processOriginData(JsonData jsonData);
+    public void beforeRequest();
+
+    public void onRequestFail(RequestResultType requestResultType);
+
+    public void send();
+
+    /**
+     * filter the origin data or convert its structure.
+     *
+     * @param jsonData
+     * @return
+     */
+    T processOriginData(JsonData jsonData);
 }

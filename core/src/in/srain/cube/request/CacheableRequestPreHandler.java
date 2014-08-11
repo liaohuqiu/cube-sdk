@@ -1,20 +1,22 @@
 package in.srain.cube.request;
 
-public interface CacheableRequestPreHandler extends BeforeRequestHandler {
+public interface CacheAbleRequestPreHandler extends BeforeRequestHandler {
 
-	/**
-	 * Once the cache key is sepified, the data will be cached by using this key,
-	 * 
-	 * or else, the url path return by getRequestUrl() will be used, after '/' has been replaced into '-'.
-	 */
-	public String getSpecificCacheKey();
+    /**
+     * Once the cache key is specified, the data will be cached by using this key,
+     * <p/>
+     * or else, the url path return by getRequestUrl() will be used, after '/' has been replaced into '-'.
+     */
+    public String getSpecificCacheKey();
 
-	public String getInitFileAssertPath();
+    public String getInitFileAssertPath();
 
-	/**
-	 * Indicate how long the data should be cached
-	 * 
-	 * @return
-	 */
-	public int getCacheTime();
+    public boolean disableCache();
+
+    /**
+     * Indicate how long the data should be cached
+     *
+     * @return
+     */
+    public int getCacheTime();
 }

@@ -1,12 +1,7 @@
 package in.srain.cube.sample.data;
 
-import in.srain.cube.request.BeforeRequestHandler;
-import in.srain.cube.request.CacheableRequestPreHandler;
-import in.srain.cube.request.JsonCacheableRequestSuccHandler;
-import in.srain.cube.request.JsonData;
-import in.srain.cube.request.JsonRequestSuccHandler;
-import in.srain.cube.request.SimpleCacheableRequest;
-import in.srain.cube.request.SimpleRequest;
+import in.srain.cube.request.*;
+import in.srain.cube.request.CacheAbleRequest;
 
 /**
  * <p>
@@ -30,13 +25,13 @@ public class SampleRequest {
     /**
      * Show how to encapsulate the calling of a web API by Request
      */
-    public static void reverse(final String str, final JsonRequestSuccHandler handler) {
+    public static void reverse(final String str, final RequestJsonHandler handler) {
         new SimpleRequest<JsonData>(new BeforeRequestHandler() {
 
             public <T> void beforeRequest(SimpleRequest<T> request) {
 
                 String url = "http://cube-server.liaohuqiu.net/api_demo/reverse.php?str=" + str;
-                request.setRequestUrl(url);
+                request.getRequestData().setRequestUrl(url);
             }
         }, handler).send();
     }
@@ -44,13 +39,13 @@ public class SampleRequest {
     /**
      * Show how to encapsulate the calling of a web API by CacheableRequest
      */
-    public static void getCacheableRequestSampleData(final String msg, final JsonCacheableRequestSuccHandler handler) {
+    public static void getCacheableRequestSampleData(final String msg, final CacheAbleRequestJsonHandler handler) {
 
-        new SimpleCacheableRequest<JsonData>(new CacheableRequestPreHandler() {
+        new CacheAbleRequest<JsonData>(new CacheAbleRequestPreHandler() {
 
             public <T> void beforeRequest(SimpleRequest<T> request) {
                 String url = "http://cube-server.liaohuqiu.net/api_demo/request.php";
-                request.setRequestUrl(url);
+                request.getRequestData().setRequestUrl(url);
             }
 
             @Override

@@ -11,7 +11,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import in.srain.cube.request.JsonData;
-import in.srain.cube.request.JsonRequestSuccHandler;
+import in.srain.cube.request.RequestJsonHandler;
 import in.srain.cube.sample.R;
 import in.srain.cube.sample.activity.TitleBaseFragment;
 import in.srain.cube.sample.data.SampleRequest;
@@ -44,7 +44,7 @@ public class RequestDemoFragment extends TitleBaseFragment {
 				button.setText("Requesting...");
 
 				String str = inpuText.getText().toString();
-				SampleRequest.reverse(str, new JsonRequestSuccHandler() {
+				SampleRequest.reverse(str, new RequestJsonHandler() {
 
 					@Override
 					public void onRequestFinish(JsonData jsonData) {

@@ -2,75 +2,49 @@ package in.srain.cube.request;
 
 /**
  * @author http://www.liaohuqiu.net
- * 
- *         TODO: request parameters / request method
  */
-public class SimpleRequest<T> implements IRequest<T> {
+public class SimpleRequest<T> extends RequestBase<T> implements IRequest<T> {
 
-	private RequestSuccHandler<T> mOnSuccHandler;
-	private BeforeRequestHandler mBeforeRequestHandler;
+    private RequestHandler<T> mRequestHandler;
+    private BeforeRequestHandler mBeforeRequestHandler;
 
-	private String mUrl;
+    public SimpleRequest(BeforeRequestHandler beforeRequestHandler, RequestHandler<T> handler) {
+        mBeforeRequestHandler = beforeRequestHandler;
+        mRequestHandler = handler;
+    }
 
-	public SimpleRequest(BeforeRequestHandler beforeRequestHandler, RequestSuccHandler<T> succHandler) {
-		mBeforeRequestHandler = beforeRequestHandler;
-		mOnSuccHandler = succHandler;
-	}
+    @Override
+    public void send() {
+        this.beforeRequest();
+        SimpleRequestManager.sendRequest(this);
+    }
 
-	public void send() {
-		setBeforeRequest();
-		doQuery();
-	}
+    @Override
+    public void beforeRequest() {
+        if (null != mBeforeRequestHandler) {
+            mBeforeRequestHandler.beforeRequest(this);
+        }
+    }
 
-	/**
-	 * Use a request Manger to send this SimpleRequestBase
-	 */
-	protected void doQuery() {
-		SimpleRequestManager.sendRequest(this);
-	}
+    @Override
+    public void onRequestSuccess(T data) {
+        if (null != mRequestHandler) {
+            mRequestHandler.onRequestFinish(data);
+        }
+    }
 
-	public void setRequestUrl(String url) {
-		mUrl = url;
-	}
+    @Override
+    public void onRequestFail(RequestResultType requestResultType) {
+        if (null != mRequestHandler) {
+            mRequestHandler.onRequestFail(requestResultType);
+        }
+    }
 
-	/**
-	 * Implements interface {@link IRequest}
-	 */
-	@Override
-	public String getRequestUrl() {
-		return mUrl;
-	}
-
-	/**
-	 * Implements interface {@link IRequest}
-	 */
-	@Override
-	public void onRequestSucc(T data) {
-		if (null != mOnSuccHandler) {
-			mOnSuccHandler.onRequestFinish(data);
-		}
-	}
-
-	protected void setBeforeRequest() {
-		if (null != mBeforeRequestHandler) {
-			mBeforeRequestHandler.beforeRequest(this);
-		}
-	}
-
-	/**
-	 * Override this method to process the data from data source.
-	 * 
-	 * Implements interface {@link IRequest}
-	 */
-	@Override
-	public T processOriginData(JsonData rawData) {
-		if (null != mOnSuccHandler) {
-			return mOnSuccHandler.processOriginData(rawData);
-		}
-		return null;
-	}
-
-	public byte[] getPostData() {
-		return null;
-	}
+    @Override
+    public T processOriginData(JsonData rawData) {
+        if (null != mRequestHandler) {
+            return mRequestHandler.processOriginData(rawData);
+        }
+        return null;
+    }
 }
