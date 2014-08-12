@@ -4,6 +4,8 @@ import java.util.List;
 
 public abstract class PagedListDataModel<T> {
 
+    protected abstract void doQueryData();
+
     protected ListPageInfo<T> mListPageInfo;
 
     private PagedListDataHandler mPagedListDataHandler;
@@ -42,12 +44,17 @@ public abstract class PagedListDataModel<T> {
         doQueryData();
     }
 
-    protected abstract void doQueryData();
 
     protected void setRequestResult(List<T> list, int total) {
         mListPageInfo.updateListInfo(list, total);
         if (null != mPagedListDataHandler) {
             mPagedListDataHandler.onPageDataLoaded(mListPageInfo);
+        }
+    }
+
+    public void stopRequest() {
+        if (mListPageInfo != null) {
+            mListPageInfo.unlock();
         }
     }
 

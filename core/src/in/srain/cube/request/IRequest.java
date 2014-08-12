@@ -12,11 +12,13 @@ public interface IRequest<T> {
 
     public void send();
 
+    public void cancelRequest();
+
     /**
      * filter the origin data or convert its structure.
      *
      * @param jsonData
      * @return
      */
-    T processOriginData(JsonData jsonData);
+    T processOriginDataFromServer(JsonData jsonData);
 }

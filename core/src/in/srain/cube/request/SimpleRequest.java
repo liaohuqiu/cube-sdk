@@ -41,10 +41,15 @@ public class SimpleRequest<T> extends RequestBase<T> implements IRequest<T> {
     }
 
     @Override
-    public T processOriginData(JsonData rawData) {
+    public T processOriginDataFromServer(JsonData rawData) {
         if (null != mRequestHandler) {
             return mRequestHandler.processOriginData(rawData);
         }
         return null;
+    }
+
+    @Override
+    public void cancelRequest() {
+
     }
 }

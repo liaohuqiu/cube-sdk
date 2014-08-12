@@ -57,10 +57,10 @@ public class PtrFrame extends FrameLayout {
 
     private int mDurationClose = 300;
     private int mDurationToCloseHeader = 300;
-    private int mRotateAniTime = 250;
+    private int mRotateAniTime = 150;
 
-    private float mRatioOfHeaderToRotate = 1.2f;
-    private float mRatioOfHeaderToRefresh = 1.2f;
+    private float mRatioOfHeaderToRotate = 1.5f;
+    private float mRatioOfHeaderToRefresh = 1.5f;
     private boolean mKeepHeaderWhenRefresh = false;
 
     private int mOffsetToRotateView = 0;

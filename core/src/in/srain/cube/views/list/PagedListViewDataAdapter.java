@@ -21,6 +21,10 @@ public class PagedListViewDataAdapter<ItemDataType> extends ListViewDataAdapterB
         mListPageInfo = listPageInfo;
     }
 
+    public ListPageInfo<ItemDataType> getListPageInfo() {
+        return mListPageInfo;
+    }
+
     @Override
     public int getCount() {
         if (null == mListPageInfo) {
@@ -35,6 +39,12 @@ public class PagedListViewDataAdapter<ItemDataType> extends ListViewDataAdapterB
             return null;
         }
         return mListPageInfo.getItem(position);
+    }
+
+    public void clearList() {
+        if (null != mListPageInfo && mListPageInfo.getDataList() != null) {
+            mListPageInfo.getDataList().clear();
+        }
     }
 
     @Override

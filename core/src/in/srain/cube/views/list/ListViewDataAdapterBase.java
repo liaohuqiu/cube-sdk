@@ -18,55 +18,55 @@ import in.srain.cube.util.CLog;
  */
 public abstract class ListViewDataAdapterBase<ItemDataType> extends BaseAdapter {
 
-	private static String LOG_TAG = "cube_list";
+    private static String LOG_TAG = "cube_list";
 
-	protected ViewHolderCreator<ItemDataType> mViewHolderCreator;
-	protected HashSet<Integer> mCreatedTag = new HashSet<Integer>();
-	private boolean mEnableCreateViewForMeasure = true;
+    protected ViewHolderCreator<ItemDataType> mViewHolderCreator;
+    protected HashSet<Integer> mCreatedTag = new HashSet<Integer>();
+    private boolean mEnableCreateViewForMeasure = true;
 
-	/**
-	 * @param viewHolderCreator The view holder creator will create a View Holder that extends {@link ViewHolderBase}
-	 */
-	public ListViewDataAdapterBase(ViewHolderCreator<ItemDataType> viewHolderCreator) {
-		mViewHolderCreator = viewHolderCreator;
-	}
+    /**
+     * @param viewHolderCreator The view holder creator will create a View Holder that extends {@link ViewHolderBase}
+     */
+    public ListViewDataAdapterBase(ViewHolderCreator<ItemDataType> viewHolderCreator) {
+        mViewHolderCreator = viewHolderCreator;
+    }
 
-	public void setEnableCreateViewForMeasure(boolean enable) {
-		mEnableCreateViewForMeasure = enable;
-	}
+    public void setEnableCreateViewForMeasure(boolean enable) {
+        mEnableCreateViewForMeasure = enable;
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-		if (mEnableCreateViewForMeasure && convertView == null) {
+    @SuppressWarnings("unchecked")
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        if (mEnableCreateViewForMeasure && convertView == null) {
 
-		}
-		if (CLog.DEBUG_LIST) {
-			Log.d(LOG_TAG, String.format("getView %s", position));
-		}
-		ItemDataType itemData = getItem(position);
-		if (convertView == null) {
-			LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-			ViewHolderBase<ItemDataType> holderBase = mViewHolderCreator.createViewHolder();
+        }
+        if (CLog.DEBUG_LIST) {
+            Log.d(LOG_TAG, String.format("getView %s", position));
+        }
+        ItemDataType itemData = getItem(position);
+        if (convertView == null) {
+            LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+            ViewHolderBase<ItemDataType> holderBase = mViewHolderCreator.createViewHolder();
 
-			if (holderBase != null) {
-				convertView = holderBase.createView(inflater);
-				if (convertView != null) {
-					holderBase.setItemData(position);
-					holderBase.showData(position, itemData);
-					convertView.setTag(holderBase);
-				}
-			}
-		} else {
-			ViewHolderBase<ItemDataType> holderBase = (ViewHolderBase<ItemDataType>) convertView.getTag();
-			if (holderBase != null) {
-				holderBase.setItemData(position);
-				holderBase.showData(position, itemData);
-			}
-		}
-		return convertView;
-	}
+            if (holderBase != null) {
+                convertView = holderBase.createView(inflater);
+                if (convertView != null) {
+                    holderBase.setItemData(position);
+                    holderBase.showData(position, itemData);
+                    convertView.setTag(holderBase);
+                }
+            }
+        } else {
+            ViewHolderBase<ItemDataType> holderBase = (ViewHolderBase<ItemDataType>) convertView.getTag();
+            if (holderBase != null) {
+                holderBase.setItemData(position);
+                holderBase.showData(position, itemData);
+            }
+        }
+        return convertView;
+    }
 
-	@Override
-	public abstract ItemDataType getItem(int position);
+    @Override
+    public abstract ItemDataType getItem(int position);
 }

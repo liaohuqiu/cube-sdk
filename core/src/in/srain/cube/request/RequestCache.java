@@ -57,6 +57,8 @@ public class RequestCache {
         public void onCacheData(T previousJsonData, boolean outOfDate);
 
         public void queryFromServer();
+
+        public boolean disableCache();
     }
 
     @SuppressLint("HandlerLeak")
@@ -103,7 +105,7 @@ public class RequestCache {
 
     public <T> void requestCache(ICacheAbleRequest<T> cacheAbleRequest) {
         ReadCacheTask<T> task = new ReadCacheTask<T>(cacheAbleRequest);
-        task.query();
+        task.beginQuery();
     }
 
     public <T> void cacheRequest(final ICacheAbleRequest<T> cacheAble, final JsonData data) {
@@ -154,7 +156,16 @@ public class RequestCache {
             mCacheAble = cacheAble;
         }
 
-        void query() {
+        void beginQuery() {
+
+            if (mCacheAble.disableCache()) {
+                if (DEBUG) {
+                    CLog.d(LOG_TAG, "Cache is disabled, query from server, key:%s", mCacheAble.getCacheKey());
+                }
+                mCacheAble.queryFromServer();
+                return;
+            }
+
             String cacheKey = mCacheAble.getCacheKey();
 
             // try to find in runtime cache
@@ -171,14 +182,14 @@ public class RequestCache {
             String filePath = mCacheDir + "/ " + mCacheAble.getCacheKey();
             File file = new File(filePath);
             if (file.exists()) {
-                queryFromCacheFile();
+                queryFromCacheFileAsync();
                 return;
             }
 
             // try to read from assert cache file
             String assertInitDataPath = mCacheAble.getAssertInitDataPath();
             if (assertInitDataPath != null && assertInitDataPath.length() > 0) {
-                queryFromAssertCacheFile();
+                queryFromAssertCacheFileAsync();
                 return;
             }
 
@@ -210,7 +221,7 @@ public class RequestCache {
             }
         }
 
-        private void queryFromCacheFile() {
+        private void queryFromCacheFileAsync() {
             mWorkType = DO_READ_FROM_FILE;
             SimpleExcutor.getInstance().execute(this);
         }
@@ -230,7 +241,7 @@ public class RequestCache {
             sHandler.sendMessage(msg);
         }
 
-        private void queryFromAssertCacheFile() {
+        private void queryFromAssertCacheFileAsync() {
             mWorkType = DO_READ_FROM_ASSERT;
             SimpleExcutor.getInstance().execute(this);
         }
@@ -266,7 +277,7 @@ public class RequestCache {
         private void processRawCacheData() {
             if (null != mRawData && mRawData.has("data")) {
                 mWorkType = DO_CONVERT;
-                new Thread(this).start();
+                SimpleExcutor.getInstance().execute(this);
             } else {
                 if (DEBUG) {
                     CLog.d(LOG_TAG, "onNoCacheDataAvailable, key:%s", mCacheAble.getCacheKey());

@@ -21,6 +21,7 @@ public class SimpleRequestManager {
 
     public static <T> void sendRequest(final IRequest<T> request) {
 
+        request.beforeRequest();
         final Handler handler = new Handler() {
             @SuppressWarnings("unchecked")
             @Override
@@ -62,7 +63,7 @@ public class SimpleRequestManager {
                     e.printStackTrace();
                 }
 
-                T data = request.processOriginData(json);
+                T data = request.processOriginDataFromServer(json);
                 if (null == data) {
                     Message msg = Message.obtain();
                     msg.what = REQUEST_FAILED;

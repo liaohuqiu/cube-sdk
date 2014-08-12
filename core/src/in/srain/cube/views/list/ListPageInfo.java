@@ -25,6 +25,10 @@ public class ListPageInfo<T> {
         mIsBusy = false;
     }
 
+    public void unlock() {
+        mIsBusy = false;
+    }
+
     public boolean tryEnterLock() {
         if (mIsBusy) {
             return false;
