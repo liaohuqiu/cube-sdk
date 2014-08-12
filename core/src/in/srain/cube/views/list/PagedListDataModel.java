@@ -44,17 +44,10 @@ public abstract class PagedListDataModel<T> {
         doQueryData();
     }
 
-
     protected void setRequestResult(List<T> list, int total) {
         mListPageInfo.updateListInfo(list, total);
         if (null != mPagedListDataHandler) {
             mPagedListDataHandler.onPageDataLoaded(mListPageInfo);
-        }
-    }
-
-    public void stopRequest() {
-        if (mListPageInfo != null) {
-            mListPageInfo.unlock();
         }
     }
 
