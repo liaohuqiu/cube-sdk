@@ -12,9 +12,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import in.srain.cube.sample.R;
-import in.srain.cube.sample.activity.SampleTabsStyled;
+import in.srain.cube.sample.activity.PagerTabIndicatorActivity;
 import in.srain.cube.sample.activity.TitleBaseFragment;
-import in.srain.cube.sample.data.SampleRequest;
 import in.srain.cube.sample.ui.fragment.imagelist.BigListViewFragment;
 import in.srain.cube.sample.ui.fragment.imagelist.GridListViewFragment;
 import in.srain.cube.sample.ui.fragment.imagelist.SmallListViewFragment;
@@ -86,9 +85,8 @@ public class HomeFragment extends TitleBaseFragment {
 
             @Override
             public void onClick(View v) {
-                getContext().pushFragmentToBackStatck(MoreActionViewFragment.class, null);
                 Intent intent = new Intent();
-                Class<?> dstClassName = SampleTabsStyled.class;
+                Class<?> dstClassName = PagerTabIndicatorActivity.class;
                 intent.setClass(getActivity(), dstClassName);
                 startActivity(intent);
             }

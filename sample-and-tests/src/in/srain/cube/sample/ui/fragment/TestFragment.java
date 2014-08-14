@@ -8,54 +8,82 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.ListView;
 import android.widget.TextView;
+import in.srain.cube.sample.R;
+import in.srain.cube.sample.ui.views.header.ptr.PtrFrameDemo;
+import in.srain.cube.views.list.ListViewDataAdapter;
+import in.srain.cube.views.list.ViewHolderBase;
+import in.srain.cube.views.list.ViewHolderCreator;
+import in.srain.cube.views.ptr.PtrFrame;
+
+import java.util.ArrayList;
 
 public final class TestFragment extends Fragment {
-    private static final String KEY_CONTENT = "TestFragment:Content";
+    private ArrayList<String> mStringList = new ArrayList<String>();
 
     public static TestFragment newInstance(String content) {
-        TestFragment fragment = new TestFragment();
-
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < 20; i++) {
-            builder.append(content).append(" ");
-        }
-        builder.deleteCharAt(builder.length() - 1);
-        fragment.mContent = builder.toString();
-
+        TestFragment fragment = new TestFragment(content);
         return fragment;
     }
 
-    private String mContent = "???";
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        if ((savedInstanceState != null) && savedInstanceState.containsKey(KEY_CONTENT)) {
-            mContent = savedInstanceState.getString(KEY_CONTENT);
+    private TestFragment(String content) {
+        for (int i = 0; i < 20; i++) {
+            mStringList.add(content);
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        TextView text = new TextView(getActivity());
-        text.setGravity(Gravity.CENTER);
-        text.setText(mContent);
-        text.setTextSize(20 * getResources().getDisplayMetrics().density);
-        text.setPadding(20, 20, 20, 20);
+        View view = inflater.inflate(R.layout.fragment_pager_tab_indicator, container, false);
+        view.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
-        LinearLayout layout = new LinearLayout(getActivity());
-        layout.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
-        layout.setGravity(Gravity.CENTER);
-        layout.addView(text);
+        ListView listView = (ListView) view.findViewById(R.id.lv_frg_pager_tab);
+        ListViewDataAdapter<String> listViewDataAdapter = new ListViewDataAdapter<String>(new ViewHolderCreator<String>() {
+            @Override
+            public ViewHolderBase<String> createViewHolder() {
+                return new ViewHolder();
+            }
+        });
 
-        return layout;
+        listView.setAdapter(listViewDataAdapter);
+        listViewDataAdapter.getDataList().addAll(mStringList);
+        listViewDataAdapter.notifyDataSetChanged();
+
+        final PtrFrameDemo frame = (PtrFrameDemo) view.findViewById(R.id.frame_frg_pager_tab);
+        frame.setHandler(new PtrFrameDemo.Handler() {
+            @Override
+            public void onRefresh() {
+
+                frame.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        frame.onRefreshComplete();
+                    }
+                }, 1000);
+            }
+
+            @Override
+            public boolean canDoRefresh() {
+                return true;
+            }
+        });
+        return view;
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString(KEY_CONTENT, mContent);
+    private class ViewHolder extends ViewHolderBase<String> {
+
+        private TextView mTextView;
+
+        @Override
+        public View createView(LayoutInflater layoutInflater) {
+            mTextView = new TextView(getActivity());
+            return mTextView;
+        }
+
+        @Override
+        public void showData(int position, String itemData) {
+            mTextView.setText(itemData);
+        }
     }
 }

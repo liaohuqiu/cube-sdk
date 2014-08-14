@@ -302,8 +302,17 @@ public class PtrFrame extends RelativeLayout {
 
     private void updatePos() {
         int change = mCurrentPos - mLastPos;
-        mHeaderContainer.offsetTopAndBottom(change);
-        mContentViewContainer.offsetTopAndBottom(change);
+        // if (Version.hasHoneycomb()) {
+        //     mHeaderContainer.offsetTopAndBottom(change);
+        //     mContentViewContainer.offsetTopAndBottom(change);
+        // } else {
+        //     mHeaderContainer.setPadding(0, mCurrentPos, 0, 0);
+        //     mContentViewContainer.setPadding(0, mCurrentPos, 0, 0);
+        //         }
+        RelativeLayout.LayoutParams lyp = (LayoutParams) mHeaderContainer.getLayoutParams();
+        lyp.setMargins(0, mCurrentPos, 0, 0);
+        ((LayoutParams) mContentViewContainer.getLayoutParams()).setMargins(0, mCurrentPos, 0, 0);
+        requestLayout();
 
         if (mCurrentPos < mOffsetToRotateView && mLastPos >= mOffsetToRotateView) {
             if (null != mPtrHandler) {

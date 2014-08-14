@@ -61,7 +61,6 @@ public class PtrFrameDemo extends PtrFrame {
 
             @Override
             public void onRefresh() {
-                mRotateView.setVisibility(INVISIBLE);
                 mHandler.onRefresh();
             }
 
@@ -74,6 +73,7 @@ public class PtrFrameDemo extends PtrFrame {
 
             @Override
             public void onRelease() {
+                mRotateView.setVisibility(INVISIBLE);
                 mTitleTextView.setVisibility(VISIBLE);
                 mTitleTextView.setText("updating");
             }

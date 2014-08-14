@@ -15,7 +15,7 @@ import in.srain.cube.sample.ui.fragment.TestFragment;
 import in.srain.cube.util.CLog;
 import in.srain.cube.views.pager.TabPageIndicator;
 
-public class SampleTabsStyled extends FragmentActivity {
+public class PagerTabIndicatorActivity extends FragmentActivity {
     private static final String[] CONTENT = new String[]{"Recent", "Artists", "Albums", "Songs", "Playlists", "Genres"};
 
     @Override
@@ -46,7 +46,8 @@ public class SampleTabsStyled extends FragmentActivity {
         @Override
         public Fragment getItem(int position) {
             CLog.d("test", "getItem:%s", position);
-            return TestFragment.newInstance(CONTENT[position % CONTENT.length]);
+            Fragment fragment = TestFragment.newInstance(CONTENT[position % CONTENT.length]);
+            return fragment;
         }
 
         @Override
