@@ -6,21 +6,22 @@ import android.graphics.PointF;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.*;
-import android.widget.FrameLayout;
 
+import android.widget.RelativeLayout;
 import in.srain.cube.R;
 import in.srain.cube.util.CLog;
 
 /**
  * @author http://www.liaohuqiu.net
  */
-public class ScrollHeaderFrame extends FrameLayout {
+public class ScrollHeaderFrame extends RelativeLayout {
 
     private static final boolean DEBUG = CLog.DEBUG_SCROLL_HEADER_FRAME;
     private static final String LOG_TAG = ScrollHeaderFrame.class.getName();
 
     private int mHeaderHeight;
-    private int mCurrentTop = 0;
+    private int mCurrentPos = 0;
+    private int mLastPos = 0;
     private int mHeaderId = 0;
     private int mContainerId = 0;
     private boolean mDisabled = false;
@@ -95,50 +96,38 @@ public class ScrollHeaderFrame extends FrameLayout {
         int w = getMeasuredWidth();
         int h = getMeasuredHeight();
 
-        int lastTop = mHeaderContainer.getTop();
-        int change = mCurrentTop - lastTop;
-        mHeaderContainer.offsetTopAndBottom(change);
-        mContentViewContainer.offsetTopAndBottom(change);
-
-        int containerOffset = headerHeight + mCurrentTop;
-        mContentViewContainer.layout(0, containerOffset, w, h);
-
-        if (DEBUG) {
-            Log.d(LOG_TAG, String.format("onLayout: w:%s h:%s mCurrentTop: %s change:%s containerOffset: %s", w, h, mCurrentTop, change, containerOffset));
-        }
+        // mHeaderContainer.layout(0, mCurrentPos, w, mCurrentPos + headerHeight);
+        mContentViewContainer.layout(0, mCurrentPos + headerHeight, w, h);
     }
 
     /**
-     * if deltaY > 0, tryToMove the content up
+     * if deltaY > 0, tryToMove the content down
      */
-    private boolean tryToMoveAndCheckContainerCanMove(float deltaY) {
-
-        // has reached the top
-        if ((deltaY > 0 && mCurrentTop == -mHeaderHeight)) {
-            if (DEBUG) {
-                Log.d(LOG_TAG, String.format("has reached the top"));
-            }
-            return true;
-        }
+    private void tryToMove(float deltaY) {
 
         // has reached the bottom
-        if ((deltaY < 0 && mCurrentTop == 0)) {
+        if ((deltaY > 0 && mCurrentPos == 0)) {
             if (DEBUG) {
                 Log.d(LOG_TAG, String.format("has reached the bottom"));
             }
-            return true;
+            return;
         }
 
-        int to = mCurrentTop - (int) deltaY;
+        // has reached the top
+        if ((deltaY < 0 && mCurrentPos == -mHeaderHeight)) {
+            if (DEBUG) {
+                Log.d(LOG_TAG, String.format("has reached the top"));
+            }
+            return;
+        }
 
-        boolean reached = false;
+        int to = mCurrentPos + (int) deltaY;
 
         // over top
         if (to < -mHeaderHeight) {
             if (DEBUG) {
                 Log.d(LOG_TAG, String.format("over top"));
             }
-            reached = true;
             to = -mHeaderHeight;
         }
 
@@ -147,23 +136,29 @@ public class ScrollHeaderFrame extends FrameLayout {
             if (DEBUG) {
                 Log.d(LOG_TAG, String.format("over bottom"));
             }
-            reached = true;
             to = 0;
         }
         moveTo(to);
-        return reached;
     }
 
     private void moveTo(int to) {
         if (DEBUG) {
-            Log.d(LOG_TAG, String.format("moveTo: %s %s, %s", to, mCurrentTop, mHeaderHeight));
+            Log.d(LOG_TAG, String.format("moveTo: %s %s, %s", to, mCurrentPos, mHeaderHeight));
         }
-        if (mCurrentTop == to) {
+        if (mCurrentPos == to) {
             return;
         }
-        mCurrentTop = to;
+        mCurrentPos = to;
         invalidate();
         requestLayout();
+        updatePos();
+    }
+
+    private void updatePos() {
+        int change = mCurrentPos - mLastPos;
+        mHeaderContainer.offsetTopAndBottom(change);
+        mContentViewContainer.offsetTopAndBottom(change);
+
     }
 
     @Override
@@ -173,7 +168,7 @@ public class ScrollHeaderFrame extends FrameLayout {
         int h = getMeasuredHeight();
         mHeaderHeight = mHeaderContainer.getMeasuredHeight();
 
-        h = h - (mHeaderHeight + mCurrentTop);
+        h = h - (mHeaderHeight + mCurrentPos);
 
         if (DEBUG) {
             Log.d(LOG_TAG, String.format("onMeasure %s getMeasuredHeight: %s", h, mHeaderContainer.getMeasuredHeight()));
@@ -203,15 +198,16 @@ public class ScrollHeaderFrame extends FrameLayout {
                     break;
                 }
 
-                float offsetX = mPtLastMove.x - e.getX();
-                float deltaY = (int) (mPtLastMove.y - e.getY());
+                float deltaY = (int) (e.getY() - mPtLastMove.y);
                 mPtLastMove.set(e.getX(), e.getY());
+
                 float speed = Math.abs(deltaY / (mLastTime - e.getEventTime()));
                 mLastTime = e.getEventTime();
-                boolean moveUp = deltaY > 0;
-                boolean canMoveUp = mCurrentTop > -mHeaderHeight;
+
+                boolean moveUp = deltaY < 0;
+                boolean canMoveUp = mCurrentPos > -mHeaderHeight;
                 boolean moveDown = !moveUp;
-                boolean canMoveDown = mCurrentTop < 0;
+                boolean canMoveDown = mCurrentPos < 0;
                 if (DEBUG) {
                     Log.d(LOG_TAG, String.format("ACTION_MOVE: %s, speed: %s, moveUp: %s, canMoveUp: %s, moveDown: %s, canMoveDown: %s", speed, deltaY, moveUp, canMoveUp, moveDown, canMoveDown));
                 }
@@ -228,7 +224,7 @@ public class ScrollHeaderFrame extends FrameLayout {
                     if (moveDown && mIScrollHeaderFrameHandler == null) {
                         deltaY = deltaY * 0.3f;
                     }
-                    tryToMoveAndCheckContainerCanMove(deltaY);
+                    tryToMove(deltaY);
                 }
                 break;
             default:

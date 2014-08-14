@@ -15,7 +15,7 @@ public class CubeApplication extends Application {
         // ..
 
         // CLog.DEBUG_IMAGE = true;
-        // CLog.DEBUG_SCROLL_HEADER_FRAME = true;
+        CLog.DEBUG_SCROLL_HEADER_FRAME = true;
         CLog.DEBUG_PTR_FRAME = true;
         Cube.onCreate(this);
     }

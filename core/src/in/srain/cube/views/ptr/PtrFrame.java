@@ -4,15 +4,19 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.PointF;
 import android.util.AttributeSet;
-import android.view.*;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewConfiguration;
+import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
-import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.Scroller;
 import in.srain.cube.R;
 import in.srain.cube.util.CLog;
+import in.srain.cube.util.Version;
 
-public class PtrFrame extends FrameLayout {
+public class PtrFrame extends RelativeLayout {
 
     private static final boolean DEBUG = CLog.DEBUG_PTR_FRAME;
     private static int ID = 1;
@@ -188,11 +192,27 @@ public class PtrFrame extends FrameLayout {
         if (DEBUG) {
             CLog.d(LOG_TAG, "onLayout mHeaderHeight: %s, mCurrentPos: %s", mHeaderHeight, mCurrentPos);
         }
-        if (mHeaderContainer != null) {
-            mHeaderContainer.layout(0, -mHeaderHeight + mCurrentPos, w, mCurrentPos);
-        }
-        if (mContentViewContainer != null) {
-            mContentViewContainer.layout(0, mCurrentPos, w, h + mCurrentPos);
+
+        if (Version.hasHoneycomb()) {
+            if (mHeaderContainer != null) {
+                mHeaderContainer.layout(0, -mHeaderHeight + mCurrentPos, w, mCurrentPos);
+            }
+            if (mContentViewContainer != null) {
+                mContentViewContainer.layout(0, mCurrentPos, w, h + mCurrentPos);
+            }
+        } else {
+            if (mHeaderContainer != null) {
+                mHeaderContainer.layout(0, -mHeaderHeight + mCurrentPos, w, mCurrentPos);
+            }
+            if (mContentViewContainer != null) {
+                mContentViewContainer.layout(0, mCurrentPos, w, h + mCurrentPos);
+            }
+            // FrameLayout.LayoutParams lyp1 = new LayoutParams(w, mHeaderHeight);
+            // mHeaderContainer.setLayoutParams(lyp1);
+
+            // FrameLayout.LayoutParams lyp2 = new LayoutParams(w, h - mHeaderHeight);
+            // lyp2.setMargins(0, mHeaderHeight, 0, 0);
+            // mHeaderContainer.setLayoutParams(lyp2);
         }
     }
 
@@ -275,14 +295,13 @@ public class PtrFrame extends FrameLayout {
             to = 0;
         }
 
-        mLastPos = mCurrentPos;
         mCurrentPos = to;
         updatePos();
+        mLastPos = mCurrentPos;
     }
 
     private void updatePos() {
-        int lastPos = mHeaderContainer.getBottom();
-        int change = mCurrentPos - lastPos;
+        int change = mCurrentPos - mLastPos;
         mHeaderContainer.offsetTopAndBottom(change);
         mContentViewContainer.offsetTopAndBottom(change);
 
@@ -307,6 +326,7 @@ public class PtrFrame extends FrameLayout {
                 }
             }
         }
+        invalidate();
     }
 
     private void release() {
@@ -408,7 +428,7 @@ public class PtrFrame extends FrameLayout {
             int curY = mScroller.getCurrY();
             int deltaY = curY - mLastFlingY;
             if (DEBUG) {
-                CLog.d(LOG_TAG, "scroll: %s, start: %s, to: %s, mCurrentPos: %s, current :%s, last: %s, delta: %s", finish, mStart, mTo, mCurrentPos, curY, mLastFlingY, deltaY);
+                // CLog.d(LOG_TAG, "scroll: %s, start: %s, to: %s, mCurrentPos: %s, current :%s, last: %s, delta: %s", finish, mStart, mTo, mCurrentPos, curY, mLastFlingY, deltaY);
             }
             if (!finish) {
                 mLastFlingY = curY;
@@ -421,7 +441,7 @@ public class PtrFrame extends FrameLayout {
 
         private void finish() {
             if (DEBUG) {
-                CLog.d(LOG_TAG, "finish, mCurrentPos:%s", mCurrentPos);
+                // CLog.d(LOG_TAG, "finish, mCurrentPos:%s", mCurrentPos);
             }
             reset();
             notifyScrollFinish();

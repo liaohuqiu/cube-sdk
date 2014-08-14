@@ -28,7 +28,7 @@ public class SampleRequest {
     public static void reverse(final String str, final RequestJsonHandler handler) {
         new SimpleRequest<JsonData>(new BeforeRequestHandler() {
 
-            public <T> void beforeRequest(SimpleRequest<T> request) {
+            public <T> void beforeRequest(RequestBase<T> request) {
 
                 String url = "http://cube-server.liaohuqiu.net/api_demo/reverse.php?str=" + str;
                 request.getRequestData().setRequestUrl(url);
@@ -41,7 +41,7 @@ public class SampleRequest {
      */
     public static void getCacheableRequestSampleData(final String msg, final CacheAbleRequestJsonHandler handler) {
 
-        new CacheAbleRequest<JsonData>(new CacheAbleRequestPreHandler() {
+        new CacheAbleRequest<JsonData>(new CacheAbleRequestDefaultPreHandler() {
 
             public <T> void beforeRequest(SimpleRequest<T> request) {
                 String url = "http://cube-server.liaohuqiu.net/api_demo/request.php";

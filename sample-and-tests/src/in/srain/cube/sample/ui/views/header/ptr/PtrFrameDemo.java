@@ -61,11 +61,13 @@ public class PtrFrameDemo extends PtrFrame {
 
             @Override
             public void onRefresh() {
+                mRotateView.setVisibility(INVISIBLE);
                 mHandler.onRefresh();
             }
 
             @Override
             public void onBackToTop() {
+                mRotateView.setVisibility(VISIBLE);
                 mTitleTextView.setVisibility(VISIBLE);
                 mTitleTextView.setText("pull down");
             }
