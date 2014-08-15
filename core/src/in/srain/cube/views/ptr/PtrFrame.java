@@ -90,7 +90,7 @@ public class PtrFrame extends RelativeLayout {
 
     private PointF mPtLastMove = new PointF();
 
-    private boolean isRefreshing = false;
+    private boolean mIsRefreshing = false;
     private boolean mPreventForHorizontal = false;
     private boolean mIsInTouching = false;
 
@@ -336,6 +336,11 @@ public class PtrFrame extends RelativeLayout {
             }
         }
         invalidate();
+        onUpdatePos(mLastPos, mCurrentPos);
+    }
+
+    protected void onUpdatePos(int last, int now) {
+
     }
 
     private void release() {
@@ -353,8 +358,8 @@ public class PtrFrame extends RelativeLayout {
     }
 
     private void notifyRefresh() {
-        if (mPtrHandler != null && !isRefreshing) {
-            isRefreshing = true;
+        if (mPtrHandler != null && !mIsRefreshing) {
+            mIsRefreshing = true;
             mPtrHandler.onRefresh();
         }
     }
@@ -379,13 +384,17 @@ public class PtrFrame extends RelativeLayout {
         return mLastPos == -mHeaderHeight;
     }
 
-    public void onRefreshComplete() {
-        if (isRefreshing) {
-            isRefreshing = false;
+    public void refreshComplete() {
+        if (mIsRefreshing) {
+            mIsRefreshing = false;
             if (mKeepHeaderWhenRefresh) {
                 mScrollChecker.scrollTo(0, mDurationToCloseHeader);
             }
         }
+    }
+
+    public void reset() {
+        mIsRefreshing = false;
     }
 
     public View getContent() {
