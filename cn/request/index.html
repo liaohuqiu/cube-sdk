@@ -5,8 +5,12 @@
     <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <meta name="description" content="A android development framework. It makes loading image and network request easy.">
+
+
 <meta name="keywords" content="Cube-SDK, Android development framework, Image Loader, Easy netwrok request.">
+
 <meta name="author" content="liaohuqiu@gmail.com">
 
 <title>
@@ -59,7 +63,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a href="/cn" class="navbar-brand">Cube</a>
+            <a href="" class="navbar-brand">Cube</a>
         </div>
         <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
             <ul class="nav navbar-nav">
@@ -70,6 +74,10 @@
                 
                 <li>
                 <a href="/cn/request">网络请求</a>
+                </li>
+                
+                <li>
+                <a href="/cn/views">常用组件</a>
                 </li>
                 
             </ul>
@@ -105,11 +113,31 @@
 
       <div class="row">
         <div class="col-md-9" role="main">
-          <h1>用法</h1>
+          <h1 id='simple-request'>SimpleRequest</h1>
 
 <hr>
 
-<h2>服务器端API</h2>
+<ol>
+<li><p>请求的发送和结果处理</p>
+
+<p>对于API请求，处理业务逻辑是，关注发送的具体数据，以及请求完成，失败后的逻辑处理。</p>
+
+<p>如下接口定义:</p>
+<div class="highlight"><pre><code class="text language-text" data-lang="text">public void onRequestFinish(T data);
+public void onRequestFail(RequestResultType requestResultType);
+</code></pre></div></li>
+<li><p>数据转换</p>
+
+<p>在实际开发中，我们可能会对服务器返回的数据做一些处理，比如数据拼装和转换。</p>
+
+<p>另外服务器返回数据映射成实体类或者反序列化都是比较耗时的操作，这样的操作，也应该在后台线程中完成。</p>
+
+<p>所以开发中，还关心数据转化这个操作:</p>
+<div class="highlight"><pre><code class="text language-text" data-lang="text">public T processOriginData(JsonData jsonData);
+</code></pre></div></li>
+</ol>
+
+<h2 id="toc_0">服务器端API</h2>
 
 <p>在Demo中，我们使用了一个反转字符串的服务器端接口：<code>reverse</code>，
 <a href="http://cube-server.liaohuqiu.net/api_demo/reverse.php">http://cube-server.liaohuqiu.net/api_demo/reverse.php</a></p>
@@ -135,7 +163,7 @@
 <span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;server_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">date</span><span class="p">(</span><span class="s1">&#39;Y-m-d H:i:s&#39;</span><span class="p">);</span>
 <span class="k">echo</span> <span class="nb">json_encode</span><span class="p">(</span><span class="nv">$data</span><span class="p">);</span>
 </code></pre></div>
-<h4>一个请求的例子:</h4>
+<h4 id="toc_1">一个请求的例子:</h4>
 
 <p><a href="http://cube-server.liaohuqiu.net/api_demo/reverse.php?str=123">http://cube-server.liaohuqiu.net/api_demo/reverse.php?str=123</a></p>
 
@@ -147,29 +175,29 @@
     <span class="nt">&quot;server_time&quot;</span><span class="p">:</span> <span class="s2">&quot;2014-02-14 23:56:25&quot;</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2>请求封装</h2>
+<h2 id="toc_2">请求封装</h2>
 
 <p>我们建议，把网络请求进行封装，放在数据层。使用的时候，调用数据层，将数据显示在界面上。如下：</p>
-<div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">SampleRequest</span> <span class="o">{</span>
+<div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">DemoRequestData</span> <span class="o">{</span>
 
     <span class="cm">/**</span>
 <span class="cm">     * Show how to encapsulate the calling of a web API by Request</span>
 <span class="cm">     */</span>
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">reverse</span><span class="o">(</span><span class="kd">final</span> <span class="n">String</span> <span class="n">str</span><span class="o">,</span> <span class="kd">final</span> <span class="n">JsonRequestSuccHandler</span> <span class="n">handler</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">reverse</span><span class="o">(</span><span class="kd">final</span> <span class="n">String</span> <span class="n">str</span><span class="o">,</span> <span class="kd">final</span> <span class="n">RequestJsonHandler</span> <span class="n">handler</span><span class="o">)</span> <span class="o">{</span>
+
         <span class="k">new</span> <span class="n">SimpleRequest</span><span class="o">&lt;</span><span class="n">JsonData</span><span class="o">&gt;(</span><span class="k">new</span> <span class="n">BeforeRequestHandler</span><span class="o">()</span> <span class="o">{</span>
 
-                <span class="nd">@Override</span>
-                <span class="kd">public</span> <span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="kt">void</span> <span class="n">beforeRequest</span><span class="o">(</span><span class="n">SimpleRequest</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
+            <span class="kd">public</span> <span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="kt">void</span> <span class="n">beforeRequest</span><span class="o">(</span><span class="n">RequestBase</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
 
                 <span class="n">String</span> <span class="n">url</span> <span class="o">=</span> <span class="s">&quot;http://cube-server.liaohuqiu.net/api_demo/reverse.php?str=&quot;</span> <span class="o">+</span> <span class="n">str</span><span class="o">;</span>
-                <span class="n">request</span><span class="o">.</span><span class="na">setRequestUrl</span><span class="o">(</span><span class="n">url</span><span class="o">);</span>
-                <span class="o">}</span>
+                <span class="n">request</span><span class="o">.</span><span class="na">getRequestData</span><span class="o">().</span><span class="na">setRequestUrl</span><span class="o">(</span><span class="n">url</span><span class="o">);</span>
 
-                <span class="o">},</span> <span class="n">handler</span><span class="o">).</span><span class="na">send</span><span class="o">();</span>
+            <span class="o">}</span>
+        <span class="o">},</span> <span class="n">handler</span><span class="o">).</span><span class="na">send</span><span class="o">();</span>
     <span class="o">}</span>
 <span class="o">}</span>
 </code></pre></div>
-<h2>界面</h2>
+<h2 id="toc_3">界面</h2>
 
 <div class='row'>
     <div class="col-sm-10">
@@ -223,12 +251,46 @@
 <span class="o">};</span>
 <span class="n">button</span><span class="o">.</span><span class="na">setOnClickListener</span><span class="o">(</span><span class="n">onClickListener</span><span class="o">);</span>
 </code></pre></div>
-<p>当然，例子中的情况是比较简单的，有些理想化。但是事情，本来就是应该做得很简单的。</p>
+<p>当然，例子中的情况是比较简单的，实际的情况可能比这个复杂一些。但不管如何，本质是简单的。</p>
 
-<h1>请求缓存</h1>
+<h1 id='cache-able-request'>CacheAbleRequest</h1>
 
-<p>未完待续。</p>
+<hr>
 
+<h2 id="toc_4">需要解决的问题</h2>
+
+<p>在实际开发中，我们经常需要缓存请求的结果，以期减少网络请求，在无网络时有缓存数据可展示。</p>
+
+<p>在处理结果缓存的时候，我们会关心以下几个方面：</p>
+
+<ol>
+<li><p>什么样的内容该缓存，如何分辨缓存的内容。</p>
+
+<p>同一个接口，请求参数不同，应该有不同的缓存。</p>
+
+<p>比如列表接口，首页内容可以缓存，第二页内容一般不做缓存。</p></li>
+<li><p>缓存时间。根据不同的业务逻辑，缓存时间各有不同，即使同一个接口，缓存时间有可能不同。比如在数据更新频繁的时段，缓存时间短一些。</p></li>
+<li><p>缓存数据和远程服务器数据的辨识</p>
+
+<p>哪些数据是来自缓存，哪些数据又是来自于服务器？</p></li>
+<li><p>请求完成，数据的展示问题</p>
+
+<p>如果缓存中有数据，可能会优先展示缓存中数据。如果数据过期，选择加载服务器数据，当服务器数据请求完成，重新加载，导致界面闪烁。</p></li>
+</ol>
+
+<blockquote>
+<p>当然简单是第一要求</p>
+</blockquote>
+
+<p>对于以上需求，抽象成:</p>
+<div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="kd">public</span> <span class="n">String</span> <span class="nf">getSpecificCacheKey</span><span class="o">();</span>
+
+<span class="kd">public</span> <span class="kt">int</span> <span class="nf">getCacheTime</span><span class="o">();</span>
+
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCacheData</span><span class="o">(</span><span class="n">T1</span> <span class="n">data</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">outOfDate</span><span class="o">);</span>
+
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCacheAbleRequestFinish</span><span class="o">(</span><span class="n">T1</span> <span class="n">data</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">fromCache</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">outOfDate</span><span class="o">);</span>
+</code></pre></div>
         </div>
         <div class="col-md-3">
           <div class="bs-sidebar hidden-print" role="complementary">

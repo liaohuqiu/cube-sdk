@@ -5,8 +5,12 @@
     <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <meta name="description" content="A android development framework. It makes loading image and network request easy.">
+
+
 <meta name="keywords" content="Cube-SDK, Android development framework, Image Loader, Easy netwrok request.">
+
 <meta name="author" content="liaohuqiu@gmail.com">
 
 <title>
@@ -59,7 +63,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a href="/cn" class="navbar-brand">Cube</a>
+            <a href="" class="navbar-brand">Cube</a>
         </div>
         <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
             <ul class="nav navbar-nav">
@@ -70,6 +74,10 @@
                 
                 <li>
                 <a href="/cn/request">网络请求</a>
+                </li>
+                
+                <li>
+                <a href="/cn/views">常用组件</a>
                 </li>
                 
             </ul>
@@ -105,7 +113,7 @@
 
       <div class="row">
         <div class="col-md-9" role="main">
-          <h1>非常简单的用法</h1>
+          <h1 id="toc_0">非常简单的用法</h1>
 
 <hr>
 
@@ -140,13 +148,13 @@
 </code></pre></div></li>
 </ol>
 
-<h1>工作原理</h1>
+<h1 id="toc_1">工作原理</h1>
 
 <hr>
 
 <p class='lead'>整个加载图片的流程非常简单。</p>
 
-<h2>加载流程：</h2>
+<h2 id="toc_2">加载流程：</h2>
 
 <ol>
 <li> <code>CubeImageView</code>会检查图片是否已经加载过，图片已经加载完成并已经在显示的重复请求直接忽略。</li>
@@ -158,7 +166,7 @@
 <li><p>获取到图片之后，存内存缓存，通知加载完成。收到加载完成通知后，<code>ImageView</code>就可以显示图片了。</p></li>
 </ol>
 
-<h2>组成</h2>
+<h2 id="toc_3">组成</h2>
 
 <p><code>ImageLoader</code>中包含了几个组件，让我们看看它的构造函数：</p>
 
@@ -204,11 +212,11 @@ void onLoadFinish(ImageTask imageTask, CubeImageView cubeImageView, BitmapDrawab
 <p>当图像加载完成, 调用<code>ImageLoadHandler.onLoadFinish()</code>，通知ImageView显示图像。</p></li>
 </ul>
 
-<h1>扩展</h1>
+<h1 id="toc_4">扩展</h1>
 
 <p class='lead'>这些接口，Cube-SDK都有一个默认的实现，你可以在你自己的App中，自己实现这些接口，实现特殊需求。</p>
 
-<h3>自定义loading图</h3>
+<h3 id="toc_5">自定义loading图</h3>
 
 <p>自定义loading图有很多种办法：</p>
 
@@ -225,7 +233,7 @@ void onLoadFinish(ImageTask imageTask, CubeImageView cubeImageView, BitmapDrawab
 </code></pre></div></li>
 </ol>
 
-<h3>图像加载完成之后，一些特殊效果</h3>
+<h3 id="toc_6">图像加载完成之后，一些特殊效果</h3>
 
 <ol>
 <li><p>实现<code>ImageLoadHandler.onLoadFinish()</code>，想要什么效果都行，<code>自己动手，丰衣足食</code>。</p></li>
@@ -241,7 +249,7 @@ void onLoadFinish(ImageTask imageTask, CubeImageView cubeImageView, BitmapDrawab
 </ul></li>
 </ol>
 
-<h3>通过拼接不同的url，获得不同尺寸的图</h3>
+<h3 id="toc_7">通过拼接不同的url，获得不同尺寸的图</h3>
 
 <p>如果你的服务器支持通过拼接不同的url，获取不同尺寸，不同质量的尺寸，你想在加载图片的时候，根据<code>ImageView</code>的尺寸大小，加载最合适的图，</p>
 
@@ -257,9 +265,9 @@ void onLoadFinish(ImageTask imageTask, CubeImageView cubeImageView, BitmapDrawab
     <span class="o">}</span>
 <span class="o">}</span>
 </code></pre></div>
-<h1>高级用法</h1>
+<h1 id="toc_8">高级用法</h1>
 
-<h3>图片复用</h3>
+<h3 id="toc_9">图片复用</h3>
 
 <p>如果你加载了一个大图(360x360)，随后你又要加载同一个图的较小尺寸(180x180)，这样做能节省网络带宽，不管是用户的，还是服务器的。</p>
 

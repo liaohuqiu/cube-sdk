@@ -5,8 +5,12 @@
     <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <meta name="description" content="A android development framework. It makes loading image and network request easy.">
+
+
 <meta name="keywords" content="Cube-SDK, Android development framework, Image Loader, Easy netwrok request.">
+
 <meta name="author" content="liaohuqiu@gmail.com">
 
 <title>
@@ -72,6 +76,10 @@
                 <a href="/request">Network Request</a>
                 </li>
                 
+                <li>
+                <a href="/views">Component Views</a>
+                </li>
+                
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 
@@ -105,11 +113,11 @@
 
       <div class="row">
         <div class="col-md-9" role="main">
-          <h1>Usage</h1>
+          <h1 id='simple-request'>SimpleRequest</h1>
 
 <hr>
 
-<h2>The Web API</h2>
+<h2 id="toc_0">The Web API</h2>
 
 <p>A sample API to reverse string:
 <a href="http://cube-server.liaohuqiu.net/api_demo/reverse.php">http://cube-server.liaohuqiu.net/api_demo/reverse.php</a></p>
@@ -134,7 +142,7 @@
 <span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;server_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">date</span><span class="p">(</span><span class="s1">&#39;Y-m-d H:i:s&#39;</span><span class="p">);</span>
 <span class="k">echo</span> <span class="nb">json_encode</span><span class="p">(</span><span class="nv">$data</span><span class="p">);</span>
 </code></pre></div>
-<h4>A sample request:</h4>
+<h4 id="toc_1">A sample request:</h4>
 
 <p><a href="http://cube-server.liaohuqiu.net/api_demo/reverse.php?str=123">http://cube-server.liaohuqiu.net/api_demo/reverse.php?str=123</a></p>
 
@@ -146,7 +154,7 @@
     <span class="nt">&quot;server_time&quot;</span><span class="p">:</span> <span class="s2">&quot;2014-02-14 23:56:25&quot;</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2>Encapsulate Reuqest</h2>
+<h2 id="toc_2">Encapsulate Reuqest</h2>
 
 <p>It is a good practice to encapsulate all the request logic in a module, for example:</p>
 <div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">SampleRequest</span> <span class="o">{</span>
@@ -168,7 +176,7 @@
     <span class="o">}</span>
 <span class="o">}</span>
 </code></pre></div>
-<h2>The UI</h2>
+<h2 id="toc_3">The UI</h2>
 
 <div class='row'>
     <div class="col-sm-10">
@@ -220,7 +228,9 @@
 <span class="o">};</span>
 <span class="n">button</span><span class="o">.</span><span class="na">setOnClickListener</span><span class="o">(</span><span class="n">onClickListener</span><span class="o">);</span>
 </code></pre></div>
-<h1>Request Cache</h1>
+<h1 id='cache-able-request'>CacheAbleRequest</h1>
+
+<hr>
 
 <p>To be continued.</p>
 
