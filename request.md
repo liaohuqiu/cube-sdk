@@ -4,7 +4,7 @@ title: Network Request
 lead: Request data in a simple way, then use the data easily.
 ---
 
-#Usage
+<h1 id='simple-request'>SimpleRequest</h1>
 ---
 
 ##The Web API
@@ -131,6 +131,8 @@ OnClickListener onClickListener = new OnClickListener() {
 };
 button.setOnClickListener(onClickListener);
 ```
-#Request Cache
+
+<h1 id='cache-able-request'>CacheAbleRequest</h1>
+---
 
 To be continued.

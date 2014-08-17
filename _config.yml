@@ -1,5 +1,8 @@
 # Dependencies
 markdown:         redcarpet
+redcarpet:
+    extensions: [with_toc_data]
+
 pygments:         true
 
 # Permalinks
@@ -25,8 +28,9 @@ meta:
   author:       liaohuqiu@gmail.com
 
 languages:      ["en", "cn"]
+language_default:   "en"
 
-navigation:
+left_nav:
   en:
     title:    Cube
     items:
@@ -34,13 +38,17 @@ navigation:
         title:    Image Loader
       - path:     /request
         title:    Network Request
+      - path:     /views
+        title:    Component Views
   cn:
     title:    Cube
     items:
-      - path:     /imageloader
+      - path:     /cn/imageloader
         title:    图片加载组件
-      - path:     /request
+      - path:     /cn/request
         title:    网络请求
+      - path:     /cn/views
+        title:    常用组件
 
 right_nav:
   - title:    English Version
