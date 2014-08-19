@@ -140,7 +140,7 @@
     <span class="na">android:layout_height=</span><span class="s">&quot;wrap_content&quot;</span>
     <span class="na">android:orientation=</span><span class="s">&quot;vertical&quot;</span> <span class="nt">&gt;</span>
 
-    <span class="nt">&lt;com.srain.cube.image.CubeImageView</span>
+    <span class="nt">&lt;in.srain.cube.image.CubeImageView</span>
         <span class="na">android:id=</span><span class="s">&quot;@+id/iv_item_image_list_big&quot;</span>
         <span class="na">android:layout_width=</span><span class="s">&quot;match_parent&quot;</span>
         <span class="na">android:layout_height=</span><span class="s">&quot;match_parent&quot;</span>
@@ -171,8 +171,84 @@
 <li><p>If the image is stored in file cache, it will be decoded, or else <code>ImageProvider</code> will fetch it from remote server then store it to file cache.</p></li>
 <li><p>After decoded, the process is complete. The ImageView will be notified to display this image.</p></li>
 </ol>
-
-<h2 id="toc_4">Components</h2>
+<div class="highlight"><pre><code class="text language-text" data-lang="text">                                           Work Flow       
+</code></pre></div><div class="highlight"><pre><code class="text language-text" data-lang="text">           | start
+           v
++-----------------------+                                                                
+|                       |             Y                                                  
+|  loaded or loading ?  +-----------------------------+                                  
+|                       |                             |                                  
++----------+------------+                             |                                  
+           | N                                        v                                  
+           v                                          |                                  
++-----------------------+                             |      +--------------------------+
+|                       |             Y               |      |                          |
+|  in memeory cache ?   +------------------------&gt;----+----&gt; |  display                 |
+|                       |                             |      |                          |
++----------+------------+                             |      ---------------------------+
+           | N                                        |                                  
+           v                                          ^                                  
++-----------------------+                             |                                  
+|                       |             Y               |                                  
+|  in file cache ?      +-------------------------+   |                                  
+|                       |                         |   |                                  
++----------+------------+                         |   |                                   
+           | N                                    |   |                                   
+           v                                      v   |                                   
++-----------------------+      +----------+     +-----+--+     +------------------------+ 
+|                       |      |          |     |        |     |                        |
+|  not in any cache     +----&gt; | download +---&gt; | decode +---&gt; | save to cache          | 
+|                       |      |          |     |        |     |                        |
++-----------------------+      +----------+     +--------+     +------------------------+
+</code></pre></div>
+<h2 id="toc_4">The Schema</h2>
+<div class="highlight"><pre><code class="text language-text" data-lang="text">                                           Cube ImageLoader
+</code></pre></div><div class="highlight"><pre><code class="bash language-bash" data-lang="bash">   +-----------------+        +-----------------------+      +--------------------------+    
+   <span class="p">|</span> CubeImageView   <span class="p">|</span>        <span class="p">|</span> ImageTask             <span class="p">|</span>      <span class="p">|</span>  ImageViewHodler         <span class="p">|</span>    
+   <span class="p">|</span>   +             +-------&gt;<span class="p">|</span>   +                   <span class="p">|</span>      <span class="p">|</span>    +                     <span class="p">|</span>    
+   <span class="p">|</span>   +- loadImage  <span class="p">|</span>        <span class="p">|</span>   +- addImageView     <span class="p">|</span>      <span class="p">|</span>    +- mNext              <span class="p">|</span>    
+   <span class="p">|</span>   +- ImageTask  <span class="p">|</span>        <span class="p">|</span>   +- removeImageView  +-----&gt;<span class="p">|</span>    +- mPrev              <span class="p">|</span>    
+   +-----------------+        <span class="p">|</span>   +- getIdentityUrl   <span class="p">|</span>      <span class="p">|</span>                          <span class="p">|</span>    
+                              <span class="p">|</span>   <span class="p">|</span>                   <span class="p">|</span>      +--------------------------+    
+            +---------------- +   +- ImageViewHolder  <span class="p">|</span>                                      
+            <span class="p">|</span>                 +-----------------------+                                      
+            v                                                                                
++----------------------------+      +-------------------+                                    
+<span class="p">|</span> ImageLoader                <span class="p">|</span>      <span class="p">|</span> ImageHandler      <span class="p">|</span>                                    
+<span class="p">|</span>   +                        <span class="p">|</span>      <span class="p">|</span>   +               <span class="p">|</span>                                    
+<span class="p">|</span>   +- queryCache            +-----&gt;<span class="p">|</span>   +- onLoading    <span class="p">|</span>                                    
+<span class="p">|</span>   +- addTask               <span class="p">|</span>      <span class="p">|</span>   +- onLoadFinish <span class="p">|</span>                                    
+<span class="p">|</span>   <span class="p">|</span>                        <span class="p">|</span>      <span class="p">|</span>   +- onLoadError  <span class="p">|</span>                                    
+<span class="p">|</span>   +- stopWork              <span class="p">|</span>      +-------------------+                                    
+<span class="p">|</span>   +- recoverWork           <span class="p">|</span>                                                               
+<span class="p">|</span>   +- pasueWork             <span class="p">|</span>      +---------------------+   +------------------------+     
+<span class="p">|</span>   +- resumeWork            <span class="p">|</span>      <span class="p">|</span> LoadImageTask       <span class="p">|</span>   <span class="p">|</span> SimpleImageTask        <span class="p">|</span>     
+<span class="p">|</span>   <span class="p">|</span>                        +-----&gt;<span class="p">|</span>   +                 +--&gt;<span class="p">|</span>   +                    <span class="p">|</span>     
+<span class="p">|</span>   +- ImageProvider         <span class="p">|</span>      <span class="p">|</span>   +- doInBackground <span class="p">|</span>   <span class="p">|</span>   +- doInBackground    <span class="p">|</span>     
+<span class="p">|</span>   +- ImageTaskExecutor     <span class="p">|</span>      +------------------+--+   <span class="p">|</span>   +- onFinish          <span class="p">|</span>     
+<span class="p">|</span>   +- ImageResizer          <span class="p">|</span>                         <span class="p">|</span>      <span class="p">|</span>   +- onCancle          <span class="p">|</span>     
+<span class="p">|</span>   +- ImageHandler          <span class="p">|</span>                         <span class="p">|</span>      <span class="p">|</span>   +- canchel           <span class="p">|</span>     
++------------+-----------+---+                         <span class="p">|</span>      +------------------------+     
+             <span class="p">|</span>           <span class="p">|</span>                             <span class="p">|</span>                                     
+             v           +-------------------+         <span class="p">|</span>                                     
++-------------------------------+            <span class="p">|</span>         <span class="p">|</span>                                     
+<span class="p">|</span> ImageProvider                 <span class="p">|</span>            v         v                                     
+<span class="p">|</span>   +                           <span class="p">|</span>        +----------------------+                            
+<span class="p">|</span>   +- getBitmapFromMemCache    <span class="p">|</span>        <span class="p">|</span>  ImageTaskExecutor   <span class="p">|</span>                            
+<span class="p">|</span>   +- fetchBitmapData          <span class="p">|</span>        <span class="p">|</span>   +                  <span class="p">|</span>                            
+<span class="p">|</span>   +                           <span class="p">|</span>        <span class="p">|</span>   +- execute         <span class="p">|</span>                            
+<span class="p">|</span>   +- MemoryCache              <span class="p">|</span>        <span class="p">|</span>   +- setTaskOrder    <span class="p">|</span>                            
+<span class="p">|</span>   +- ImageDownLoader          <span class="p">|</span>        +----------------------+                            
+<span class="p">|</span>   +- FileCache                <span class="p">|</span>                                                            
++------+-------------------+--+-+                                                            
+       <span class="p">|</span>                   <span class="p">|</span>  <span class="p">|</span>                                                              
+       <span class="p">|</span>                   <span class="p">|</span>  +--------------+                                               
+       v                   v                 v                                               
++----------------+  +---------------+   +---------------+                                    
+<span class="p">|</span> LRUMemoryCache <span class="p">|</span>  <span class="p">|</span> LRUFileCache  <span class="p">|</span>   <span class="p">|</span> Downloader    <span class="p">|</span>                                    
++----------------+  +---------------+   +---------------+                                    
+</code></pre></div>
+<h2 id="toc_5">Components</h2>
 
 <p>There are four components used in <code>ImageLoader</code> to load image. As you can see in the construct method in the <code>ImageLoader</code>:</p>
 
@@ -216,11 +292,11 @@ void onLoadFinish(ImageTask imageTask, CubeImageView cubeImageView, BitmapDrawab
 <p>Once image is loaded, <code>onLoadFinish()</code> will be called to notify the ImageView to display the image.</p></li>
 </ul>
 
-<h1 id="toc_5">Customize</h1>
+<h1 id="toc_6">Customize</h1>
 
 <p class='lead'>Most of the components interface has a default implementions, you can implement for your own application.</p>
 
-<h3 id="toc_6">A speical loading image</h3>
+<h3 id="toc_7">A speical loading image</h3>
 
 <p>There are lots of ways:</p>
 
@@ -237,7 +313,7 @@ void onLoadFinish(ImageTask imageTask, CubeImageView cubeImageView, BitmapDrawab
 </code></pre></div></li>
 </ol>
 
-<h3 id="toc_7">Some speical effect after the image is loaded</h3>
+<h3 id="toc_8">Some speical effect after the image is loaded</h3>
 
 <ol>
 <li><p>You can also implement the <code>ImageLoadHandler</code>, in the <code>onLoadFinish()</code> method, you can add whatever effect you want, as long as they are based on <code>Drawable</code>.</p></li>
@@ -253,7 +329,7 @@ void onLoadFinish(ImageTask imageTask, CubeImageView cubeImageView, BitmapDrawab
 </ul></li>
 </ol>
 
-<h3 id="toc_8">Diffrent url for diffrent size</h3>
+<h3 id="toc_9">Diffrent url for diffrent size</h3>
 
 <p>If you have a thumbnail web service which can return multiple size image according the url, you can implements this method to return the specified url according the request size.</p>
 
@@ -269,9 +345,9 @@ void onLoadFinish(ImageTask imageTask, CubeImageView cubeImageView, BitmapDrawab
     <span class="o">}</span>
 <span class="o">}</span>
 </code></pre></div>
-<h1 id="toc_9">Advance</h1>
+<h1 id="toc_10">Advance</h1>
 
-<h3 id="toc_10">Reuse of Image</h3>
+<h3 id="toc_11">Reuse of Image</h3>
 
 <ul>
 <li>ReuseInfo</li>
