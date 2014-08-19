@@ -33,7 +33,7 @@ lead: "Make Loading Image Efficiently & Easily."
         android:layout_height="wrap_content"
         android:orientation="vertical" >
 
-        <com.srain.cube.image.CubeImageView
+        <in.srain.cube.image.CubeImageView
             android:id="@+id/iv_item_image_list_big"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -64,6 +64,96 @@ lead: "Make Loading Image Efficiently & Easily."
 4.  If the image is stored in file cache, it will be decoded, or else `ImageProvider` will fetch it from remote server then store it to file cache.
 
 5.  After decoded, the process is complete. The ImageView will be notified to display this image.
+
+```
+                                           Work Flow       
+```
+
+```
+           | start
+           v
++-----------------------+                                                                
+|                       |             Y                                                  
+|  loaded or loading ?  +-----------------------------+                                  
+|                       |                             |                                  
++----------+------------+                             |                                  
+           | N                                        v                                  
+           v                                          |                                  
++-----------------------+                             |      +--------------------------+
+|                       |             Y               |      |                          |
+|  in memeory cache ?   +------------------------>----+----> |  display                 |
+|                       |                             |      |                          |
++----------+------------+                             |      ---------------------------+
+           | N                                        |                                  
+           v                                          ^                                  
++-----------------------+                             |                                  
+|                       |             Y               |                                  
+|  in file cache ?      +-------------------------+   |                                  
+|                       |                         |   |                                  
++----------+------------+                         |   |                                   
+           | N                                    |   |                                   
+           v                                      v   |                                   
++-----------------------+      +----------+     +-----+--+     +------------------------+ 
+|                       |      |          |     |        |     |                        |
+|  not in any cache     +----> | download +---> | decode +---> | save to cache          | 
+|                       |      |          |     |        |     |                        |
++-----------------------+      +----------+     +--------+     +------------------------+
+
+```
+
+##The Schema
+
+```
+                                           Cube ImageLoader
+```
+```bash
+
+   +-----------------+        +-----------------------+      +--------------------------+    
+   | CubeImageView   |        | ImageTask             |      |  ImageViewHodler         |    
+   |   +             +------->|   +                   |      |    +                     |    
+   |   +- loadImage  |        |   +- addImageView     |      |    +- mNext              |    
+   |   +- ImageTask  |        |   +- removeImageView  +----->|    +- mPrev              |    
+   +-----------------+        |   +- getIdentityUrl   |      |                          |    
+                              |   |                   |      +--------------------------+    
+            +---------------- +   +- ImageViewHolder  |                                      
+            |                 +-----------------------+                                      
+            v                                                                                
++----------------------------+      +-------------------+                                    
+| ImageLoader                |      | ImageHandler      |                                    
+|   +                        |      |   +               |                                    
+|   +- queryCache            +----->|   +- onLoading    |                                    
+|   +- addTask               |      |   +- onLoadFinish |                                    
+|   |                        |      |   +- onLoadError  |                                    
+|   +- stopWork              |      +-------------------+                                    
+|   +- recoverWork           |                                                               
+|   +- pasueWork             |      +---------------------+   +------------------------+     
+|   +- resumeWork            |      | LoadImageTask       |   | SimpleImageTask        |     
+|   |                        +----->|   +                 +-->|   +                    |     
+|   +- ImageProvider         |      |   +- doInBackground |   |   +- doInBackground    |     
+|   +- ImageTaskExecutor     |      +------------------+--+   |   +- onFinish          |     
+|   +- ImageResizer          |                         |      |   +- onCancle          |     
+|   +- ImageHandler          |                         |      |   +- canchel           |     
++------------+-----------+---+                         |      +------------------------+     
+             |           |                             |                                     
+             v           +-------------------+         |                                     
++-------------------------------+            |         |                                     
+| ImageProvider                 |            v         v                                     
+|   +                           |        +----------------------+                            
+|   +- getBitmapFromMemCache    |        |  ImageTaskExecutor   |                            
+|   +- fetchBitmapData          |        |   +                  |                            
+|   +                           |        |   +- execute         |                            
+|   +- MemoryCache              |        |   +- setTaskOrder    |                            
+|   +- ImageDownLoader          |        +----------------------+                            
+|   +- FileCache                |                                                            
++------+-------------------+--+-+                                                            
+       |                   |  |                                                              
+       |                   |  +--------------+                                               
+       v                   v                 v                                               
++----------------+  +---------------+   +---------------+                                    
+| LRUMemoryCache |  | LRUFileCache  |   | Downloader    |                                    
++----------------+  +---------------+   +---------------+                                    
+```
+
 
 ##Components
 

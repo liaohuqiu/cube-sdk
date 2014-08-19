@@ -30,7 +30,7 @@ lead: "简单，高效地加载图片 / 图片复用"
         android:orientation="vertical" >
 
         <!-- 用定制的CubeImageView -->
-        <com.srain.cube.image.CubeImageView 
+        <in.srain.cube.image.CubeImageView 
             android:id="@+id/iv_item_image_list_big"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
