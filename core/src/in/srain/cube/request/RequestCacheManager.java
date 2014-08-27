@@ -48,16 +48,16 @@ public class RequestCacheManager {
     public void init(Context content, String cacheDir, int memoryCacheSizeInKB, int fileCacheSizeInKB) {
         mContext = content;
 
-        mMemoryCache = new LruCache<String, CacheData>(memoryCacheSizeInKB) {
+        mMemoryCache = new LruCache<String, CacheData>(memoryCacheSizeInKB * 1024) {
             @Override
             protected int sizeOf(String key, CacheData value) {
-                return (value.getSize() + key.getBytes().length) / 1024;
+                return (value.getSize() + key.getBytes().length);
             }
         };
         mFileCache = new LruFileCache(content, cacheDir, fileCacheSizeInKB * 1024);
         mFileCache.initDiskCacheAsync();
         if (DEBUG) {
-            CLog.d(LOG_TAG, "init file cache. dir: %s, size: %s, used: %s", mFileCache.getCachePath(), mFileCache.getMaxSize(), mFileCache.getUsedSpace());
+            CLog.d(LOG_TAG, "init file cache. dir: %s => %s, size: %s, used: %s", cacheDir, mFileCache.getCachePath(), mFileCache.getMaxSize(), mFileCache.getUsedSpace());
         }
     }
 

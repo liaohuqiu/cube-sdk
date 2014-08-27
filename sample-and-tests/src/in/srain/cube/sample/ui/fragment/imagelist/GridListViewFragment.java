@@ -62,9 +62,6 @@ public class GridListViewFragment extends TitleBaseFragment {
                                 " onCacheAbleRequestFinish\n result type: %s\n out of date: %s\n time: %s",
                                 type, outOfDate, data.optJson("data").optString("time"));
                         Toast.makeText(getContext(), msg, 1).show();
-                        Toast.makeText(getContext(), msg, 1).show();
-                        Toast.makeText(getContext(), msg, 1).show();
-                        Toast.makeText(getContext(), msg, 1).show();
                         adapter.getDataList().clear();
                         adapter.getDataList().addAll(data.optJson("data").optJson("list").toArrayList());
                         adapter.notifyDataSetChanged();
