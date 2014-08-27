@@ -2,12 +2,10 @@ package in.srain.cube.sample.ui.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
 import android.widget.TextView;
 import in.srain.cube.sample.R;
@@ -15,7 +13,6 @@ import in.srain.cube.sample.ui.views.header.ptr.PtrFrameDemo;
 import in.srain.cube.views.list.ListViewDataAdapter;
 import in.srain.cube.views.list.ViewHolderBase;
 import in.srain.cube.views.list.ViewHolderCreator;
-import in.srain.cube.views.ptr.PtrFrame;
 
 import java.util.ArrayList;
 
@@ -51,21 +48,16 @@ public final class TestFragment extends Fragment {
         listViewDataAdapter.notifyDataSetChanged();
 
         final PtrFrameDemo frame = (PtrFrameDemo) view.findViewById(R.id.frame_frg_pager_tab);
-        frame.setHandler(new PtrFrameDemo.Handler() {
+        frame.setHandler(new PtrFrameDemo.DefaultHandler() {
             @Override
             public void onRefresh() {
 
                 frame.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        frame.onRefreshComplete();
+                        frame.refreshComplete();
                     }
                 }, 1000);
-            }
-
-            @Override
-            public boolean canDoRefresh() {
-                return true;
             }
         });
         return view;

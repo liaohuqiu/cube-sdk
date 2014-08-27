@@ -1,7 +1,5 @@
 package in.srain.cube.sample.ui.fragment.imagelist;
 
-import java.util.Arrays;
-
 import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-
 import in.srain.cube.image.CubeImageView;
 import in.srain.cube.image.ImageLoader;
 import in.srain.cube.image.ImageLoaderFactory;
@@ -24,56 +21,56 @@ import in.srain.cube.views.list.ListViewDataAdapter;
 import in.srain.cube.views.list.ViewHolderBase;
 import in.srain.cube.views.list.ViewHolderCreator;
 
+import java.util.Arrays;
+
 public class BigListViewFragment extends TitleBaseFragment {
 
-	private static final int sBigImageSize = LocalDisplay.SCREEN_WIDTH_PIXELS - LocalDisplay.dp2px(10 + 10);
+    private static final int sBigImageSize = LocalDisplay.SCREEN_WIDTH_PIXELS - LocalDisplay.dp2px(10 + 10);
 
-	private ImageLoader mImageLoader;
-	private static final ImageReuseInfo sBigImageReuseInfo = Images.sImageReuseInfoManger.create("big");
+    private ImageLoader mImageLoader;
+    private static final ImageReuseInfo sBigImageReuseInfo = Images.sImageReuseInfoManger.create("big");
 
-	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-	@Override
-	public View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    @Override
+    public View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-		mImageLoader = ImageLoaderFactory.create(getActivity());
-		final View v = inflater.inflate(R.layout.fragment_image_list_big, container, false);
+        mImageLoader = ImageLoaderFactory.create(getActivity());
+        final View v = inflater.inflate(R.layout.fragment_image_list_big, container, false);
 
-		ListView listView = (ListView) v.findViewById(R.id.ly_image_list_big);
+        ListView listView = (ListView) v.findViewById(R.id.ly_image_list_big);
 
-		ListViewDataAdapter<String> adpter = new ListViewDataAdapter<String>(new ViewHolderCreator<String>() {
-			@Override
-			public ViewHolderBase<String> createViewHolder() {
-				return new ViewHolder();
-			}
-		});
-		listView.setAdapter(adpter);
-		String[] urls = {"http://wwc.taobaocdn.com/avatar/get_avatar.do?userId=35805952&width=160&height=160&type=sns"};
-		adpter.getDataList().addAll(Arrays.asList(Images.imageUrls));
-		adpter.notifyDataSetChanged();
+        ListViewDataAdapter<String> adapter = new ListViewDataAdapter<String>(new ViewHolderCreator<String>() {
+            @Override
+            public ViewHolderBase<String> createViewHolder() {
+                return new ViewHolder();
+            }
+        });
+        listView.setAdapter(adapter);
+        adapter.getDataList().addAll(Arrays.asList(Images.imageUrls));
+        adapter.notifyDataSetChanged();
 
-		setHeaderTitle("Big Image");
-		return v;
-	}
+        setHeaderTitle("Big Image");
+        return v;
+    }
 
-	private class ViewHolder extends ViewHolderBase<String> {
+    private class ViewHolder extends ViewHolderBase<String> {
 
-		private CubeImageView mImageView;
+        private CubeImageView mImageView;
 
-		@Override
-		public View createView(LayoutInflater inflater) {
-			View view = inflater.inflate(R.layout.item_image_list_big, null);
-			mImageView = (CubeImageView) view.findViewById(R.id.iv_item_image_list_big);
-			mImageView.setScaleType(ScaleType.CENTER_CROP);
+        @Override
+        public View createView(LayoutInflater inflater) {
+            View view = inflater.inflate(R.layout.item_image_list_big, null);
+            mImageView = (CubeImageView) view.findViewById(R.id.iv_item_image_list_big);
+            mImageView.setScaleType(ScaleType.CENTER_CROP);
 
-			LinearLayout.LayoutParams lyp = new LinearLayout.LayoutParams(sBigImageSize, sBigImageSize);
-			mImageView.setLayoutParams(lyp);
+            LinearLayout.LayoutParams lyp = new LinearLayout.LayoutParams(sBigImageSize, sBigImageSize);
+            mImageView.setLayoutParams(lyp);
 
-			return view;
-		}
+            return view;
+        }
 
-		@Override
-		public void showData(int position, String itemData) {
-			mImageView.loadImage(mImageLoader, itemData, sBigImageReuseInfo);
-		}
-	}
+        @Override
+        public void showData(int position, String itemData) {
+            mImageView.loadImage(mImageLoader, itemData, sBigImageReuseInfo);
+        }
+    }
 }

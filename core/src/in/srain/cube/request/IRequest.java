@@ -6,13 +6,18 @@ public interface IRequest<T> {
 
     public void onRequestSuccess(T data);
 
-    public void beforeRequest();
+    public void onRequestFail(FailData failData);
 
-    public void onRequestFail(RequestResultType requestResultType);
+    public void prepareRequest();
 
+    /**
+     * send request, {@link IRequest#prepareRequest} should be called.
+     */
     public void send();
 
     public void cancelRequest();
+
+    public T onDataFromServer(String data);
 
     /**
      * filter the origin data or convert its structure.

@@ -1,23 +1,22 @@
 package in.srain.cube.image;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map.Entry;
-
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
-
 import in.srain.cube.concurrent.SimpleTask;
 import in.srain.cube.image.iface.ImageLoadHandler;
 import in.srain.cube.image.iface.ImageResizer;
-import in.srain.cube.image.iface.ImageTaskExcutor;
-import in.srain.cube.image.imple.DefaultImageLoadHandler;
-import in.srain.cube.image.imple.DefaultImageTaskExecutor;
-import in.srain.cube.image.imple.DefaultResizer;
+import in.srain.cube.image.iface.ImageTaskExecutor;
+import in.srain.cube.image.impl.DefaultImageLoadHandler;
+import in.srain.cube.image.impl.DefaultImageResizer;
+import in.srain.cube.image.impl.DefaultImageTaskExecutor;
 import in.srain.cube.util.CLog;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
 
 /**
  * Manager the ImageTask loading list,
@@ -36,8 +35,8 @@ public class ImageLoader {
     protected static final boolean DEBUG = CLog.DEBUG_IMAGE;
     protected static final String Log_TAG = "cube_image";
 
-    protected ImageTaskExcutor mImageTaskExcutor;
-    protected ImageResizer mResizer;
+    protected ImageTaskExecutor mImageTaskExecutor;
+    protected ImageResizer mImageResizer;
     protected ImageProvider mImageProvider;
     protected ImageLoadHandler mImageLoadHandler;
 
@@ -54,13 +53,13 @@ public class ImageLoader {
         FIRST_IN_FIRST_OUT, LAST_IN_FIRST_OUT
     }
 
-    public ImageLoader(Context context, ImageProvider imageProvider, ImageTaskExcutor imageTaskExcutor, ImageResizer imageResizer, ImageLoadHandler imageLoadHandler) {
+    public ImageLoader(Context context, ImageProvider imageProvider, ImageTaskExecutor imageTaskExecutor, ImageResizer imageResizer, ImageLoadHandler imageLoadHandler) {
         mContext = context;
         mResources = context.getResources();
 
         mImageProvider = imageProvider;
-        mImageTaskExcutor = imageTaskExcutor;
-        mResizer = imageResizer;
+        mImageTaskExecutor = imageTaskExecutor;
+        mImageResizer = imageResizer;
         mImageLoadHandler = imageLoadHandler;
 
         mLoadWorkList = new HashMap<String, LoadImageTask>();
@@ -68,7 +67,7 @@ public class ImageLoader {
 
     public static ImageLoader createDefault(Context context) {
         DefaultImageLoadHandler imageLoadHandler = new DefaultImageLoadHandler(context);
-        return new ImageLoader(context, ImageProvider.getDefault(context), DefaultImageTaskExecutor.getInstance(), DefaultResizer.getInstance(), imageLoadHandler);
+        return new ImageLoader(context, ImageProvider.getDefault(context), DefaultImageTaskExecutor.getInstance(), DefaultImageResizer.getInstance(), imageLoadHandler);
     }
 
     public void setImageLoadHandler(ImageLoadHandler imageLoadHandler) {
@@ -77,6 +76,18 @@ public class ImageLoader {
 
     public ImageLoadHandler getImageLoadHandler() {
         return mImageLoadHandler;
+    }
+
+    public void setImageResizer(ImageResizer resizer) {
+        mImageResizer = resizer;
+    }
+
+    public ImageResizer getImageResizer() {
+        return mImageResizer;
+    }
+
+    public ImageProvider getImageProvider() {
+        return mImageProvider;
     }
 
     /**
@@ -151,7 +162,7 @@ public class ImageLoader {
 
         LoadImageTask loadImageTask = new LoadImageTask(imageTask);
         mLoadWorkList.put(imageTask.getIdentityKey(), loadImageTask);
-        mImageTaskExcutor.execute(loadImageTask);
+        mImageTaskExecutor.execute(loadImageTask);
     }
 
     /**
@@ -178,8 +189,8 @@ public class ImageLoader {
     }
 
     public void setTaskOrder(ImageTaskOrder order) {
-        if (null != mImageTaskExcutor) {
-            mImageTaskExcutor.setTaskOrder(order);
+        if (null != mImageTaskExecutor) {
+            mImageTaskExecutor.setTaskOrder(order);
         }
     }
 
@@ -226,7 +237,7 @@ public class ImageLoader {
             // the cache
             if (!isCancelled() && !mExitTasksEarly && (mImageTask.isPreLoad() || mImageTask.stillHasRelatedImageView())) {
                 try {
-                    bitmap = mImageProvider.fetchBitmapData(mImageTask, mResizer);
+                    bitmap = mImageProvider.fetchBitmapData(mImageTask, mImageResizer);
                     mDrawable = mImageProvider.createBitmapDrawable(mResources, bitmap);
                     mImageProvider.addBitmapToMemCache(mImageTask.getIdentityKey(), mDrawable);
                 } catch (Exception e) {
@@ -307,7 +318,7 @@ public class ImageLoader {
             Entry<String, LoadImageTask> item = it.next();
             LoadImageTask task = item.getValue();
             task.restart();
-            mImageTaskExcutor.execute(task);
+            mImageTaskExecutor.execute(task);
         }
     }
 
@@ -329,7 +340,7 @@ public class ImageLoader {
     /**
      * Drop all the work, clear the work list.
      */
-    public void destory() {
+    public void destroy() {
         mExitTasksEarly = true;
         setPause(false);
 

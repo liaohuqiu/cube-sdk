@@ -6,23 +6,23 @@ package in.srain.cube.request;
 public class SimpleRequest<T> extends RequestBase<T> implements IRequest<T> {
 
     private RequestHandler<T> mRequestHandler;
-    private BeforeRequestHandler mBeforeRequestHandler;
+    private RequestPreHandler mRequestPreHandler;
 
-    public SimpleRequest(BeforeRequestHandler beforeRequestHandler, RequestHandler<T> handler) {
-        mBeforeRequestHandler = beforeRequestHandler;
+    public SimpleRequest(RequestPreHandler requestPreHandler, RequestHandler<T> handler) {
+        mRequestPreHandler = requestPreHandler;
         mRequestHandler = handler;
     }
 
     @Override
-    public void send() {
-        this.beforeRequest();
+    protected void doSendRequest() {
+        this.prepareRequest();
         SimpleRequestManager.sendRequest(this);
     }
 
     @Override
-    public void beforeRequest() {
-        if (null != mBeforeRequestHandler) {
-            mBeforeRequestHandler.beforeRequest(this);
+    public void prepareRequest() {
+        if (null != mRequestPreHandler) {
+            mRequestPreHandler.prepareRequest(this);
         }
     }
 
@@ -34,9 +34,9 @@ public class SimpleRequest<T> extends RequestBase<T> implements IRequest<T> {
     }
 
     @Override
-    public void onRequestFail(RequestResultType requestResultType) {
+    public void onRequestFail(FailData failData) {
         if (null != mRequestHandler) {
-            mRequestHandler.onRequestFail(requestResultType);
+            mRequestHandler.onRequestFail(failData);
         }
     }
 
@@ -46,10 +46,5 @@ public class SimpleRequest<T> extends RequestBase<T> implements IRequest<T> {
             return mRequestHandler.processOriginData(rawData);
         }
         return null;
-    }
-
-    @Override
-    public void cancelRequest() {
-
     }
 }

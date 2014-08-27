@@ -1,12 +1,7 @@
 package in.srain.cube.image.iface;
 
-import java.io.InputStream;
+import in.srain.cube.cache.IFileCache;
 
-import android.graphics.Bitmap;
+public interface ImageFileCache extends IFileCache {
 
-public interface ImageFileCache {
-
-	public void write(String fileCacheKey, Bitmap bitmap);
-
-	public InputStream read(String fileCacheKey);
 }

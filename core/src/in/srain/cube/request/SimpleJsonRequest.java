@@ -5,7 +5,7 @@ package in.srain.cube.request;
  */
 public class SimpleJsonRequest extends SimpleRequest<JsonData> {
 
-    public SimpleJsonRequest(BeforeRequestHandler beforeRequestHandler, RequestJsonHandler succHandler) {
-        super(beforeRequestHandler, succHandler);
+    public SimpleJsonRequest(RequestPreHandler requestPreHandler, RequestJsonHandler succHandler) {
+        super(requestPreHandler, succHandler);
     }
 }

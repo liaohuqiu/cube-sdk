@@ -2,11 +2,11 @@ package in.srain.cube.app;
 
 public interface ICubeFragement {
 
-	void onComeIn(Object data);
+    void onComeIn(Object data);
 
-	void onLeave();
+    void onLeave();
 
-	void onBack(Object data);
+    void onBack(Object data);
 
-	boolean stayWhenBackPressed();
+    boolean stayWhenBackPressed();
 }

@@ -393,6 +393,12 @@ public class PtrFrame extends RelativeLayout {
         }
     }
 
+    public void doRefresh() {
+        int deltaY = mHeaderHeight - mCurrentPos;
+        movePos(deltaY);
+        notifyRefresh();
+    }
+
     public void reset() {
         mIsRefreshing = false;
     }

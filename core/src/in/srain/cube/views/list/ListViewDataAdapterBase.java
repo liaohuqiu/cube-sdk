@@ -1,14 +1,13 @@
 package in.srain.cube.views.list;
 
-import java.util.HashSet;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-
 import in.srain.cube.util.CLog;
+
+import java.util.HashSet;
 
 /**
  * A adapter using View Holder to display the item of a list view;

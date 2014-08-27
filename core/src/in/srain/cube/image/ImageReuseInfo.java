@@ -5,8 +5,8 @@ public class ImageReuseInfo {
     private String mIdentitySize;
     private String[] mReuseSize;
 
-    public ImageReuseInfo(String indentitySize, String[] reuseSize) {
-        mIdentitySize = indentitySize;
+    public ImageReuseInfo(String identitySize, String[] reuseSize) {
+        mIdentitySize = identitySize;
         mReuseSize = reuseSize;
     }
 

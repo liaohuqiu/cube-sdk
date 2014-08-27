@@ -1,7 +1,5 @@
 package in.srain.cube.sample.ui.fragment;
 
-import java.util.ArrayList;
-
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -10,7 +8,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
+import in.srain.cube.request.RequestCacheManager;
 import in.srain.cube.sample.R;
 import in.srain.cube.sample.activity.PagerTabIndicatorActivity;
 import in.srain.cube.sample.activity.TitleBaseFragment;
@@ -21,6 +19,8 @@ import in.srain.cube.util.LocalDisplay;
 import in.srain.cube.views.block.BlockListAdapter;
 import in.srain.cube.views.block.BlockListView;
 import in.srain.cube.views.block.BlockListView.OnItemClickListener;
+
+import java.util.ArrayList;
 
 public class HomeFragment extends TitleBaseFragment {
 
@@ -79,6 +79,21 @@ public class HomeFragment extends TitleBaseFragment {
             @Override
             public void onClick(View v) {
                 getContext().pushFragmentToBackStatck(MoreActionViewFragment.class, null);
+            }
+        }));
+        mItemInfos.add(new ItemInfo("ImageLoader Management", "#4d90fe", new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                getContext().pushFragmentToBackStatck(ImageLoaderManagementFragment.class, null);
+            }
+        }));
+
+        mItemInfos.add(new ItemInfo("RequestCache Management", "#4d90fe", new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                getContext().pushFragmentToBackStatck(RequestCacheManagementFragment.class, null);
             }
         }));
         mItemInfos.add(new ItemInfo("Tab", "#4d90fe", new OnClickListener() {

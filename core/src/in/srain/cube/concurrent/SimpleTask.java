@@ -1,9 +1,9 @@
 package in.srain.cube.concurrent;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import android.os.Handler;
 import android.os.Message;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A class which encapsulate a task that can execute in background thread and can be cancelled.
@@ -17,9 +17,9 @@ public abstract class SimpleTask implements Runnable {
     private static final int STATE_COMPLETING = 0x04;
     private static final int STATE_CANCELLED = 0x08;
 
-    private static final int TASK_DONE = 0x01;
+    private static final int MSG_TASK_DONE = 0x01;
     private static InternalHandler sHandler = new InternalHandler();
-    private Thread mCurrenThread;
+    private Thread mCurrentThread;
     private AtomicInteger mState = new AtomicInteger(STATE_NEW);
 
     /**
@@ -39,7 +39,7 @@ public abstract class SimpleTask implements Runnable {
     }
 
     /**
-     * Restart the task, just set the state to {@link STATE_NEW}
+     * Restart the task, just set the state to {@link #STATE_NEW}
      */
     public void restart() {
         mState.set(STATE_NEW);
@@ -50,9 +50,9 @@ public abstract class SimpleTask implements Runnable {
         if (!mState.compareAndSet(STATE_NEW, STATE_RUNNING)) {
             return;
         }
-        mCurrenThread = Thread.currentThread();
+        mCurrentThread = Thread.currentThread();
         doInBackground();
-        sHandler.obtainMessage(TASK_DONE, this).sendToTarget();
+        sHandler.obtainMessage(MSG_TASK_DONE, this).sendToTarget();
     }
 
     /**
@@ -62,6 +62,11 @@ public abstract class SimpleTask implements Runnable {
         return mState.get() == STATE_CANCELLED;
     }
 
+    /**
+     * check whether this work has done
+     *
+     * @return
+     */
     public boolean isDone() {
         return mState.get() == STATE_COMPLETING;
     }
@@ -70,9 +75,9 @@ public abstract class SimpleTask implements Runnable {
         if (mState.get() >= STATE_COMPLETING) {
             return;
         } else {
-            if (mState.get() == STATE_RUNNING && mayInterruptIfRunning && null != mCurrenThread) {
+            if (mState.get() == STATE_RUNNING && mayInterruptIfRunning && null != mCurrentThread) {
                 try {
-                    mCurrenThread.interrupt();
+                    mCurrentThread.interrupt();
                 } catch (Exception e) {
                 }
             }
@@ -86,7 +91,7 @@ public abstract class SimpleTask implements Runnable {
         public void handleMessage(Message msg) {
             SimpleTask work = (SimpleTask) msg.obj;
             switch (msg.what) {
-                case TASK_DONE:
+                case MSG_TASK_DONE:
                     work.mState.set(STATE_COMPLETING);
                     work.onFinish();
                     break;
@@ -94,5 +99,9 @@ public abstract class SimpleTask implements Runnable {
                     break;
             }
         }
+    }
+
+    public static void postDelay(Runnable r, long delayMillis) {
+        sHandler.postDelayed(r, delayMillis);
     }
 }

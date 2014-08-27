@@ -1,7 +1,6 @@
 package in.srain.cube.image.iface;
 
 import android.graphics.BitmapFactory;
-
 import in.srain.cube.image.ImageTask;
 
 /**
@@ -9,10 +8,12 @@ import in.srain.cube.image.ImageTask;
  */
 public interface ImageResizer {
 
-	/**
-	 * Return the {@link BitmapFactory.Options#inSampleSize}, which will be used when load the image from the disk.
-	 * 
-	 * You should better calculate this value according the hard device of the mobile.
-	 */
-	int getInSampleSize(ImageTask imageTask);
+    /**
+     * Return the {@link BitmapFactory.Options#inSampleSize}, which will be used when load the image from the disk.
+     * <p/>
+     * You should better calculate this value according the hard device of the mobile.
+     */
+    public int getInSampleSize(ImageTask imageTask);
+
+    public String getRemoteUrl(ImageTask imageTask);
 }

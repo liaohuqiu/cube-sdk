@@ -1,12 +1,11 @@
 package in.srain.cube.image;
 
-import java.lang.ref.WeakReference;
-
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
-
 import in.srain.cube.image.iface.ImageLoadHandler;
 import in.srain.cube.util.Encrypt;
+
+import java.lang.ref.WeakReference;
 
 /**
  * A wrapper of the related information used in loading a bitmap
