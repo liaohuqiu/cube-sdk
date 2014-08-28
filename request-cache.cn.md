@@ -28,6 +28,8 @@ lead: ""
 
 <br/>
 
+---
+
 ### 返回结果
 
 使用缓存，关心的是数据的新鲜度，以及需要的结果和使用场景是否相符。
@@ -64,6 +66,9 @@ public class CacheAbleRequest {
 ```
 
 <br/>
+
+---
+
 ### 回调
 
 在 `CacheAbleRequestHandler` 中有我们需要的几个回调。
@@ -92,6 +97,8 @@ public class CacheAbleRequest {
     public void onRequestFail(failData)
     ```
 <br/>
+
+---
 
 ### 控制
 
@@ -166,7 +173,9 @@ public class CacheAbleRequest {
     ```
 <br/>
 
-### 容量控制和缓存管理
+---
+
+### 容量和缓存管理
 
 *   容量控制
 
@@ -210,7 +219,17 @@ public class CacheAbleRequest {
 
         `public long getFileCacheMaxSpace();`
 
+*   demo
+
+<div class='row'>
+    <div class='col-md-offset-4 col-md-4'>
+        <img src='http://cube-sdk.liaohuqiu.net/assets/img/request-cache-management.png'/>
+    </div>
+</div>
+
 <br/>
+
+---
 
 ### 设计
 
@@ -239,6 +258,8 @@ public class CacheAbleRequest {
 
 <br/>
 
+---
+
 ###示例
 
 *   服务器接口
@@ -247,6 +268,7 @@ public class CacheAbleRequest {
 
     这个接口返回的数据变化不大，适合做缓存。
 
+<br/>
 
 ```java
 
@@ -342,10 +364,3 @@ public static void getImageList(final boolean noCache, final ImageListDataHandle
     request.send();
 }
 ```
-<br/>
-
-### 实现参考
-
-1.  文件缓存读写异步处理
-
-    读写文件属于耗时操作，不能在UI线程进行
