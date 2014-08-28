@@ -57,9 +57,9 @@ public class GridListViewFragment extends TitleBaseFragment {
             public void onRefresh() {
                 DemoRequestData.getImageList(false, new DemoRequestData.ImageListDataHandler() {
 
-                    public void onCacheAbleRequestFinish(JsonData data, CacheAbleRequest.ResultType type, boolean outOfDate) {
+                    public void onData(JsonData data, CacheAbleRequest.ResultType type, boolean outOfDate) {
                         String msg = String.format(
-                                " onCacheAbleRequestFinish\n result type: %s\n out of date: %s\n time: %s",
+                                " onData\n result type: %s\n out of date: %s\n time: %s",
                                 type, outOfDate, data.optJson("data").optString("time"));
                         Toast.makeText(getContext(), msg, 1).show();
                         adapter.getDataList().clear();

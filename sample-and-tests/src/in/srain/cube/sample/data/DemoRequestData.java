@@ -49,12 +49,17 @@ public class DemoRequestData {
         request.send();
     }
 
+    /**
+     * customized callback, notified when data loaded
+     */
     public static interface ImageListDataHandler {
-        public void onCacheAbleRequestFinish(JsonData data, CacheAbleRequest.ResultType type, boolean outOfDate);
+        public void onData(JsonData data, CacheAbleRequest.ResultType type, boolean outOfDate);
     }
 
     /**
      * Demo for using {@link CacheAbleRequest}
+     *
+     * @param noCache
      */
     public static void getImageList(final boolean noCache, final ImageListDataHandler handler) {
 
@@ -95,9 +100,13 @@ public class DemoRequestData {
             }
 
             @Override
-            public void onCacheAbleRequestFinish(JsonData data, CacheAbleRequest.ResultType type, boolean outOfDate) {
-                CLog.d("demo-request", "onCacheAbleRequestFinish: result type: %s, out of date: %s", type, outOfDate);
-                handler.onCacheAbleRequestFinish(data, type, outOfDate);
+            public void onCacheAbleRequestFinish(JsonData data, CacheAbleRequest.ResultType type,
+                                                 boolean outOfDate) {
+
+                CLog.d("demo-request",
+                        "onData: result type: %s, out of date: %s", type, outOfDate);
+
+                handler.onData(data, type, outOfDate);
             }
 
             @Override
@@ -116,12 +125,15 @@ public class DemoRequestData {
             }
         };
 
-        CacheAbleRequest<JsonData> request = new CacheAbleRequest<JsonData>(prePreHandler, requestHandler);
+        CacheAbleRequest<JsonData> request =
+                new CacheAbleRequest<JsonData>(prePreHandler, requestHandler);
 
-        // Uncomment following line, if you want to use the data from cache when cache is available no matter whether it is expired or not.
-        // request.usingCacheAnyway(true);
+        // Uncomment following line to use the data from cache when cache is available
+        // no matter whether it is expired or not.
+        // request.useCacheAnyway(true);
 
-        // When cache is available and request time has exceeded the timeout time, cache data will be used.
+        // When cache is available and request time has exceeded the timeout time,
+        // cache data will be used.
         // request.setTimeout(1000);
         request.send();
     }

@@ -54,5 +54,5 @@ public interface ICacheAbleRequest<T> extends IRequest<T> {
      *
      * @param use
      */
-    public void usingCacheAnyway(boolean use);
+    public void useCacheAnyway(boolean use);
 }

@@ -26,7 +26,7 @@ public class RequestCacheManagementFragment extends TitleBaseFragment {
 
     @Override
     protected View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        setHeaderTitle("ImageLoader Management");
+        setHeaderTitle("RequestCache Management");
 
         View view = inflater.inflate(R.layout.fragment_request_cache_management, null);
         mList = (LinearLayout) view.findViewById(R.id.ly_btn_request_cache_management);

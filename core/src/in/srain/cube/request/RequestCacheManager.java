@@ -98,14 +98,6 @@ public class RequestCacheManager {
         return JsonData.create(jsonObject);
     }
 
-    public void invalidateCache(String key) {
-        if (DEBUG) {
-            CLog.d(LOG_TAG, "%s, invalidateCache", key);
-        }
-        mFileCache.delete(key);
-        mMemoryCache.remove(key);
-    }
-
     private class ReadCacheTask<T1> extends SimpleTask {
 
         private ICacheAbleRequest<T1> mCacheAble;
@@ -293,6 +285,19 @@ public class RequestCacheManager {
     }
 
     /**
+     * delete cache by key
+     *
+     * @param key
+     */
+    public void invalidateCache(String key) {
+        if (DEBUG) {
+            CLog.d(LOG_TAG, "%s, invalidateCache", key);
+        }
+        mFileCache.delete(key);
+        mMemoryCache.remove(key);
+    }
+
+    /**
      * clear the memory cache
      */
     public void clearMemoryCache() {
@@ -301,10 +306,19 @@ public class RequestCacheManager {
         }
     }
 
+    /**
+     * get the spaced has been used
+     *
+     * @return
+     */
     public int getMemoryCacheUsedSpace() {
         return mMemoryCache.size();
     }
 
+    /**
+     * get the spaced max space in config
+     * @return
+     */
     public int getMemoryCacheMaxSpace() {
         return mMemoryCache.maxSize();
     }
@@ -331,7 +345,7 @@ public class RequestCacheManager {
     }
 
     /**
-     * get the used space
+     * get the used space in file cache
      *
      * @return
      */
@@ -339,6 +353,10 @@ public class RequestCacheManager {
         return null != mFileCache ? mFileCache.getUsedSpace() : 0;
     }
 
+    /**
+     * get the max space for file cache
+     * @return
+     */
     public long getFileCacheMaxSpace() {
         if (null != mFileCache) {
             return mFileCache.getMaxSize();

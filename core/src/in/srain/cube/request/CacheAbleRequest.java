@@ -29,7 +29,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
 
     private int mTimeout = 0;
     private boolean mHasTimeout = false;
-    private boolean mUsingCacheAnyway = false;
+    private boolean mUseCacheAnyway = false;
     private boolean mHasNotified = false;
 
     public CacheAbleRequest(CacheAbleRequestPrePreHandler preHandler, final CacheAbleRequestHandler<T> handler) {
@@ -51,8 +51,8 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
     }
 
     @Override
-    public void usingCacheAnyway(boolean use) {
-        mUsingCacheAnyway = use;
+    public void useCacheAnyway(boolean use) {
+        mUseCacheAnyway = use;
     }
 
     @Override
@@ -66,7 +66,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
         mCacheData = data;
         if (null != mHandler) {
             mHandler.onRequestFinish(data);
-            if (!mHasTimeout && !mUsingCacheAnyway) {
+            if (!mHasTimeout && !mUseCacheAnyway) {
                 notifyRequestFinish(ResultType.USE_DATA_FROM_SERVER, false);
             } else {
                 if (DEBUG) {
@@ -96,7 +96,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
         }
         if (null != mHandler) {
             mHandler.onRequestFail(failData);
-            if (mCacheData != null && !disableCache() && !mUsingCacheAnyway) {
+            if (mCacheData != null && !disableCache() && !mUseCacheAnyway) {
                 notifyRequestFinish(ResultType.USE_CACHE_ON_FAIL, true);
             } else {
                 mHandler.onRequestFail(null);
@@ -144,7 +144,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
         if (null != mHandler) {
             mHandler.onCacheData(data, outOfDate);
 
-            if (mUsingCacheAnyway) {
+            if (mUseCacheAnyway) {
                 notifyRequestFinish(ResultType.USE_CACHE_ANYWAY, mOutOfDate);
             } else {
                 if (!outOfDate) {
