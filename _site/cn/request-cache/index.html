@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="description" content="A android development framework. It makes loading image and network request easy.">
+
+
+<meta name="keywords" content="Cube-SDK, Android development framework, Image Loader, Easy netwrok request.">
+
+<meta name="author" content="liaohuqiu@gmail.com">
+
+<title>
+  
+  请求缓存 &middot; Cube SDK
+  
+</title>
+
+<!-- Bootstrap core CSS -->
+<link href="/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Documentation extras -->
+<link href="/assets/css/docs.min.css" rel="stylesheet">
+<link href="/assets/css/app.css" rel="stylesheet">
+<!--[if lt IE 9]><script src="../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+
+<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+  <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Favicons -->
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="/assets/ico/apple-touch-icon-144-precomposed.png">
+<link rel="shortcut icon" href="/assets/ico/favicon.ico">
+
+<script>
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-43024238-2']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+
+  </head>
+  <body>
+    <a class="sr-only" href="#content">Skip to main content</a>
+
+    <!-- Docs master nav -->
+    <header class="navbar navbar-static-top bs-docs-nav" role="banner">
+    <div class="container">
+        
+        <div class="navbar-header">
+            <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/cn" class="navbar-brand">Cube</a>
+        </div>
+        <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+            <ul class="nav navbar-nav">
+                
+                <li>
+                <a href="/cn/imageloader">图片加载组件</a>
+                </li>
+                
+                <li>
+                <a href="/cn/request">网络请求</a>
+                </li>
+                
+                <li>
+                <a href="/cn/request-cache">请求缓存</a>
+                </li>
+                
+                <li>
+                <a href="/cn/views">常用组件</a>
+                </li>
+                
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                
+                <li>
+                <a href="/">English</a>
+                </li>
+                
+                <li>
+                <a href="/cn">简体中文</a>
+                </li>
+                
+                <li>
+                <a href="https://github.com/liaohuqiu/cube-sdk">Fork on Github</a>
+                </li>
+                
+            </ul>
+        </nav>
+    </div>
+</header>
+
+
+    <!-- Docs page layout -->
+    <div class="bs-header" id="content">
+      <div class="container">
+        <h1>请求缓存</h1>
+        <p></p>
+      </div>
+    </div>
+
+    <div class="container bs-docs-container">
+
+      <div class="row">
+        <div class="col-md-9" role="main">
+          <h1 id='cache-able-request'>CacheAbleRequest</h1>
+
+<hr>
+
+<h3 id="toc_0">目的</h3>
+
+<p>设计和使用缓存为的是给用户带来更好的体验，比如减少网络请求，在无网络时也可有数据展示。而非使程序结构变得更加复杂。</p>
+
+<p>缓存的终极目的是在任何情况下，都有最新的数据可用。这就需要:</p>
+
+<ol>
+<li><p>灵活控制缓存的新鲜度</p></li>
+<li><p>有效快速的缓存</p>
+
+<ul>
+<li>  内存缓存，速度快</li>
+<li>  文件缓存，可缓存更多内容</li>
+</ul></li>
+<li><p>在极端情况下也有数据可用</p>
+
+<ul>
+<li>  没有网络情况下，有缓存数据可展示</li>
+<li>  用户初安装，没有网络的情况下，也有数据展示</li>
+</ul></li>
+<li><p>请求失败，可展示缓存数据</p></li>
+<li><p>请求耗时较长(未超时)，超过一定时间的请求可直接使用缓存数据。</p></li>
+</ol>
+
+<p><br/></p>
+
+<h3 id="toc_1">返回结果</h3>
+
+<p>使用缓存，关心的是数据的新鲜度，以及需要的结果和使用场景是否相符。</p>
+
+<p>在不禁用缓存的情况下，且有初始化缓存的情况下，无论如何，都可以获取到数据。</p>
+
+<ol>
+<li><p><code>USE_CACHE_NOT_EXPIRED</code>: 如果有缓存，没有过期，使用未过期的缓存数据。</p></li>
+<li><p><code>USE_DATA_FROM_SERVER</code>: 如果缓存过期，会进行请求，请求成功之后，使用服务器数据。</p>
+
+<p><strong>一般的缓存设计，都能满足以上两点，但在实际开发中，你可能需要以下功能</strong>:</p></li>
+<li><p><code>USE_CACHE_ON_FAIL</code>:   请求失败，使用缓存数据。</p></li>
+<li><p><code>USE_CACHE_ON_TIMEOUT</code>:  请求时间可能很长，设定一个超时时间，超过次时间，直接使用缓存数据，缓存会在请求完成后更新。</p></li>
+<li><p><code>USE_CACHE_ANYWAY</code>:   强制使用缓存。不管缓存过期与否，都使用缓存。如果缓存过期，会请求数据，并更新缓存。</p>
+
+<p>基于服务器配置的App 启动界面，都是利用这个方式。</p></li>
+</ol>
+
+<p>结果类型，有如下枚举:</p>
+<div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">CacheAbleRequest</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">enum</span> <span class="n">ResultType</span> <span class="o">{</span>
+        <span class="n">USE_CACHE_NOT_EXPIRED</span><span class="o">,</span>
+        <span class="n">USE_CACHE_ANYWAY</span><span class="o">,</span>
+        <span class="n">USE_CACHE_ON_TIMEOUT</span><span class="o">,</span>
+        <span class="n">USE_DATA_FROM_SERVER</span><span class="o">,</span>
+        <span class="n">USE_CACHE_ON_FAIL</span><span class="o">,</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>
+<p><br/></p>
+
+<h3 id="toc_2">回调</h3>
+
+<p>在 <code>CacheAbleRequestHandler</code> 中有我们需要的几个回调。</p>
+
+<ol>
+<li><p>数据加载完回调。这个是开发人员最常关心的一个回调。</p>
+<div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCacheAbleRequestFinish</span><span class="o">(</span><span class="n">data</span><span class="o">,</span> <span class="n">resultType</span><span class="o">,</span> <span class="n">outOfDate</span><span class="o">);</span>
+</code></pre></div></li>
+<li><p>缓存数据加载完回调</p>
+<div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCacheData</span><span class="o">(</span><span class="n">data</span><span class="o">,</span> <span class="n">outOfDate</span><span class="o">);</span>
+</code></pre></div></li>
+<li><p>服务器数据加载完回调</p>
+<div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="kd">public</span> <span class="kt">void</span> <span class="nf">onRequestFinish</span><span class="o">(</span><span class="n">data</span><span class="o">);</span>
+</code></pre></div></li>
+<li><p>数据加载失败回调</p>
+<div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="kd">public</span> <span class="kt">void</span> <span class="nf">onRequestFail</span><span class="o">(</span><span class="n">failData</span><span class="o">)</span>
+</code></pre></div>
+<p><br/></p></li>
+</ol>
+
+<h3 id="toc_3">控制</h3>
+
+<p>每个请求需要有一个<code>CacheAbleRequestPrePreHandler</code>控制请求行为，另外<code>CacheAbleRequest</code>也有几个公开方法可供控制行为。</p>
+
+<ol>
+<li><p><code>CacheAbleRequestPrePreHandler</code> 接口</p>
+
+<ul>
+<li><p><code>public String getSpecificCacheKey();</code></p>
+
+<p>请求的缓存key根据url和get参数生成，如果我们想更好控制key，可以重写此方法。</p></li>
+<li><p><code>public String getInitFileAssertPath();</code></p>
+
+<p>如果有初始化缓存文件，返回<code>assets</code>目录下缓存文件路径。</p></li>
+<li><p><code>public boolean disableCache();</code></p>
+
+<p>可返回<code>true</code>在特定场景下禁用缓存</p></li>
+<li><p><code>public int getCacheTime();</code></p>
+
+<p>控制缓存时间。</p></li>
+</ul></li>
+<li><p><code>CacheAbleRequest</code>的公开方法</p>
+
+<ul>
+<li><p>setTimeout(int timeout)</p>
+
+<p>当请求超过此时间，在有有缓存情况下，使用缓存数据。</p></li>
+<li><p>useCacheAnyway(boolean yes)</p>
+
+<p>只要有缓存数据存在，不管过期与否，都使用缓存数据。</p></li>
+</ul></li>
+</ol>
+
+<h4 id="toc_4">使用场景</h4>
+
+<ol>
+<li><p>强制使用缓存</p>
+
+<p><code>CacheAbleRequest::useCacheAnyway()</code></p>
+<div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="n">CacheAbleRequest</span> <span class="n">request</span> <span class="o">=</span> <span class="k">new</span> <span class="n">CacheAbleRequest</span><span class="o">(....);</span>
+<span class="n">request</span><span class="o">.</span><span class="na">useCacheAnyway</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+</code></pre></div></li>
+<li><p>设置超时时间</p>
+
+<p><code>CacheAbleRequest::setTimeout()</code></p>
+<div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="n">CacheAbleRequest</span> <span class="n">request</span> <span class="o">=</span> <span class="k">new</span> <span class="n">CacheAbleRequest</span><span class="o">(....);</span>
+<span class="n">request</span><span class="o">.</span><span class="na">setTimeout</span><span class="o">(</span><span class="mi">1000</span><span class="o">);</span>
+</code></pre></div></li>
+<li><p>禁用缓存</p>
+
+<p><code>CacheAbleRequestPrePreHandler::disableCache()</code></p>
+<div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="nd">@Override</span>
+<span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">disableCache</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">page</span> <span class="o">!=</span> <span class="mi">1</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></div></li>
+<li><p>设置初始化文件</p>
+
+<p><code>CacheAbleRequestPrePreHandler::getInitFileAssertPath()</code></p>
+
+<p>将服务器返回数据放入文件。文件放到 <code>assets</code> 文件下。如果文件路径是 <code>assets/request_init/demo/image-list.json</code></p>
+
+<p>如下:</p>
+<div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="nd">@Override</span>
+<span class="kd">public</span> <span class="n">String</span> <span class="nf">getInitFileAssertPath</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="s">&quot;request_init/demo/image-list.json&quot;</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></div>
+<p><br/></p></li>
+</ol>
+
+<h3 id="toc_5">容量控制和缓存管理</h3>
+
+<ul>
+<li><p>容量控制</p>
+
+<p><code>RequestCacheManager::init(Context content, cacheDir, memoryCacheSizeInKB, fileCacheSizeInKB);</code></p>
+
+<p>初始化时，可指定文件缓存路径，内存和文件缓存的大小</p></li>
+<li><p>缓存管理</p>
+
+<p><code>RequestCacheManager</code>提供了管理缓存的方法</p>
+
+<ul>
+<li><p>删除缓存</p>
+
+<p><code>public void invalidateCache(String key);</code></p></li>
+<li><p>清除内存缓存</p>
+
+<p><code>public void clearMemoryCache();</code></p></li>
+<li><p>指定的最大可用内存</p>
+
+<p><code>public int getMemoryCacheMaxSpace();</code></p></li>
+<li><p>目前已用的内存大小</p>
+
+<p><code>public int getMemoryCacheUsedSpace();</code></p></li>
+<li><p>清除文件缓存</p>
+
+<p><code>public void clearDiskCache();</code></p></li>
+<li><p>获取文件缓存，实际磁盘路径</p>
+
+<p><code>public String getFileCachePath();</code></p></li>
+<li><p>已用文件缓存空间</p>
+
+<p><code>public long getFileCacheUsedSpace();</code></p></li>
+<li><p>指定的最大可用文件缓存空间</p>
+
+<p><code>public long getFileCacheMaxSpace();</code></p></li>
+</ul></li>
+</ul>
+
+<p><br/></p>
+
+<h3 id="toc_6">设计</h3>
+
+<ul>
+<li><p>原则</p>
+
+<ol>
+<li> 没有缓存数据，或者缓存数据过期，都会获取服务器数据。</li>
+<li> 如果禁用缓存，不会加载缓存，请求完成之后，也不会更新缓存数据。</li>
+<li> <code>onCacheAbleRequestFinish()</code> 只会通知一次。这个是由设计和编码双重保证的。</li>
+</ol></li>
+<li><p>简单的流程</p>
+
+<ol>
+<li> 如有缓存，加载缓存。</li>
+<li> 如果设置强制使用缓存，不管数据是否过期，都使用缓存数据回调。</li>
+<li> 未设置强制使用缓存，如果数据没有过期，使用缓存数据回调。</li>
+<li> 数据过期，开始请求服务器数据。</li>
+<li> 如果设置请求超时，超过时间，使用缓存数据回调。请求继续</li>
+<li> 请求完成，更新缓存，如果<strong>未设置超时也未强制缓存</strong>，使用请求结果回调。</li>
+<li> 请求失败，如果有缓存，使用缓存数据。</li>
+<li> 请求失败，也没有缓存，请求失败。</li>
+</ol></li>
+</ul>
+
+<p><br/></p>
+
+<div class='row'>
+    <div class='col-md-offset-1 col-md-10'>
+        <img src='http://cube-sdk.liaohuqiu.net/assets/img/request-cache-workflow.png'/>
+    </div>
+</div>
+
+<p><br/></p>
+
+<h3 id="toc_7">示例</h3>
+
+<ul>
+<li><p>服务器接口</p>
+
+<p><a href="http://cube-server.liaohuqiu.net/api_demo/image-list.php"><code>http://cube-server.liaohuqiu.net/api_demo/image-list.php</code></a></p>
+
+<p>这个接口返回的数据变化不大，适合做缓存。</p></li>
+</ul>
+<div class="highlight"><pre><code class="java language-java" data-lang="java"><span class="cm">/**</span>
+<span class="cm"> * customized callback, notified when data loaded</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="kd">static</span> <span class="kd">interface</span> <span class="nc">ImageListDataHandler</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onData</span><span class="o">(</span><span class="n">JsonData</span> <span class="n">data</span><span class="o">,</span> <span class="n">CacheAbleRequest</span><span class="o">.</span><span class="na">ResultType</span> <span class="n">type</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">outOfDate</span><span class="o">);</span>
+<span class="o">}</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * Demo for using {@link CacheAbleRequest}</span>
+<span class="cm"> *</span>
+<span class="cm"> * @param noCache disableCache / 禁用缓存</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">getImageList</span><span class="o">(</span><span class="kd">final</span> <span class="kt">boolean</span> <span class="n">noCache</span><span class="o">,</span> <span class="kd">final</span> <span class="n">ImageListDataHandler</span> <span class="n">handler</span><span class="o">)</span> <span class="o">{</span>
+
+    <span class="n">CacheAbleRequestPrePreHandler</span> <span class="n">prePreHandler</span> <span class="o">=</span> <span class="k">new</span> <span class="n">CacheAbleRequestPrePreHandler</span><span class="o">()</span> <span class="o">{</span>
+
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="kt">void</span> <span class="n">prepareRequest</span><span class="o">(</span><span class="n">RequestBase</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">String</span> <span class="n">url</span> <span class="o">=</span> <span class="s">&quot;http://cube-server.liaohuqiu.net/api_demo/image-list.php&quot;</span><span class="o">;</span>
+            <span class="n">request</span><span class="o">.</span><span class="na">getRequestData</span><span class="o">().</span><span class="na">setRequestUrl</span><span class="o">(</span><span class="n">url</span><span class="o">);</span>
+        <span class="o">}</span>
+
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="n">String</span> <span class="nf">getSpecificCacheKey</span><span class="o">()</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="s">&quot;image-list&quot;</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="n">String</span> <span class="nf">getInitFileAssertPath</span><span class="o">()</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="s">&quot;/request_init/demo/image-list.json&quot;</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">disableCache</span><span class="o">()</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="n">noCache</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getCacheTime</span><span class="o">()</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="mi">30</span><span class="o">;</span>
+        <span class="o">}</span>
+
+    <span class="o">};</span>
+
+    <span class="n">CacheAbleRequestHandler</span> <span class="n">requestHandler</span> <span class="o">=</span> <span class="k">new</span> <span class="n">CacheAbleRequestHandler</span><span class="o">&lt;</span><span class="n">JsonData</span><span class="o">&gt;()</span> <span class="o">{</span>
+
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCacheData</span><span class="o">(</span><span class="n">JsonData</span> <span class="n">data</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">outOfDate</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">CLog</span><span class="o">.</span><span class="na">d</span><span class="o">(</span><span class="s">&quot;demo-request&quot;</span><span class="o">,</span> 
+                <span class="s">&quot;data has been loaded form cache, out of date: %s&quot;</span><span class="o">,</span> <span class="n">outOfDate</span><span class="o">);</span>
+        <span class="o">}</span>
+
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCacheAbleRequestFinish</span><span class="o">(</span><span class="n">JsonData</span> <span class="n">data</span><span class="o">,</span> <span class="n">CacheAbleRequest</span><span class="o">.</span><span class="na">ResultType</span> <span class="n">type</span><span class="o">,</span> 
+                                                    <span class="kt">boolean</span> <span class="n">outOfDate</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">CLog</span><span class="o">.</span><span class="na">d</span><span class="o">(</span><span class="s">&quot;demo-request&quot;</span><span class="o">,</span> 
+                <span class="s">&quot;onCacheAbleRequestFinish: result type: %s, out of date: %s&quot;</span><span class="o">,</span> <span class="n">type</span><span class="o">,</span> <span class="n">outOfDate</span><span class="o">);</span>
+
+            <span class="n">handler</span><span class="o">.</span><span class="na">onData</span><span class="o">(</span><span class="n">data</span><span class="o">,</span> <span class="n">type</span><span class="o">,</span> <span class="n">outOfDate</span><span class="o">);</span>
+        <span class="o">}</span>
+
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="n">JsonData</span> <span class="nf">processOriginData</span><span class="o">(</span><span class="n">JsonData</span> <span class="n">jsonData</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="n">jsonData</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onRequestFail</span><span class="o">(</span><span class="n">FailData</span> <span class="n">requestResultType</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">CLog</span><span class="o">.</span><span class="na">d</span><span class="o">(</span><span class="s">&quot;demo-request&quot;</span><span class="o">,</span> <span class="s">&quot;onRequestFail&quot;</span><span class="o">);</span>
+        <span class="o">}</span>
+
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onRequestFinish</span><span class="o">(</span><span class="n">JsonData</span> <span class="n">data</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">CLog</span><span class="o">.</span><span class="na">d</span><span class="o">(</span><span class="s">&quot;demo-request&quot;</span><span class="o">,</span> <span class="s">&quot;onRequestFinish&quot;</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">};</span>
+
+    <span class="n">CacheAbleRequest</span><span class="o">&lt;</span><span class="n">JsonData</span><span class="o">&gt;</span> <span class="n">request</span> <span class="o">=</span> 
+                <span class="k">new</span> <span class="n">CacheAbleRequest</span><span class="o">&lt;</span><span class="n">JsonData</span><span class="o">&gt;(</span><span class="n">prePreHandler</span><span class="o">,</span> <span class="n">requestHandler</span><span class="o">);</span>
+
+    <span class="c1">// Uncomment following line to use the data from cache when cache is available</span>
+    <span class="c1">//  no matter whether it is expired or not.</span>
+    <span class="c1">// 取消注释下面一行，强制使用缓存。</span>
+    <span class="c1">// request.useCacheAnyway(true);</span>
+
+    <span class="c1">// When cache is available and request time has exceeded the timeout time</span>
+    <span class="c1">// cache data will be used.</span>
+    <span class="c1">// 可以在这里设置超时时间</span>
+    <span class="c1">// request.setTimeout(1000);</span>
+    <span class="n">request</span><span class="o">.</span><span class="na">send</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre></div>
+<p><br/></p>
+
+<h3 id="toc_8">实现参考</h3>
+
+<ol>
+<li><p>文件缓存读写异步处理</p>
+
+<p>读写文件属于耗时操作，不能在UI线程进行</p></li>
+</ol>
+
+        </div>
+        <div class="col-md-3">
+          <div class="bs-sidebar hidden-print" role="complementary">
+            <ul class="nav bs-sidenav">
+                <!-- auto gen -->
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer
+================================================== -->
+<footer class="bs-footer" role="contentinfo">
+  <div class="container">
+    <ul class="footer-links muted">
+      <li>Document framework powered by <a href="http://bt-docs.liaohuqiu.net">Bt-docs</a></li>
+      <li>&middot;</li>
+      <li>Proudly hosted by <a href="https://pages.github.com">Github Pages</a></li>
+    </ul>
+  </div>
+</footer>
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="/assets/js/jquery.min.js"></script>
+<script src="/dist/js/bootstrap.min.js"></script>
+<script src="/assets/js/docs.min.js"></script>
+
+  </body>
+</html>
