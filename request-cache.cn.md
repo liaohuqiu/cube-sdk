@@ -119,10 +119,10 @@ public class CacheAbleRequest {
         控制缓存时间。
 
 1.  `CacheAbleRequest`的公开方法
-    * setTimeout(int timeout)
+    * `setTimeout(int timeout)`
 
         当请求超过此时间，在有有缓存情况下，使用缓存数据。
-    * useCacheAnyway(boolean yes)
+    * `useCacheAnyway(boolean yes)`
 
         只要有缓存数据存在，不管过期与否，都使用缓存数据。
 
