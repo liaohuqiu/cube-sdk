@@ -32,28 +32,34 @@ language_default:   "en"
 
 left_nav:
   en:
-    title:    Cube
+    path:       /
+    title:      Cube
     items:
       - path:     /imageloader
         title:    Image Loader
       - path:     /request
-        title:    Network Request
+        title:    Request
+      - path:     /request-cache
+        title:    Cache for Request
       - path:     /views
         title:    Component Views
   cn:
+    path:     /cn
     title:    Cube
     items:
       - path:     /cn/imageloader
         title:    图片加载组件
       - path:     /cn/request
         title:    网络请求
+      - path:     /cn/request-cache
+        title:    请求缓存
       - path:     /cn/views
         title:    常用组件
 
 right_nav:
-  - title:    English Version
+  - title:    English
     url:      /
-  - title:    中文版文档
+  - title:    简体中文
     url:      /cn
   - title:    Fork on Github
     url:     https://github.com/liaohuqiu/cube-sdk

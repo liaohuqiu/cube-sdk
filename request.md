@@ -131,8 +131,3 @@ OnClickListener onClickListener = new OnClickListener() {
 };
 button.setOnClickListener(onClickListener);
 ```
-
-<h1 id='cache-able-request'>CacheAbleRequest</h1>
----
-
-To be continued.

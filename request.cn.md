@@ -158,43 +158,4 @@ OnClickListener onClickListener = new OnClickListener() {
 button.setOnClickListener(onClickListener);
 ```
 
-当然，例子中的情况是比较简单的，实际的情况可能比这个复杂一些。但不管如何，本质是简单的。
-
-<h1 id='cache-able-request'>CacheAbleRequest</h1>
----
-
-##需要解决的问题
-
-在实际开发中，我们经常需要缓存请求的结果，以期减少网络请求，在无网络时有缓存数据可展示。
-
-在处理结果缓存的时候，我们会关心以下几个方面：
-
-1.  什么样的内容该缓存，如何分辨缓存的内容。
-
-    同一个接口，请求参数不同，应该有不同的缓存。
-
-    比如列表接口，首页内容可以缓存，第二页内容一般不做缓存。
-
-2.  缓存时间。根据不同的业务逻辑，缓存时间各有不同，即使同一个接口，缓存时间有可能不同。比如在数据更新频繁的时段，缓存时间短一些。
-
-3.  缓存数据和远程服务器数据的辨识
-
-    哪些数据是来自缓存，哪些数据又是来自于服务器？
-
-4.  请求完成，数据的展示问题
-
-    如果缓存中有数据，可能会优先展示缓存中数据。如果数据过期，选择加载服务器数据，当服务器数据请求完成，重新加载，导致界面闪烁。
-
-> 当然简单是第一要求
-
-对于以上需求，抽象成:
-
-```java
-public String getSpecificCacheKey();
-
-public int getCacheTime();
-
-public void onCacheData(T1 data, boolean outOfDate);
-
-public void onCacheAbleRequestFinish(T1 data, boolean fromCache, boolean outOfDate);
-```
+> 当然，例子中的情况是比较简单的，实际的情况可能比这个复杂一些。但不管如何，任何事情的本质应该是简单的。

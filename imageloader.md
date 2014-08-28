@@ -265,5 +265,6 @@ public class EtaoImageResizer extends DefaultResizer {
 #Advance
 
 ###Reuse of Image
+
 * ReuseInfo
 * load image with `ReuseInfo`
