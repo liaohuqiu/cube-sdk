@@ -1,23 +1,29 @@
-package in.srain.cube.image.util;
+package in.srain.cube.image.impl;
 
 import android.os.Build;
 import android.util.Log;
+import in.srain.cube.image.iface.ImageDownloader;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
  * A simple class that fetches images from a URL.
  */
-public class Downloader {
+public class DefaultImageDownloader implements ImageDownloader {
 
     private static final String TAG = "image_provider";
 
     private static final int IO_BUFFER_SIZE = 8 * 1024;
+    private static DefaultImageDownloader sDefault;
+
+    public static ImageDownloader getDefault() {
+        if (sDefault == null) {
+            sDefault = new DefaultImageDownloader();
+        }
+        return sDefault;
+    }
 
     /**
      * Download a bitmap from a URL and write the content to an output stream.
@@ -59,6 +65,24 @@ public class Downloader {
             }
         }
         return false;
+    }
+
+    public InputStream download(String urlString) {
+        disableConnectionReuseIfNecessary();
+        HttpURLConnection urlConnection = null;
+
+        try {
+            final URL url = new URL(urlString);
+            urlConnection = (HttpURLConnection) url.openConnection();
+            return urlConnection.getInputStream();
+        } catch (final IOException e) {
+            Log.e(TAG, "Error in downloadBitmap - " + e);
+        } finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+        }
+        return null;
     }
 
     /**

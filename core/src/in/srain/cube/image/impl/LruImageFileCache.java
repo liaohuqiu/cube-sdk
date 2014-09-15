@@ -12,10 +12,7 @@ import in.srain.cube.file.FileUtil;
 import in.srain.cube.image.iface.ImageFileCache;
 import in.srain.cube.util.CLog;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 /**
  * This class handles disk and memory caching of bitmaps.
@@ -32,6 +29,7 @@ public class LruImageFileCache implements ImageFileCache {
 
     private static final String DEFAULT_CACHE_DIR = "cube-image";
     private static final int DEFAULT_CACHE_SIZE = 1024 * 1024 * 10;
+    private static final int IO_BUFFER_SIZE = 8 * 1024;
     private static LruImageFileCache sDefault;
 
     // Compression settings when writing images to disk cache
@@ -47,6 +45,33 @@ public class LruImageFileCache implements ImageFileCache {
     private int mDiskCacheSize;
 
     private long mLastFlushTime = 0;
+
+    @Override
+    public InputStream getInputStream(String fileCacheKey) {
+        return read(fileCacheKey);
+    }
+
+    @Override
+    public void writeInputStream(String fileCacheKey, InputStream stream) {
+        Editor editor = null;
+        try {
+            editor = open(fileCacheKey);
+            if (editor != null) {
+                OutputStream outputStream = editor.newOutputStream(0);
+                BufferedOutputStream out = new BufferedOutputStream(outputStream, IO_BUFFER_SIZE);
+                BufferedInputStream in = new BufferedInputStream(stream, IO_BUFFER_SIZE);
+
+                int b;
+                while ((b = in.read()) != -1) {
+                    out.write(b);
+                }
+                editor.commit();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 
     protected enum FileCacheTaskType {
         init_cache, close_cache, flush_cache
@@ -142,7 +167,7 @@ public class LruImageFileCache implements ImageFileCache {
         }
     }
 
-    public InputStream read(String fileCacheKey) {
+    private InputStream read(String fileCacheKey) {
         if (!mDiskCacheReady) {
             initDiskCache();
         }
@@ -320,6 +345,7 @@ public class LruImageFileCache implements ImageFileCache {
     /**
      * flush the data to disk cache
      */
+    @Override
     public void flushDiskCacheAsync() {
         if (DEBUG) {
             Log.d(TAG, "flushDishCacheAsync");
@@ -343,5 +369,13 @@ public class LruImageFileCache implements ImageFileCache {
     @Override
     public int getMaxSize() {
         return mDiskCacheSize;
+    }
+
+    @Override
+    public boolean has(String key) {
+        if (mDiskLruCache != null) {
+            return read(key) != null;
+        }
+        return false;
     }
 }

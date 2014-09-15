@@ -9,20 +9,18 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build.VERSION_CODES;
 import android.util.Log;
-import in.srain.cube.file.DiskLruCache;
 import in.srain.cube.image.drawable.RecyclingBitmapDrawable;
+import in.srain.cube.image.iface.ImageDownloader;
 import in.srain.cube.image.iface.ImageFileCache;
 import in.srain.cube.image.iface.ImageMemoryCache;
 import in.srain.cube.image.iface.ImageResizer;
+import in.srain.cube.image.impl.DefaultImageDownloader;
 import in.srain.cube.image.impl.DefaultMemoryCache;
 import in.srain.cube.image.impl.LruImageFileCache;
-import in.srain.cube.image.util.Downloader;
 import in.srain.cube.util.CLog;
 import in.srain.cube.util.Version;
 
 import java.io.FileDescriptor;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -52,26 +50,22 @@ public class ImageProvider {
     private static final String MSG_DECODE = "%s decode: %sx%s inSampleSize:%s";
 
     private ImageMemoryCache mMemoryCache;
-    private LruImageFileCache mFileCache;
-
     private ImageFileCache mImageFileCache;
+    private ImageDownloader mDownloader;
 
     private static ImageProvider sDefault;
 
     public static ImageProvider getDefault(Context context) {
         if (null == sDefault) {
-            sDefault = new ImageProvider(context, DefaultMemoryCache.getDefault(), LruImageFileCache.getDefault(context));
+            sDefault = new ImageProvider(context, DefaultMemoryCache.getDefault(), LruImageFileCache.getDefault(context), DefaultImageDownloader.getDefault());
         }
         return sDefault;
     }
 
-    public ImageProvider(Context context, ImageMemoryCache memoryCache, LruImageFileCache fileCache) {
+    public ImageProvider(Context context, ImageMemoryCache memoryCache, LruImageFileCache fileCache, ImageDownloader downloader) {
         mMemoryCache = memoryCache;
-        mFileCache = fileCache;
-
-        if (fileCache instanceof ImageFileCache) {
-            mImageFileCache = fileCache;
-        }
+        mImageFileCache = fileCache;
+        mDownloader = downloader;
     }
 
     /**
@@ -132,7 +126,7 @@ public class ImageProvider {
      */
     public Bitmap fetchBitmapData(ImageTask imageTask, ImageResizer imageResizer) {
         Bitmap bitmap = null;
-        if (mFileCache != null) {
+        if (mImageFileCache != null) {
             InputStream inputStream = null;
 
             String fileCacheKey = imageTask.getFileCacheKey();
@@ -147,7 +141,7 @@ public class ImageProvider {
             }
 
             // read from file cache
-            inputStream = mFileCache.read(fileCacheKey);
+            inputStream = mImageFileCache.getInputStream(fileCacheKey);
 
             // try to reuse
             if (inputStream == null) {
@@ -160,7 +154,7 @@ public class ImageProvider {
                     for (int i = 0; i < sizeKeyList.length; i++) {
                         String size = sizeKeyList[i];
                         final String key = imageTask.generateFileCacheKeyForReuse(size);
-                        inputStream = mFileCache.read(key);
+                        inputStream = mImageFileCache.getInputStream(key);
 
                         if (inputStream != null) {
                             if (DEBUG) {
@@ -181,40 +175,26 @@ public class ImageProvider {
             }
 
             // We've got nothing from file cache
-            try {
+            boolean download = false;
+            if (inputStream == null) {
+                String url = imageResizer.getRemoteUrl(imageTask);
+                if (DEBUG) {
+                    Log.d(TAG, String.format(MSG_FETCH_DOWNLOAD, imageTask, url));
+                }
+                download = true;
+                inputStream = mDownloader.download(url);
                 if (inputStream == null) {
-                    String url = imageResizer.getRemoteUrl(imageTask);
-                    if (DEBUG) {
-                        Log.d(TAG, String.format(MSG_FETCH_DOWNLOAD, imageTask, url));
-                    }
-                    DiskLruCache.Editor editor = mFileCache.open(fileCacheKey);
-                    if (editor != null) {
-                        if (Downloader.downloadUrlToStream(url, editor.newOutputStream(0))) {
-                            editor.commit();
-                        } else {
-                            editor.abort();
-                        }
-                    } else {
-                        Log.e(TAG, imageTask + " open editor fail. file cache key: " + fileCacheKey);
-                    }
-                    inputStream = mFileCache.read(fileCacheKey);
+                    Log.e(TAG, imageTask + " open editor fail. file cache key: " + fileCacheKey);
                 }
-                if (inputStream != null) {
-                    FileDescriptor fd = ((FileInputStream) inputStream).getFD();
-                    bitmap = decodeSampledBitmapFromDescriptor(fd, imageTask, imageResizer);
-                } else {
-                    Log.e(TAG, imageTask + " fetch bitmap fail. file cache key: " + fileCacheKey);
+            }
+            if (inputStream != null) {
+                bitmap = decodeSampledBitmapFromInputStream(inputStream, imageTask, imageResizer);
+                // save data to file cache
+                if (download) {
+                    mImageFileCache.writeInputStream(fileCacheKey, inputStream);
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    if (inputStream != null) {
-                        inputStream.close();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            } else {
+                Log.e(TAG, imageTask + " fetch bitmap fail. file cache key: " + fileCacheKey);
             }
         }
         return bitmap;
@@ -244,9 +224,32 @@ public class ImageProvider {
         return bitmap;
     }
 
+    private Bitmap decodeSampledBitmapFromInputStream(InputStream stream, ImageTask imageTask, ImageResizer imageResizer) {
+        // First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeStream(stream, null, options);
+
+        imageTask.setBitmapOriginSize(options.outWidth, options.outHeight);
+
+        // Calculate inSampleSize
+        options.inSampleSize = imageResizer.getInSampleSize(imageTask);
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+
+        if (DEBUG) {
+            Log.d(TAG, String.format(MSG_DECODE, imageTask, imageTask.getBitmapOriginSize().x, imageTask.getBitmapOriginSize().y, options.inSampleSize));
+        }
+
+        Bitmap bitmap = BitmapFactory.decodeStream(stream, null, options);
+
+        return bitmap;
+    }
+
     public void flushFileCache() {
-        if (null != mFileCache) {
-            mFileCache.flushDiskCacheAsync();
+        if (null != mImageFileCache) {
+            mImageFileCache.flushDiskCacheAsync();
         }
     }
 
@@ -298,8 +301,8 @@ public class ImageProvider {
     }
 
     public long getFileCacheMaxSpace() {
-        if (null != mFileCache) {
-            return mFileCache.getMaxSize();
+        if (null != mImageFileCache) {
+            return mImageFileCache.getMaxSize();
         }
         return 0;
     }

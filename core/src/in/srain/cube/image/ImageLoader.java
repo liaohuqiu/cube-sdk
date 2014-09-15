@@ -173,6 +173,10 @@ public class ImageLoader {
             return false;
         }
         BitmapDrawable drawable = mImageProvider.getBitmapFromMemCache(imageTask);
+
+        if (imageTask.getStatistics() != null) {
+            imageTask.getStatistics().afterCache();
+        }
         if (drawable == null) {
             return false;
         }
@@ -216,6 +220,10 @@ public class ImageLoader {
         public void doInBackground() {
             if (DEBUG) {
                 Log.d(Log_TAG, String.format(MSG_TASK_DO_IN_BACKGROUND, mImageTask));
+            }
+
+            if (mImageTask.getStatistics() != null) {
+                mImageTask.getStatistics().beginLoad();
             }
             Bitmap bitmap = null;
             // Wait here if work is paused and the task is not cancelled

@@ -3,6 +3,7 @@ package in.srain.cube.image;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import in.srain.cube.image.iface.ImageLoadHandler;
+import in.srain.cube.image.util.ImageTaskStatistics;
 import in.srain.cube.util.Encrypt;
 
 import java.lang.ref.WeakReference;
@@ -42,6 +43,7 @@ public class ImageTask {
 
     private ImageViewHolder mFirstImageViewHolder;
     protected ImageReuseInfo mReuseInfo;
+    private ImageTaskStatistics mImageTaskStatistics;
 
     public ImageTask(String originUrl, int requestWidth, int requestHeight, ImageReuseInfo imageReuseInfo) {
 
@@ -52,6 +54,8 @@ public class ImageTask {
         if (imageReuseInfo != null) {
             mReuseInfo = imageReuseInfo;
         }
+
+        mImageTaskStatistics = new ImageTaskStatistics();
     }
 
     /**
@@ -338,6 +342,10 @@ public class ImageTask {
             mStr = String.format("%s %sx%s", mId, mRequestSize.x, mRequestSize.y);
         }
         return mStr;
+    }
+
+    public ImageTaskStatistics getStatistics() {
+        return mImageTaskStatistics;
     }
 
     /**

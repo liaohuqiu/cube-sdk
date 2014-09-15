@@ -161,9 +161,6 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
 
     @Override
     public String getCacheKey() {
-        if (disableCache()) {
-            throw new RuntimeException("getCacheKey() should not be called, I should check the code.");
-        }
         if (mCacheKey == null) {
             String cacheKey = mPreHandler.getSpecificCacheKey();
             if (TextUtils.isEmpty(cacheKey)) {
