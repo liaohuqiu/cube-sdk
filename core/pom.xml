@@ -13,7 +13,7 @@
     <artifactId>cube-sdk</artifactId>
     <packaging>apklib</packaging>
     <name>Cube SDK</name>
-    <version>1.0.34-SNAPSHOT</version>
+    <version>1.0.34</version>
 
     <dependencies>
         <dependency>
