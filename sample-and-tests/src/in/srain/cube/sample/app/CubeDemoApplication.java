@@ -16,7 +16,7 @@ public class CubeDemoApplication extends Application {
         // other code
         // ..
 
-        // CLog.DEBUG_IMAGE = true;
+        CLog.DEBUG_IMAGE = true;
         // CLog.DEBUG_SCROLL_HEADER_FRAME = true;
         // CLog.DEBUG_PTR_FRAME = true;
         CLog.DEBUG_REQUEST_CACHE = true;

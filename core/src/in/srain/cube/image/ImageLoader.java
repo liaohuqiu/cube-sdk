@@ -97,7 +97,7 @@ public class ImageLoader {
         int len = urls.length;
         len = 10;
         for (int i = 0; i < len; i++) {
-            final ImageTask imageTask = new ImageTask(urls[i], 0, 0, null);
+            final ImageTask imageTask = createImageTask(urls[i], 0, 0, null);
             addImageTask(imageTask, null);
         }
     }
@@ -114,7 +114,12 @@ public class ImageLoader {
      * @return
      */
     public ImageTask createImageTask(String url, int requestWidth, int requestHeight, ImageReuseInfo imageReuseInfo) {
-        return new ImageTask(url, requestWidth, requestWidth, imageReuseInfo);
+        ImageTask imageTask = ImageTask.obtain();
+        if (imageTask == null) {
+            imageTask = new ImageTask();
+        }
+        imageTask.renew().setOriginUrl(url).setRequestSize(requestWidth, requestHeight).setReuseInfo(imageReuseInfo);
+        return imageTask;
     }
 
     /**
@@ -135,6 +140,9 @@ public class ImageLoader {
                     Log.d(Log_TAG, String.format("%s previous work is cancelled.", imageTask));
                 }
             }
+        }
+        if (!imageTask.stillHasRelatedImageView()) {
+            imageTask.tryToRecycle();
         }
     }
 
@@ -175,7 +183,7 @@ public class ImageLoader {
         BitmapDrawable drawable = mImageProvider.getBitmapFromMemCache(imageTask);
 
         if (imageTask.getStatistics() != null) {
-            imageTask.getStatistics().afterCache();
+            imageTask.getStatistics().afterMemoryCache(drawable != null);
         }
         if (drawable == null) {
             return false;
@@ -246,8 +254,14 @@ public class ImageLoader {
             if (!isCancelled() && !mExitTasksEarly && (mImageTask.isPreLoad() || mImageTask.stillHasRelatedImageView())) {
                 try {
                     bitmap = mImageProvider.fetchBitmapData(mImageTask, mImageResizer);
+                    if (mImageTask.getStatistics() != null) {
+                        mImageTask.getStatistics().afterDecode();
+                    }
                     mDrawable = mImageProvider.createBitmapDrawable(mResources, bitmap);
                     mImageProvider.addBitmapToMemCache(mImageTask.getIdentityKey(), mDrawable);
+                    if (mImageTask.getStatistics() != null) {
+                        mImageTask.getStatistics().afterCreateBitmapDrawable();
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 } catch (OutOfMemoryError e) {
@@ -269,6 +283,7 @@ public class ImageLoader {
             if (!isCancelled() && !mExitTasksEarly) {
                 mImageTask.onLoadFinish(mDrawable, mImageLoadHandler);
             }
+            mImageTask.tryToRecycle();
         }
 
         @Override
@@ -278,6 +293,7 @@ public class ImageLoader {
             }
             mLoadWorkList.remove(mImageTask.getIdentityKey());
             mImageTask.onCancel();
+            mImageTask.tryToRecycle();
         }
     }
 

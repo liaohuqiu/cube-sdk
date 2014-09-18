@@ -9,7 +9,7 @@ import in.srain.cube.concurrent.SimpleTask;
 import in.srain.cube.file.DiskLruCache;
 import in.srain.cube.file.DiskLruCache.Editor;
 import in.srain.cube.file.FileUtil;
-import in.srain.cube.image.iface.ImageFileCache;
+import in.srain.cube.image.iface.ImageFileProvider;
 import in.srain.cube.util.CLog;
 
 import java.io.*;
@@ -21,7 +21,7 @@ import java.io.*;
  *
  * @author http://www.liaohuqiu.net
  */
-public class LruImageFileCache implements ImageFileCache {
+public class LruImageFileProvider implements ImageFileProvider {
 
     protected static final boolean DEBUG = CLog.DEBUG_IMAGE;
 
@@ -29,8 +29,7 @@ public class LruImageFileCache implements ImageFileCache {
 
     private static final String DEFAULT_CACHE_DIR = "cube-image";
     private static final int DEFAULT_CACHE_SIZE = 1024 * 1024 * 10;
-    private static final int IO_BUFFER_SIZE = 8 * 1024;
-    private static LruImageFileCache sDefault;
+    private static LruImageFileProvider sDefault;
 
     // Compression settings when writing images to disk cache
     private static final CompressFormat DEFAULT_COMPRESS_FORMAT = CompressFormat.JPEG;
@@ -47,44 +46,37 @@ public class LruImageFileCache implements ImageFileCache {
     private long mLastFlushTime = 0;
 
     @Override
-    public InputStream getInputStream(String fileCacheKey) {
+    public FileInputStream getInputStream(String fileCacheKey) {
         return read(fileCacheKey);
     }
 
     @Override
-    public void writeInputStream(String fileCacheKey, InputStream stream) {
-        Editor editor = null;
+    public FileInputStream downloadAndGetInputStream(String fileCacheKey, String url) {
         try {
-            editor = open(fileCacheKey);
+            Editor editor = open(fileCacheKey);
             if (editor != null) {
                 OutputStream outputStream = editor.newOutputStream(0);
-                BufferedOutputStream out = new BufferedOutputStream(outputStream, IO_BUFFER_SIZE);
-                BufferedInputStream in = new BufferedInputStream(stream, IO_BUFFER_SIZE);
-
-                int b;
-                while ((b = in.read()) != -1) {
-                    out.write(b);
-                }
+                SimpleDownloader.downloadUrlToStream(url, outputStream);
                 editor.commit();
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        return read(fileCacheKey);
     }
 
     protected enum FileCacheTaskType {
         init_cache, close_cache, flush_cache
     }
 
-    public LruImageFileCache(int sizeInKB, File path) {
+    public LruImageFileProvider(int sizeInKB, File path) {
         mDiskCacheSize = sizeInKB;
         mDiskCacheDir = path;
     }
 
-    public static LruImageFileCache getDefault(Context context) {
+    public static LruImageFileProvider getDefault(Context context) {
         if (null == sDefault) {
-            sDefault = new LruImageFileCache(DEFAULT_CACHE_SIZE, FileUtil.getDiskCacheDir(context, DEFAULT_CACHE_DIR, DEFAULT_CACHE_SIZE));
+            sDefault = new LruImageFileProvider(DEFAULT_CACHE_SIZE, FileUtil.getDiskCacheDir(context, DEFAULT_CACHE_DIR, DEFAULT_CACHE_SIZE));
             sDefault.initDiskCacheAsync();
         }
         return sDefault;
@@ -167,7 +159,7 @@ public class LruImageFileCache implements ImageFileCache {
         }
     }
 
-    private InputStream read(String fileCacheKey) {
+    private FileInputStream read(String fileCacheKey) {
         if (!mDiskCacheReady) {
             initDiskCache();
         }
@@ -196,7 +188,7 @@ public class LruImageFileCache implements ImageFileCache {
                     return null;
                 } else {
                     inputStream = snapshot.getInputStream(DISK_CACHE_INDEX);
-                    return inputStream;
+                    return (FileInputStream) inputStream;
                 }
             }
             return null;
