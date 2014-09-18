@@ -4,6 +4,8 @@ All of the `readme` content and document are moved to Github Pages, please visit
 
 ### Usage
 
+It's in Maven Central:
+
 ```xml
 <dependency>
     <groupId>in.srain.cube</groupId>
