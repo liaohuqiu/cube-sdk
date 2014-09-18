@@ -1,6 +1,6 @@
 package in.srain.cube.request;
 
-public interface CacheAbleRequestPreHandler extends BeforeRequestHandler {
+public interface CacheAbleRequestPrePreHandler extends RequestPreHandler {
 
     /**
      * Once the cache key is specified, the data will be cached by using this key,

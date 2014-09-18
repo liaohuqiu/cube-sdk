@@ -5,8 +5,9 @@ import android.content.res.TypedArray;
 import android.graphics.PointF;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.*;
-
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import in.srain.cube.R;
 import in.srain.cube.util.CLog;

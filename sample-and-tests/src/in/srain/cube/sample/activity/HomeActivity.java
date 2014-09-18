@@ -1,7 +1,6 @@
 package in.srain.cube.sample.activity;
 
 import android.os.Bundle;
-
 import in.srain.cube.app.XActivity;
 import in.srain.cube.sample.R;
 import in.srain.cube.sample.ui.fragment.HomeFragment;
@@ -9,8 +8,8 @@ import in.srain.cube.sample.ui.fragment.HomeFragment;
 public class HomeActivity extends XActivity {
 
     @Override
-    protected void onCreate(Bundle arg0) {
-        super.onCreate(arg0);
+    protected void onCreate(Bundle bundle) {
+        super.onCreate(bundle);
         setContentView(R.layout.activity_main);
         addFragment(HomeFragment.class, null);
     }

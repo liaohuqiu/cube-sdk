@@ -1,15 +1,5 @@
 package in.srain.cube.file;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.AssetManager;
@@ -17,8 +7,11 @@ import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.Environment;
 import android.os.StatFs;
-
 import in.srain.cube.util.Version;
+
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 
 public class FileUtil {
 
@@ -103,6 +96,25 @@ public class FileUtil {
             } else {
                 final StatFs stats = new StatFs(path.getPath());
                 return (long) stats.getBlockSize() * (long) stats.getAvailableBlocks();
+            }
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    @TargetApi(VERSION_CODES.GINGERBREAD)
+    public static long getUsedSpace(File path) {
+        if (path == null) {
+            return -1;
+        }
+
+        if (Version.hasGingerbread()) {
+            return path.getTotalSpace() - path.getUsableSpace();
+        } else {
+            if (!path.exists()) {
+                return -1;
+            } else {
+                final StatFs stats = new StatFs(path.getPath());
+                return (long) stats.getBlockSize() * (stats.getBlockCount() - stats.getAvailableBlocks());
             }
         }
     }
@@ -192,6 +204,9 @@ public class FileUtil {
      */
     public static String readAssert(Context context, String filePath) {
         try {
+            if (filePath.startsWith(File.separator)) {
+                filePath = filePath.substring(File.separator.length());
+            }
             AssetManager assetManager = context.getAssets();
             InputStream inputStream = assetManager.open(filePath);
             DataInputStream stream = new DataInputStream(inputStream);
@@ -200,10 +215,12 @@ public class FileUtil {
             stream.readFully(buffer);
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             byteArrayOutputStream.write(buffer);
+            stream.close();
             return byteArrayOutputStream.toString();
         } catch (Exception e) {
+            e.printStackTrace();
         }
-        return "";
+        return null;
     }
 
     public static String read(String filePath) {

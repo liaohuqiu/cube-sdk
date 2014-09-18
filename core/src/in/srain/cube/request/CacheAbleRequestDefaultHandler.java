@@ -6,7 +6,7 @@ public abstract class CacheAbleRequestDefaultHandler<T1> implements CacheAbleReq
     }
 
     @Override
-    public void onRequestFail(RequestResultType requestResultType) {
+    public void onRequestFail(FailData failData) {
     }
 
     @Override

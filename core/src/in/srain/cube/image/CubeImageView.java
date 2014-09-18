@@ -11,7 +11,6 @@ import android.util.AttributeSet;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
-
 import in.srain.cube.image.drawable.RecyclingBitmapDrawable;
 
 /**

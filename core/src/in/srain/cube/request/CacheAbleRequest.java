@@ -1,72 +1,105 @@
 package in.srain.cube.request;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
 import android.text.TextUtils;
-import in.srain.cube.app.lifecycle.LifeCycleComponent;
+import in.srain.cube.concurrent.SimpleTask;
 import in.srain.cube.util.CLog;
 
-public class CacheAbleRequest<T> extends RequestBase<T> implements RequestCache.ICacheAbleRequest<T> {
+import java.net.URI;
+import java.net.URISyntaxException;
+
+public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleRequest<T> {
+
+    public static enum ResultType {
+        USE_CACHE_NOT_EXPIRED,
+        USE_CACHE_ANYWAY,
+        USE_CACHE_ON_TIMEOUT,
+        USE_DATA_FROM_SERVER,
+        USE_CACHE_ON_FAIL,
+    }
 
     protected static final boolean DEBUG = CLog.DEBUG_REQUEST_CACHE;
     protected static final String LOG_TAG = "cube_request_cache";
 
-    private CacheAbleRequestHandler<T> mCacheAbleRequestHandler;
-    private CacheAbleRequestPreHandler mCacheAbleRequestPreHandler;
+    private CacheAbleRequestHandler<T> mHandler;
+    private CacheAbleRequestPrePreHandler mPreHandler;
+
     private T mCacheData;
     private boolean mOutOfDate;
-    private boolean mHasStop = false;
+    private String mCacheKey = null;
 
-    public CacheAbleRequest(CacheAbleRequestPreHandler cacheAbleRequestPreHandler, final CacheAbleRequestHandler<T> handler) {
-        mCacheAbleRequestPreHandler = cacheAbleRequestPreHandler;
-        mCacheAbleRequestHandler = handler;
+    private int mTimeout = 0;
+    private boolean mHasTimeout = false;
+    private boolean mUseCacheAnyway = false;
+    private boolean mHasNotified = false;
+
+    public CacheAbleRequest(CacheAbleRequestPrePreHandler preHandler, final CacheAbleRequestHandler<T> handler) {
+        mPreHandler = preHandler;
+        mHandler = handler;
     }
 
-    /**
-     * Implements interface {@link IRequest}
-     */
+    // ===========================================================
+    // Override parent
+    // ===========================================================
+    @Override
+    public void doSendRequest() {
+        RequestCacheManager.getInstance().requestCache(this);
+    }
+
+    @Override
+    public void setTimeout(int timeOut) {
+        mTimeout = timeOut;
+    }
+
+    @Override
+    public void useCacheAnyway(boolean use) {
+        mUseCacheAnyway = use;
+    }
+
     @Override
     public void onRequestSuccess(T data) {
         if (DEBUG) {
-            CLog.d(LOG_TAG, "onRequestSuccess %s", getCacheKey());
+            CLog.d(LOG_TAG, "%s, onRequestSuccess", getCacheKey());
         }
-        if (mHasStop) {
+        if (hasBeenCanceled()) {
             return;
         }
-        if (null != mCacheAbleRequestHandler) {
-            mCacheAbleRequestHandler.onRequestFinish(data);
-            if (DEBUG) {
-                CLog.d(LOG_TAG, "onCacheAbleRequestFinish: %s", getCacheKey());
+        mCacheData = data;
+        if (null != mHandler) {
+            mHandler.onRequestFinish(data);
+            if (!mHasTimeout && !mUseCacheAnyway) {
+                notifyRequestFinish(ResultType.USE_DATA_FROM_SERVER, false);
+            } else {
+                if (DEBUG) {
+                    CLog.d(LOG_TAG, "%s, will not notifyRequestFinish", getCacheKey());
+                }
             }
-            mCacheAbleRequestHandler.onCacheAbleRequestFinish(data, false, mOutOfDate);
         }
     }
 
     @Override
-    public void beforeRequest() {
+    public void prepareRequest() {
         if (DEBUG) {
-            CLog.d(LOG_TAG, "beforeRequest: %s", getCacheKey());
+            CLog.d(LOG_TAG, "%s, prepareRequest", getCacheKey());
         }
-        if (mCacheAbleRequestPreHandler != null) {
-            mCacheAbleRequestPreHandler.beforeRequest(this);
+        if (mPreHandler != null) {
+            mPreHandler.prepareRequest(this);
         }
     }
 
     @Override
-    public void onRequestFail(RequestResultType requestResultType) {
+    public void onRequestFail(FailData failData) {
         if (DEBUG) {
-            CLog.d(LOG_TAG, "onRequestFail: %s", getCacheKey());
+            CLog.d(LOG_TAG, "%s, onRequestFail", getCacheKey());
         }
-        if (mHasStop) {
+        if (hasBeenCanceled()) {
             return;
         }
-        if (null != mCacheAbleRequestHandler) {
-            mCacheAbleRequestHandler.onRequestFail(requestResultType);
-            if (mCacheData != null && !disableCache()) {
-                mCacheAbleRequestHandler.onCacheAbleRequestFinish(mCacheData, false, mOutOfDate);
+        if (null != mHandler) {
+            mHandler.onRequestFail(failData);
+            if (mCacheData != null && !disableCache() && !mUseCacheAnyway) {
+                notifyRequestFinish(ResultType.USE_CACHE_ON_FAIL, true);
+            } else {
+                mHandler.onRequestFail(null);
             }
         }
     }
@@ -74,85 +107,142 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements RequestCache.
     @Override
     public void queryFromServer() {
         if (DEBUG) {
-            CLog.d(LOG_TAG, "queryFromServer: %s", getCacheKey());
+            CLog.d(LOG_TAG, "%s, queryFromServer", getCacheKey());
         }
-        if (mHasStop) {
+        if (hasBeenCanceled()) {
             return;
         }
+        doQueryFromServer();
+        beginTimeout();
+    }
+
+    protected void doQueryFromServer() {
         SimpleRequestManager.sendRequest(this);
     }
 
     @Override
     public boolean disableCache() {
-        if (mCacheAbleRequestPreHandler != null) {
-            return mCacheAbleRequestPreHandler.disableCache();
+        if (mPreHandler != null) {
+            return mPreHandler.disableCache();
         }
         return false;
     }
 
-    public void send() {
-        RequestCache.getInstance().requestCache(this);
-    }
-
     // ===========================================================
-    // Implements Interface @ICacheAble
+    // Implements Interface {@link ICacheAble}
     // ===========================================================
     @Override
     public void onCacheData(T data, boolean outOfDate) {
         if (DEBUG) {
-            CLog.d(LOG_TAG, "onCacheData: %s", getCacheKey());
+            CLog.d(LOG_TAG, "%s, onCacheData, out of date: %s", getCacheKey(), outOfDate);
         }
-        if (mHasStop) {
+        if (hasBeenCanceled()) {
             return;
         }
         mCacheData = data;
         mOutOfDate = outOfDate;
-        if (null != mCacheAbleRequestHandler) {
-            mCacheAbleRequestHandler.onCacheData(data, outOfDate);
-            if (!outOfDate) {
-                if (DEBUG) {
-                    CLog.d(LOG_TAG, "onCacheAbleRequestFinish: %s", getCacheKey());
+        if (null != mHandler) {
+            mHandler.onCacheData(data, outOfDate);
+
+            if (mUseCacheAnyway) {
+                notifyRequestFinish(ResultType.USE_CACHE_ANYWAY, mOutOfDate);
+            } else {
+                if (!outOfDate) {
+                    notifyRequestFinish(ResultType.USE_CACHE_NOT_EXPIRED, false);
                 }
-                mCacheAbleRequestHandler.onCacheAbleRequestFinish(data, true, false);
             }
         }
     }
 
     @Override
     public int getCacheTime() {
-        return mCacheAbleRequestPreHandler.getCacheTime();
+        return mPreHandler.getCacheTime();
     }
 
     @Override
     public String getCacheKey() {
-        String cacheKey = mCacheAbleRequestPreHandler.getSpecificCacheKey();
-        return cacheKey;
+        if (mCacheKey == null) {
+            String cacheKey = mPreHandler.getSpecificCacheKey();
+            if (TextUtils.isEmpty(cacheKey)) {
+
+                String url = getRequestData().getRequestUrl();
+                try {
+                    URI uri = null;
+                    uri = new URI(url);
+                    cacheKey = uri.getPath();
+                    if (cacheKey.startsWith("/")) {
+                        cacheKey = cacheKey.substring(1);
+                    }
+                    cacheKey = cacheKey.replace("/", "-");
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+                }
+            }
+            mCacheKey = cacheKey;
+        }
+        return mCacheKey;
     }
 
     @Override
     public String getAssertInitDataPath() {
-        return mCacheAbleRequestPreHandler.getInitFileAssertPath();
+        return mPreHandler.getInitFileAssertPath();
+    }
+
+    @Override
+    public T onDataFromServer(String data) {
+        if (DEBUG) {
+            CLog.d(LOG_TAG, "%s, onDataFromServer", getCacheKey());
+        }
+        // cache the data
+        if (!TextUtils.isEmpty(data) && !disableCache()) {
+            RequestCacheManager.getInstance().cacheRequest(this, data);
+        }
+        return super.onDataFromServer(data);
     }
 
     @Override
     public T processOriginDataFromServer(JsonData rawData) {
+        return mHandler.processOriginData(rawData);
+    }
+
+    @Override
+    public T processRawDataFromCache(JsonData rawData) {
+
+        return mHandler.processOriginData(rawData);
+    }
+
+    /**
+     * will only notify once
+     *
+     * @param type
+     * @param outOfDate
+     */
+    private void notifyRequestFinish(ResultType type, boolean outOfDate) {
         if (DEBUG) {
-            CLog.d(LOG_TAG, "processOriginDataFromServer: %s", getCacheKey());
+            CLog.d(LOG_TAG, "%s, notifyRequestFinish: %s, %s", getCacheKey(), type, outOfDate);
         }
-        // cache the data
-        if (rawData != null && rawData.getRawData() != null && rawData.length() > 0 && !disableCache()) {
-            RequestCache.getInstance().cacheRequest(this, rawData);
+        if (mHasNotified) {
+            return;
         }
-        return mCacheAbleRequestHandler.processOriginData(rawData);
+        mHasNotified = true;
+        mHandler.onCacheAbleRequestFinish(mCacheData, type, outOfDate);
     }
 
-    @Override
-    public T processRawDataFromCache(JsonData jsonData) {
-        return mCacheAbleRequestHandler.processOriginData(jsonData);
+    private void timeout() {
+        mHasTimeout = true;
+        if (mCacheData != null && mHandler != null) {
+            notifyRequestFinish(ResultType.USE_CACHE_ON_TIMEOUT, true);
+        }
     }
 
-    @Override
-    public void cancelRequest() {
-        mHasStop = true;
+    private void beginTimeout() {
+        if (mTimeout > 0 && mCacheData != null) {
+            SimpleTask.postDelay(new Runnable() {
+                @Override
+                public void run() {
+                    timeout();
+                }
+            }, mTimeout);
+        }
     }
 }

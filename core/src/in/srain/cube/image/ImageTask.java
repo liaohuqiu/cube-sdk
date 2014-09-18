@@ -1,12 +1,12 @@
 package in.srain.cube.image;
 
-import java.lang.ref.WeakReference;
-
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
-
 import in.srain.cube.image.iface.ImageLoadHandler;
+import in.srain.cube.util.CLog;
 import in.srain.cube.util.Encrypt;
+
+import java.lang.ref.WeakReference;
 
 /**
  * A wrapper of the related information used in loading a bitmap
@@ -15,10 +15,23 @@ import in.srain.cube.util.Encrypt;
  */
 public class ImageTask {
 
+    protected static final String Log_TAG = "cube_image_task";
+    private static final Object sPoolSync = new Object();
+    private static ImageTask sTop;
+    private static int sPoolSize = 0;
+    private static final int MAX_POOL_SIZE = 20;
+    private static boolean USE_POOL = false;
+
     private static int sId = 0;
 
-    private int mFlag;
-    protected int mId;
+    private final static String SIZE_SP = "_";
+    private final static int STATUS_PRE_LOAD = 0x01;
+    private final static int STATUS_LOADING = 0x02;
+    private final static int STATUS_DONE = 0x04;
+    private final static int STATUS_CANCELED = 0x08;
+
+    private int mFlag = 0;
+    protected int mId = 0;
 
     // the origin request url for the image.
     protected String mOriginUrl;
@@ -34,25 +47,88 @@ public class ImageTask {
 
     protected Point mRequestSize = new Point();
     protected Point mBitmapOriginSize = new Point();
-
-    private final static String SIZE_SP = "_";
-    private final static int STATUS_PRE_LOAD = 0x01;
-    private final static int STATUS_LOADING = 0x02;
-    private final static int STATUS_DONE = 0x04;
-    private final static int STATUS_CANCELED = 0x08;
-
-    private ImageViewHolder mFirstImageViewHolder;
     protected ImageReuseInfo mReuseInfo;
 
-    public ImageTask(String originUrl, int requestWidth, int requestHeight, ImageReuseInfo imageReuseInfo) {
+    protected ImageViewHolder mFirstImageViewHolder;
+    protected ImageTaskStatistics mImageTaskStatistics;
 
-        mId = ++sId;
+    ImageTask next;
 
-        mOriginUrl = originUrl;
-        mRequestSize = new Point(requestWidth, requestHeight);
-        if (imageReuseInfo != null) {
-            mReuseInfo = imageReuseInfo;
+    protected void clearForRecycle() {
+        mFlag = 0;
+
+        mOriginUrl = null;
+        mIdentityUrl = null;
+        mIdentityKey = null;
+        mStr = null;
+        mRequestSize.set(0, 0);
+        mBitmapOriginSize.set(0, 0);
+
+        mReuseInfo = null;
+        mFirstImageViewHolder = null;
+        mImageTaskStatistics = null;
+    }
+
+    public static ImageTask obtain() {
+        if (!USE_POOL) {
+            return null;
         }
+        // pop top, make top.next as top
+        synchronized (sPoolSync) {
+            if (sTop != null) {
+                ImageTask m = sTop;
+                sTop = m.next;
+                m.next = null;
+                sPoolSize--;
+                return m;
+            }
+            if (CLog.DEBUG_IMAGE) {
+                CLog.d(Log_TAG, "obtain, pool remain: %d", sPoolSize);
+            }
+        }
+        return null;
+    }
+
+    public void tryToRecycle() {
+        if (!USE_POOL) {
+            return;
+        }
+        clearForRecycle();
+
+        // mark top as the next of current, then push current as pop
+        synchronized (sPoolSync) {
+            if (sPoolSize < MAX_POOL_SIZE) {
+                next = sTop;
+                sTop = this;
+                sPoolSize++;
+            }
+            if (CLog.DEBUG_IMAGE) {
+                CLog.d(Log_TAG, "recycle, pool remain: %d", sPoolSize);
+            }
+        }
+    }
+
+    public ImageTask renew() {
+        mId = ++sId;
+        if (ImagePerformanceStatistics.sample(mId)) {
+            mImageTaskStatistics = new ImageTaskStatistics();
+        }
+        return this;
+    }
+
+    public ImageTask setOriginUrl(String originUrl) {
+        mOriginUrl = originUrl;
+        return this;
+    }
+
+    public ImageTask setRequestSize(int requestWidth, int requestHeight) {
+        mRequestSize.set(requestWidth, requestHeight);
+        return this;
+    }
+
+    public ImageTask setReuseInfo(ImageReuseInfo imageReuseInfo) {
+        mReuseInfo = imageReuseInfo;
+        return this;
     }
 
     /**
@@ -221,6 +297,10 @@ public class ImageTask {
             return;
         }
 
+        if (null != mImageTaskStatistics) {
+            mImageTaskStatistics.showBegin();
+        }
+
         ImageViewHolder holder = mFirstImageViewHolder;
         do {
             final CubeImageView imageView = holder.getImageView();
@@ -229,6 +309,10 @@ public class ImageTask {
                 handler.onLoadFinish(this, imageView, drawable);
             }
         } while ((holder = holder.mNext) != null);
+
+        if (null != mImageTaskStatistics) {
+            mImageTaskStatistics.showComplete(ImageProvider.getBitmapSize(drawable));
+        }
     }
 
     public void onCancel() {
@@ -257,7 +341,7 @@ public class ImageTask {
     }
 
     public void setBitmapOriginSize(int width, int height) {
-        mBitmapOriginSize = new Point(width, height);
+        mBitmapOriginSize.set(width, height);
     }
 
     public Point getBitmapOriginSize() {
@@ -339,6 +423,10 @@ public class ImageTask {
             mStr = String.format("%s %sx%s", mId, mRequestSize.x, mRequestSize.y);
         }
         return mStr;
+    }
+
+    public ImageTaskStatistics getStatistics() {
+        return mImageTaskStatistics;
     }
 
     /**

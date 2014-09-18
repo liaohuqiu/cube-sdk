@@ -3,7 +3,7 @@
     xmlns:cube="http://schemas.android.com/apk/res/in.srain.cube.sample"
     android:layout_width="match_parent"
     android:layout_height="44dp"
-    android:background="@color/base_background" >
+    android:background="@color/base_background">
 
     <RelativeLayout
         android:id="@+id/ly_title_bar_left"
@@ -12,7 +12,7 @@
         android:layout_alignParentLeft="true"
         android:gravity="center_vertical"
         android:paddingLeft="12dp"
-        android:paddingRight="20dp" >
+        android:paddingRight="20dp">
 
         <TextView
             android:id="@+id/tv_title_bar_left"
@@ -26,10 +26,10 @@
 
     <RelativeLayout
         android:id="@+id/ly_title_bar_center"
-        android:layout_width="200dp"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_centerHorizontal="true"
-        android:gravity="center" >
+        android:gravity="center">
 
         <TextView
             android:id="@+id/tv_title_bar_title"
@@ -47,7 +47,7 @@
         android:layout_height="match_parent"
         android:layout_alignParentRight="true"
         android:paddingLeft="20dp"
-        android:paddingRight="12dp" >
+        android:paddingRight="12dp">
 
         <TextView
             android:id="@+id/tv_title_bar_right"

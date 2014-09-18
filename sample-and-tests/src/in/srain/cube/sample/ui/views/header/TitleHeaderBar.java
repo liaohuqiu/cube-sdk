@@ -4,7 +4,6 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TextView;
-
 import in.srain.cube.sample.R;
 
 /**
@@ -17,53 +16,53 @@ import in.srain.cube.sample.R;
  * <li>
  * 右侧文字
  * </ul>
- * <p>
+ * <p/>
  * <a href="http://www.liaohuqiu.net/unified-title-header/">http://www.liaohuqiu.net/unified-title-header/</a>
- * 
+ *
  * @author http://www.liaohuqiu.net
  */
 public class TitleHeaderBar extends HeaderBarBase {
 
-	private TextView mTitleTextView;
-	private TextView mRightTextView;
-	private TextView mReturnImageView;
-	private View mMoreAction;
+    private TextView mTitleTextView;
+    private TextView mRightTextView;
+    private TextView mReturnImageView;
+    private View mMoreAction;
 
-	public TitleHeaderBar(Context context) {
-		this(context, null);
-	}
+    public TitleHeaderBar(Context context) {
+        this(context, null);
+    }
 
-	public TitleHeaderBar(Context context, AttributeSet attrs) {
-		this(context, attrs, 0);
-	}
+    public TitleHeaderBar(Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
+    }
 
-	public TitleHeaderBar(Context context, AttributeSet attrs, int defStyle) {
-		super(context, attrs, defStyle);
-		mReturnImageView = (TextView) findViewById(R.id.tv_title_bar_left);
-		mTitleTextView = (TextView) findViewById(R.id.tv_title_bar_title);
-		mRightTextView = (TextView) findViewById(R.id.tv_title_bar_right);
-		mMoreAction = findViewById(R.id.ly_title_bar_more_action);
-	}
+    public TitleHeaderBar(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+        mReturnImageView = (TextView) findViewById(R.id.tv_title_bar_left);
+        mTitleTextView = (TextView) findViewById(R.id.tv_title_bar_title);
+        mRightTextView = (TextView) findViewById(R.id.tv_title_bar_right);
+        mMoreAction = findViewById(R.id.ly_title_bar_more_action);
+    }
 
-	@Override
-	protected int getLayoutId() {
-		return R.layout.base_header_bar_title;
-	}
+    @Override
+    protected int getLayoutId() {
+        return R.layout.base_header_bar_title;
+    }
 
-	public TextView getLeftTextView() {
-		return mReturnImageView;
-	}
+    public TextView getLeftTextView() {
+        return mReturnImageView;
+    }
 
-	public TextView getTitleTextView() {
-		return mTitleTextView;
-	}
+    public TextView getTitleTextView() {
+        return mTitleTextView;
+    }
 
-	public TextView getRightTextView() {
-		return mRightTextView;
-	}
+    public TextView getRightTextView() {
+        return mRightTextView;
+    }
 
-	public void showMoreMenu() {
-		mRightTextView.setVisibility(GONE);
-		mMoreAction.setVisibility(VISIBLE);
-	}
+    public void showMoreMenu() {
+        mRightTextView.setVisibility(GONE);
+        mMoreAction.setVisibility(VISIBLE);
+    }
 }

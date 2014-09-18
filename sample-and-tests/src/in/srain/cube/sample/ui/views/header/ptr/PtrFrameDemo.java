@@ -3,7 +3,6 @@ package in.srain.cube.sample.ui.views.header.ptr;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.TextView;
 import in.srain.cube.sample.R;
 import in.srain.cube.util.LocalDisplay;
@@ -14,11 +13,26 @@ public class PtrFrameDemo extends PtrFrame {
     private TextView mTitleTextView;
     private Handler mHandler;
 
+    public static abstract class DefaultHandler implements Handler {
+
+        @Override
+        public boolean canDoRefresh(PtrFrameDemo frame) {
+            return frame.checkContentFirstChild();
+        }
+    }
+
+    private boolean checkContentFirstChild() {
+        if (mContentViewContainer.getChildCount() == 0) {
+            return true;
+        }
+        return mContentViewContainer.getChildAt(0).getTop() == 0;
+    }
+
     public interface Handler {
 
         public void onRefresh();
 
-        public boolean canDoRefresh();
+        public boolean canDoRefresh(PtrFrameDemo frame);
     }
 
     public PtrFrameDemo(Context context) {
@@ -56,12 +70,15 @@ public class PtrFrameDemo extends PtrFrame {
         setPtrHandler(new PtrHandler() {
             @Override
             public boolean checkCanDoRefresh() {
-                return mHandler.canDoRefresh();
+                return mHandler.canDoRefresh(PtrFrameDemo.this);
             }
 
             @Override
             public void onRefresh() {
                 mHandler.onRefresh();
+                mRotateView.setVisibility(INVISIBLE);
+                mTitleTextView.setVisibility(VISIBLE);
+                mTitleTextView.setText("updating...");
             }
 
             @Override
@@ -75,7 +92,7 @@ public class PtrFrameDemo extends PtrFrame {
             public void onRelease() {
                 mRotateView.setVisibility(INVISIBLE);
                 mTitleTextView.setVisibility(VISIBLE);
-                mTitleTextView.setText("updating");
+                mTitleTextView.setText("updating...");
             }
 
             @Override

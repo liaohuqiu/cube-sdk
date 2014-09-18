@@ -1,10 +1,5 @@
 package in.srain.cube.image;
 
-import java.io.FileDescriptor;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Resources;
@@ -14,16 +9,19 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build.VERSION_CODES;
 import android.util.Log;
-
-import in.srain.cube.file.DiskLruCache;
 import in.srain.cube.image.drawable.RecyclingBitmapDrawable;
+import in.srain.cube.image.iface.ImageFileProvider;
 import in.srain.cube.image.iface.ImageMemoryCache;
 import in.srain.cube.image.iface.ImageResizer;
-import in.srain.cube.image.imple.DefaultMemoryCache;
-import in.srain.cube.image.imple.LruImageFileCache;
-import in.srain.cube.image.util.Downloader;
+import in.srain.cube.image.impl.DefaultMemoryCache;
+import in.srain.cube.image.impl.LruImageFileProvider;
 import in.srain.cube.util.CLog;
 import in.srain.cube.util.Version;
+
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * This class handles disk and memory caching of bitmaps.
@@ -46,26 +44,26 @@ public class ImageProvider {
 
     private static final String MSG_FETCH_TRY_REUSE = "%s Disk Cache not hit. Try to reuse";
     private static final String MSG_FETCH_HIT_DISK_CACHE = "%s Disk Cache hit";
-    private static final String MSG_FETCH_REUSE_SUCC = "%s reuse size: %s";
+    private static final String MSG_FETCH_REUSE_SUCCESS = "%s reuse size: %s";
     private static final String MSG_FETCH_REUSE_FAIL = "%s reuse fail: %s, %s";
     private static final String MSG_FETCH_DOWNLOAD = "%s downloading: %s";
     private static final String MSG_DECODE = "%s decode: %sx%s inSampleSize:%s";
 
     private ImageMemoryCache mMemoryCache;
-    private LruImageFileCache mFileCache;
+    private ImageFileProvider mImageFileProvider;
 
     private static ImageProvider sDefault;
 
     public static ImageProvider getDefault(Context context) {
         if (null == sDefault) {
-            sDefault = new ImageProvider(context, DefaultMemoryCache.getDefault(), LruImageFileCache.getDefault(context));
+            sDefault = new ImageProvider(context, DefaultMemoryCache.getDefault(), LruImageFileProvider.getDefault(context));
         }
         return sDefault;
     }
 
-    public ImageProvider(Context context, ImageMemoryCache memoryCache, LruImageFileCache fileCache) {
+    public ImageProvider(Context context, ImageMemoryCache memoryCache, ImageFileProvider fileProvider) {
         mMemoryCache = memoryCache;
-        mFileCache = fileCache;
+        mImageFileProvider = fileProvider;
     }
 
     /**
@@ -86,7 +84,7 @@ public class ImageProvider {
                 drawable = new BitmapDrawable(resources, bitmap);
             } else {
                 // Running on Gingerbread or older, so wrap in a RecyclingBitmapDrawable
-                // which will recycle automagically
+                // which will recycle automatically
                 drawable = new RecyclingBitmapDrawable(resources, bitmap);
             }
         }
@@ -95,11 +93,7 @@ public class ImageProvider {
 
     /**
      * Get from memory cache.
-     *
-     * @param key Unique identifier for which item to get
-     * @return The bitmap drawable if found in cache, null otherwise
      */
-
     public BitmapDrawable getBitmapFromMemCache(ImageTask imageTask) {
         BitmapDrawable memValue = null;
 
@@ -130,8 +124,8 @@ public class ImageProvider {
      */
     public Bitmap fetchBitmapData(ImageTask imageTask, ImageResizer imageResizer) {
         Bitmap bitmap = null;
-        if (mFileCache != null) {
-            InputStream inputStream = null;
+        if (mImageFileProvider != null) {
+            FileInputStream inputStream = null;
 
             String fileCacheKey = imageTask.getFileCacheKey();
             ImageReuseInfo reuseInfo = imageTask.getImageReuseInfo();
@@ -145,7 +139,7 @@ public class ImageProvider {
             }
 
             // read from file cache
-            inputStream = mFileCache.read(fileCacheKey);
+            inputStream = mImageFileProvider.getInputStream(fileCacheKey);
 
             // try to reuse
             if (inputStream == null) {
@@ -158,11 +152,11 @@ public class ImageProvider {
                     for (int i = 0; i < sizeKeyList.length; i++) {
                         String size = sizeKeyList[i];
                         final String key = imageTask.generateFileCacheKeyForReuse(size);
-                        inputStream = mFileCache.read(key);
+                        inputStream = mImageFileProvider.getInputStream(key);
 
                         if (inputStream != null) {
                             if (DEBUG) {
-                                Log.d(TAG, String.format(MSG_FETCH_REUSE_SUCC, imageTask, size));
+                                Log.d(TAG, String.format(MSG_FETCH_REUSE_SUCCESS, imageTask, size));
                             }
                             break;
                         } else {
@@ -178,41 +172,32 @@ public class ImageProvider {
                 }
             }
 
+            if (imageTask.getStatistics() != null) {
+                imageTask.getStatistics().afterFileCache(inputStream != null);
+            }
+
             // We've got nothing from file cache
-            try {
+            if (inputStream == null) {
+                String url = imageResizer.getRemoteUrl(imageTask);
+                if (DEBUG) {
+                    Log.d(TAG, String.format(MSG_FETCH_DOWNLOAD, imageTask, url));
+                }
+                inputStream = mImageFileProvider.downloadAndGetInputStream(fileCacheKey, url);
+                if (imageTask.getStatistics() != null) {
+                    imageTask.getStatistics().afterDownload();
+                }
                 if (inputStream == null) {
-                    String url = imageTask.getRemoteUrl();
-                    if (DEBUG) {
-                        Log.d(TAG, String.format(MSG_FETCH_DOWNLOAD, imageTask, url));
-                    }
-                    DiskLruCache.Editor editor = mFileCache.open(fileCacheKey);
-                    if (editor != null) {
-                        if (Downloader.downloadUrlToStream(url, editor.newOutputStream(0))) {
-                            editor.commit();
-                        } else {
-                            editor.abort();
-                        }
-                    } else {
-                        Log.e(TAG, imageTask + " open editor fail. file cache key: " + fileCacheKey);
-                    }
-                    inputStream = mFileCache.read(fileCacheKey);
+                    Log.e(TAG, imageTask + " download fail: " + fileCacheKey);
                 }
-                if (inputStream != null) {
-                    FileDescriptor fd = ((FileInputStream) inputStream).getFD();
-                    bitmap = decodeSampledBitmapFromDescriptor(fd, imageTask, imageResizer);
-                } else {
-                    Log.e(TAG, imageTask + " fetch bitmap fail. file cache key: " + fileCacheKey);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
+            }
+            if (inputStream != null) {
                 try {
-                    if (inputStream != null) {
-                        inputStream.close();
-                    }
+                    bitmap = decodeSampledBitmapFromDescriptor(inputStream.getFD(), imageTask, imageResizer);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            } else {
+                Log.e(TAG, imageTask + " fetch bitmap fail. file cache key: " + fileCacheKey);
             }
         }
         return bitmap;
@@ -242,9 +227,34 @@ public class ImageProvider {
         return bitmap;
     }
 
+    private Bitmap decodeSampledBitmapFromInputStream(InputStream stream, ImageTask imageTask, ImageResizer imageResizer) {
+        // First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+
+        // try to decode height and width from InputStream
+        BitmapFactory.decodeStream(stream, null, options);
+
+        imageTask.setBitmapOriginSize(options.outWidth, options.outHeight);
+
+        // Calculate inSampleSize
+        options.inSampleSize = imageResizer.getInSampleSize(imageTask);
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+
+        if (DEBUG) {
+            Log.d(TAG, String.format(MSG_DECODE, imageTask, imageTask.getBitmapOriginSize().x, imageTask.getBitmapOriginSize().y, options.inSampleSize));
+        }
+
+        Bitmap bitmap = BitmapFactory.decodeStream(stream, null, options);
+
+        return bitmap;
+    }
+
     public void flushFileCache() {
-        if (null != mFileCache) {
-            mFileCache.flushDiskCacheAsync();
+        if (null != mImageFileProvider) {
+            mImageFileProvider.flushDiskCacheAsync();
         }
     }
 
@@ -255,6 +265,51 @@ public class ImageProvider {
         if (mMemoryCache != null) {
             mMemoryCache.clear();
         }
+    }
+
+    /**
+     * clear the disk cache
+     */
+    public void clearDiskCache() {
+        if (null != mImageFileProvider) {
+            mImageFileProvider.clearCache();
+        }
+    }
+
+    public int getMemoryCacheMaxSpace() {
+        return mMemoryCache.getMaxSize();
+    }
+
+    public int getMemoryCacheUsedSpace() {
+        return mMemoryCache.getUsedSpace();
+    }
+
+    /**
+     * return the file cache path
+     *
+     * @return
+     */
+    public String getFileCachePath() {
+        if (null != mImageFileProvider) {
+            return mImageFileProvider.getCachePath();
+        }
+        return null;
+    }
+
+    /**
+     * get the used space
+     *
+     * @return
+     */
+    public long getFileCacheUsedSpace() {
+        return null != mImageFileProvider ? mImageFileProvider.getUsedSpace() : 0;
+    }
+
+    public long getFileCacheMaxSpace() {
+        if (null != mImageFileProvider) {
+            return mImageFileProvider.getMaxSize();
+        }
+        return 0;
     }
 
     /**
@@ -284,6 +339,9 @@ public class ImageProvider {
      */
     @TargetApi(VERSION_CODES.KITKAT)
     public static int getBitmapSize(BitmapDrawable value) {
+        if (null == value) {
+            return 0;
+        }
         Bitmap bitmap = value.getBitmap();
 
         // From KitKat onward use getAllocationByteCount() as allocated bytes can potentially be

@@ -25,66 +25,67 @@ import android.os.StrictMode;
  * Class containing some static utility methods about API version.
  */
 public class Version {
-	private Version() {
 
-	};
+    private Version() {
 
-	@TargetApi(VERSION_CODES.HONEYCOMB)
-	public static void enableStrictMode() {
-		if (Version.hasGingerbread()) {
-			StrictMode.ThreadPolicy.Builder threadPolicyBuilder = new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog();
-			StrictMode.VmPolicy.Builder vmPolicyBuilder = new StrictMode.VmPolicy.Builder().detectAll().penaltyLog();
+    }
 
-			if (Version.hasHoneycomb()) {
-				threadPolicyBuilder.penaltyFlashScreen();
-				// vmPolicyBuilder.setClassInstanceLimit(ImageGridActivity.class, 1).setClassInstanceLimit(ImageDetailActivity.class, 1);
-			}
-			StrictMode.setThreadPolicy(threadPolicyBuilder.build());
-			StrictMode.setVmPolicy(vmPolicyBuilder.build());
-		}
-	}
+    @TargetApi(VERSION_CODES.HONEYCOMB)
+    public static void enableStrictMode() {
+        if (Version.hasGingerbread()) {
+            StrictMode.ThreadPolicy.Builder threadPolicyBuilder = new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog();
+            StrictMode.VmPolicy.Builder vmPolicyBuilder = new StrictMode.VmPolicy.Builder().detectAll().penaltyLog();
 
-	/**
-	 * API level is or higher than 8
-	 */
-	public static boolean hasFroyo() {
-		// Can use static final constants like FROYO, declared in later versions
-		// of the OS since they are inlined at compile time. This is guaranteed behavior.
-		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO;
-	}
+            if (Version.hasHoneycomb()) {
+                threadPolicyBuilder.penaltyFlashScreen();
+                // vmPolicyBuilder.setClassInstanceLimit(ImageGridActivity.class, 1).setClassInstanceLimit(ImageDetailActivity.class, 1);
+            }
+            StrictMode.setThreadPolicy(threadPolicyBuilder.build());
+            StrictMode.setVmPolicy(vmPolicyBuilder.build());
+        }
+    }
 
-	/**
-	 * API level is or higher than 9
-	 */
-	public static boolean hasGingerbread() {
-		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD;
-	}
+    /**
+     * API level is or higher than 8
+     */
+    public static boolean hasFroyo() {
+        // Can use static final constants like FROYO, declared in later versions
+        // of the OS since they are inlined at compile time. This is guaranteed behavior.
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO;
+    }
 
-	/**
-	 * API level is or higher than 11
-	 */
-	public static boolean hasHoneycomb() {
-		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB;
-	}
+    /**
+     * API level is or higher than 9
+     */
+    public static boolean hasGingerbread() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD;
+    }
 
-	/**
-	 * API level is or higher than 12
-	 */
-	public static boolean hasHoneycombMR1() {
-		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1;
-	}
+    /**
+     * API level is or higher than 11
+     */
+    public static boolean hasHoneycomb() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB;
+    }
 
-	/**
-	 * API level is or higher than 16
-	 */
-	public static boolean hasJellyBean() {
-		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN;
-	}
+    /**
+     * API level is or higher than 12
+     */
+    public static boolean hasHoneycombMR1() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1;
+    }
 
-	/**
-	 * API level is higher than 19
-	 */
-	public static boolean hasKitKat() {
-		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
-	}
+    /**
+     * API level is or higher than 16
+     */
+    public static boolean hasJellyBean() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN;
+    }
+
+    /**
+     * API level is higher than 19
+     */
+    public static boolean hasKitKat() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+    }
 }

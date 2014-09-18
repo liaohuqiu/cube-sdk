@@ -7,5 +7,5 @@ package in.srain.cube.views.list;
  * @author http://www.liaohuqiu.net
  */
 public interface ViewHolderCreator<ItemDataType> {
-	public ViewHolderBase<ItemDataType> createViewHolder();
+    public ViewHolderBase<ItemDataType> createViewHolder();
 }
