@@ -1,8 +1,6 @@
-package in.srain.cube.request;
+package in.srain.cube.cache;
 
 import org.json.JSONObject;
-
-import java.util.HashMap;
 
 public class CacheData {
 

@@ -1,13 +1,16 @@
 package in.srain.cube.request;
 
 import android.text.TextUtils;
+import in.srain.cube.cache.CacheManager;
+import in.srain.cube.cache.ICacheAble;
 import in.srain.cube.concurrent.SimpleTask;
+import in.srain.cube.request.*;
 import in.srain.cube.util.CLog;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleRequest<T> {
+public class CacheAble<T> extends RequestBase<T> implements ICacheAble<T>, IRequest<T> {
 
     public static enum ResultType {
         USE_CACHE_NOT_EXPIRED,
@@ -32,7 +35,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
     private boolean mUseCacheAnyway = false;
     private boolean mHasNotified = false;
 
-    public CacheAbleRequest(CacheAbleRequestPrePreHandler preHandler, final CacheAbleRequestHandler<T> handler) {
+    public CacheAble(CacheAbleRequestPrePreHandler preHandler, final CacheAbleRequestHandler<T> handler) {
         mPreHandler = preHandler;
         mHandler = handler;
     }
@@ -42,7 +45,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
     // ===========================================================
     @Override
     public void doSendRequest() {
-        RequestCacheManager.getInstance().requestCache(this);
+        CacheManager.getInstance().requestCache(this);
     }
 
     @Override
@@ -105,9 +108,9 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
     }
 
     @Override
-    public void queryFromServer() {
+    public void createDataForCache(CacheManager cacheManager) {
         if (DEBUG) {
-            CLog.d(LOG_TAG, "%s, queryFromServer", getCacheKey());
+            CLog.d(LOG_TAG, "%s, createDataForCache", getCacheKey());
         }
         if (hasBeenCanceled()) {
             return;
@@ -195,7 +198,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
         }
         // cache the data
         if (!TextUtils.isEmpty(data) && !disableCache()) {
-            RequestCacheManager.getInstance().cacheRequest(this, data);
+            CacheManager.getInstance().cacheData(this, data);
         }
         return super.onDataFromServer(data);
     }

@@ -1,9 +1,12 @@
-package in.srain.cube.request;
+package in.srain.cube.cache;
+
+import in.srain.cube.cache.CacheManager;
+import in.srain.cube.request.JsonData;
 
 /**
- * A CacheAble Request wrap
+ * A CacheAble
  */
-public interface ICacheAbleRequest<T> extends IRequest<T> {
+public interface ICacheAble<T> {
 
     public int getCacheTime();
 
@@ -27,9 +30,9 @@ public interface ICacheAbleRequest<T> extends IRequest<T> {
     public void onCacheData(T cacheData, boolean outOfDate);
 
     /**
-     * process query data from server
+     * create data
      */
-    public void queryFromServer();
+    public void createDataForCache(CacheManager cacheManager);
 
     /**
      * disable cache

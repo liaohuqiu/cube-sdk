@@ -1,4 +1,4 @@
-package in.srain.cube.request;
+package in.srain.cube.cache;
 
 import android.content.Context;
 import android.support.v4.util.LruCache;
@@ -7,20 +7,20 @@ import in.srain.cube.concurrent.SimpleExecutor;
 import in.srain.cube.concurrent.SimpleTask;
 import in.srain.cube.file.FileUtil;
 import in.srain.cube.file.LruFileCache;
+import in.srain.cube.request.JsonData;
 import in.srain.cube.util.CLog;
-import org.json.JSONObject;
 
 /**
  * @author http://www.liaohuqiu.net
  */
-public class RequestCacheManager {
+public class CacheManager {
 
     private static final boolean DEBUG = CLog.DEBUG_REQUEST_CACHE;
     private static final String LOG_TAG = "cube_request_cache";
 
     private static final String THREAD_NAME = "Cube-Request-Cache";
 
-    private static RequestCacheManager mInstance;
+    private static CacheManager mInstance;
 
     private LruCache<String, CacheData> mMemoryCache;
     private LruFileCache mFileCache;
@@ -35,7 +35,7 @@ public class RequestCacheManager {
 
     private Context mContext;
 
-    private RequestCacheManager() {
+    private CacheManager() {
     }
 
     /**
@@ -61,53 +61,45 @@ public class RequestCacheManager {
         }
     }
 
-    public static RequestCacheManager getInstance() {
+    public static CacheManager getInstance() {
         if (null == mInstance)
-            mInstance = new RequestCacheManager();
+            mInstance = new CacheManager();
         return mInstance;
     }
 
-    public <T> void requestCache(ICacheAbleRequest<T> cacheAbleRequest) {
+    public <T> void requestCache(ICacheAble<T> cacheAbleRequest) {
         ReadCacheTask<T> task = new ReadCacheTask<T>(cacheAbleRequest);
         task.beginQuery();
     }
 
-    public <T> void cacheRequest(final ICacheAbleRequest<T> cacheAble, final String data) {
+    public void cacheData(final String cacheKey, final String data) {
         if (DEBUG) {
-            CLog.d(LOG_TAG, "%s, cacheRequest", cacheAble.getCacheKey());
+            CLog.d(LOG_TAG, "%s, cacheData", cacheKey);
         }
         new Thread(new Runnable() {
             @Override
             public void run() {
                 CacheData cacheData = CacheData.create(data);
-                setCacheData(cacheAble.getCacheKey(), cacheData);
-                mFileCache.write(cacheAble.getCacheKey(), cacheData.getCacheData());
+                setCacheData(cacheKey, cacheData);
+                mFileCache.write(cacheKey, cacheData.getCacheData());
             }
         }, THREAD_NAME).start();
     }
 
-    private JsonData makeCacheFormatJsonData(JsonData data, int time) {
-        JSONObject jsonObject = new JSONObject();
-        if (time == 0)
-            time = (int) (System.currentTimeMillis() / 1000);
-        try {
-            jsonObject.put("time", time);
-            jsonObject.put("data", data.getRawData());
-        } catch (Exception e) {
-        }
-        return JsonData.create(jsonObject);
+    public <T> void cacheData(final ICacheAble<T> cacheAble, final String data) {
+        cacheData(cacheAble.getCacheKey(), data);
     }
 
     private class ReadCacheTask<T1> extends SimpleTask {
 
-        private ICacheAbleRequest<T1> mCacheAble;
+        private ICacheAble<T1> mCacheAble;
 
         private CacheData mRawData;
         private T1 mResult;
         private int mWorkType = 0;
         private int mCurrentStatus = 0;
 
-        public ReadCacheTask(ICacheAbleRequest<T1> cacheAble) {
+        public ReadCacheTask(ICacheAble<T1> cacheAble) {
             mCacheAble = cacheAble;
         }
 
@@ -117,7 +109,7 @@ public class RequestCacheManager {
                 if (DEBUG) {
                     CLog.d(LOG_TAG, "%s, Cache is disabled, query from server", mCacheAble.getCacheKey());
                 }
-                mCacheAble.queryFromServer();
+                mCacheAble.createDataForCache(CacheManager.this);
                 return;
             }
 
@@ -150,7 +142,7 @@ public class RequestCacheManager {
             if (DEBUG) {
                 CLog.d(LOG_TAG, "%s, cache file not exist", mCacheAble.getCacheKey());
             }
-            mCacheAble.queryFromServer();
+            mCacheAble.createDataForCache(CacheManager.this);
         }
 
         @Override
@@ -269,7 +261,7 @@ public class RequestCacheManager {
             boolean outOfDate = timeInterval > mCacheAble.getCacheTime() || timeInterval < 0;
             mCacheAble.onCacheData(mResult, outOfDate);
             if (outOfDate) {
-                mCacheAble.queryFromServer();
+                mCacheAble.createDataForCache(CacheManager.this);
             }
         }
     }
@@ -317,6 +309,7 @@ public class RequestCacheManager {
 
     /**
      * get the spaced max space in config
+     *
      * @return
      */
     public int getMemoryCacheMaxSpace() {
@@ -355,6 +348,7 @@ public class RequestCacheManager {
 
     /**
      * get the max space for file cache
+     *
      * @return
      */
     public long getFileCacheMaxSpace() {
