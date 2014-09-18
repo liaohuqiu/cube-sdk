@@ -10,7 +10,7 @@ import in.srain.cube.util.CLog;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class CacheAble<T> extends RequestBase<T> implements ICacheAble<T>, IRequest<T> {
+public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleRequest<T> {
 
     public static enum ResultType {
         USE_CACHE_NOT_EXPIRED,
@@ -35,7 +35,7 @@ public class CacheAble<T> extends RequestBase<T> implements ICacheAble<T>, IRequ
     private boolean mUseCacheAnyway = false;
     private boolean mHasNotified = false;
 
-    public CacheAble(CacheAbleRequestPrePreHandler preHandler, final CacheAbleRequestHandler<T> handler) {
+    public CacheAbleRequest(CacheAbleRequestPrePreHandler preHandler, final CacheAbleRequestHandler<T> handler) {
         mPreHandler = preHandler;
         mHandler = handler;
     }
@@ -48,6 +48,9 @@ public class CacheAble<T> extends RequestBase<T> implements ICacheAble<T>, IRequ
         CacheManager.getInstance().requestCache(this);
     }
 
+    // ===========================================================
+    // Override Interface
+    // ===========================================================
     @Override
     public void setTimeout(int timeOut) {
         mTimeout = timeOut;
