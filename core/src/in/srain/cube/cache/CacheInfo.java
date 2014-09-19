@@ -2,25 +2,25 @@ package in.srain.cube.cache;
 
 import org.json.JSONObject;
 
-public class CacheData {
+public class CacheInfo {
 
     public String data;
     public int time;
     public int mSize;
 
-    public static CacheData create(String data) {
-        CacheData cacheData = new CacheData(data);
-        cacheData.time = (int) (System.currentTimeMillis() / 1000);
-        return cacheData;
+    public static CacheInfo create(String data) {
+        CacheInfo info = new CacheInfo(data);
+        info.time = (int) (System.currentTimeMillis() / 1000);
+        return info;
     }
 
-    public static CacheData create(String data, int time) {
-        CacheData cacheData = new CacheData(data);
-        cacheData.time = time;
-        return cacheData;
+    public static CacheInfo create(String data, int time) {
+        CacheInfo cacheInfo = new CacheInfo(data);
+        cacheInfo.time = time;
+        return cacheInfo;
     }
 
-    private CacheData(String data) {
+    private CacheInfo(String data) {
         this.data = data;
         mSize = (data.getBytes().length + 8);
     }

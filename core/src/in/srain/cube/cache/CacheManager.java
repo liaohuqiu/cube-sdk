@@ -22,7 +22,7 @@ public class CacheManager {
 
     private static CacheManager mInstance;
 
-    private LruCache<String, CacheData> mMemoryCache;
+    private LruCache<String, CacheInfo> mMemoryCache;
     private LruFileCache mFileCache;
 
     private static final int AFTER_READ_FROM_FILE = 0x01;
@@ -48,9 +48,9 @@ public class CacheManager {
     public void init(Context content, String cacheDir, int memoryCacheSizeInKB, int fileCacheSizeInKB) {
         mContext = content;
 
-        mMemoryCache = new LruCache<String, CacheData>(memoryCacheSizeInKB * 1024) {
+        mMemoryCache = new LruCache<String, CacheInfo>(memoryCacheSizeInKB * 1024) {
             @Override
-            protected int sizeOf(String key, CacheData value) {
+            protected int sizeOf(String key, CacheInfo value) {
                 return (value.getSize() + key.getBytes().length);
             }
         };
@@ -79,9 +79,9 @@ public class CacheManager {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                CacheData cacheData = CacheData.create(data);
-                setCacheData(cacheKey, cacheData);
-                mFileCache.write(cacheKey, cacheData.getCacheData());
+                CacheInfo cacheInfo = CacheInfo.create(data);
+                setCacheData(cacheKey, cacheInfo);
+                mFileCache.write(cacheKey, cacheInfo.getCacheData());
             }
         }, THREAD_NAME).start();
     }
@@ -94,7 +94,7 @@ public class CacheManager {
 
         private ICacheAble<T1> mCacheAble;
 
-        private CacheData mRawData;
+        private CacheInfo mRawData;
         private T1 mResult;
         private int mWorkType = 0;
         private int mCurrentStatus = 0;
@@ -220,7 +220,7 @@ public class CacheManager {
 
             String cacheContent = mFileCache.read(mCacheAble.getCacheKey());
             JsonData jsonData = JsonData.create(cacheContent);
-            mRawData = CacheData.create(jsonData.optString("data"), jsonData.optInt("time"));
+            mRawData = CacheInfo.create(jsonData.optString("data"), jsonData.optInt("time"));
 
             setCurrentStatus(AFTER_READ_FROM_FILE);
         }
@@ -232,7 +232,7 @@ public class CacheManager {
             }
 
             String cacheContent = FileUtil.readAssert(mContext, mCacheAble.getAssertInitDataPath());
-            mRawData = CacheData.create(cacheContent, -2);
+            mRawData = CacheInfo.create(cacheContent, -2);
             setCacheData(mCacheAble.getCacheKey(), mRawData);
 
             setCurrentStatus(AFTER_READ_FROM_ASSERT);
@@ -266,7 +266,7 @@ public class CacheManager {
         }
     }
 
-    private void setCacheData(String key, CacheData data) {
+    private void setCacheData(String key, CacheInfo data) {
         if (TextUtils.isEmpty(key)) {
             return;
         }
