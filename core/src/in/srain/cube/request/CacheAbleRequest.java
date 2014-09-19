@@ -2,9 +2,7 @@ package in.srain.cube.request;
 
 import android.text.TextUtils;
 import in.srain.cube.cache.CacheManager;
-import in.srain.cube.cache.ICacheAble;
 import in.srain.cube.concurrent.SimpleTask;
-import in.srain.cube.request.*;
 import in.srain.cube.util.CLog;
 
 import java.net.URI;
@@ -140,7 +138,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
     @Override
     public void onCacheData(T data, boolean outOfDate) {
         if (DEBUG) {
-            CLog.d(LOG_TAG, "%s, onCacheData, out of date: %s", getCacheKey(), outOfDate);
+            CLog.d(LOG_TAG, "%s, onQueryFinish, out of date: %s", getCacheKey(), outOfDate);
         }
         if (hasBeenCanceled()) {
             return;
@@ -201,7 +199,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
         }
         // cache the data
         if (!TextUtils.isEmpty(data) && !disableCache()) {
-            CacheManager.getInstance().cacheData(this, data);
+            CacheManager.getInstance().setCacheData(this, data);
         }
         return super.onDataFromServer(data);
     }

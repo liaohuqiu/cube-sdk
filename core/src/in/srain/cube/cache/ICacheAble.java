@@ -4,14 +4,22 @@ import in.srain.cube.cache.CacheManager;
 import in.srain.cube.request.JsonData;
 
 /**
- * A CacheAble
+ * Describe the behaviour of a object who can be cached
  */
 public interface ICacheAble<T> {
 
+    /**
+     * In millisecond
+     *
+     * @return
+     */
     public int getCacheTime();
 
     public String getCacheKey();
 
+    /**
+     * file path under /res, For example: "/cache_init/test.json";
+     */
     public String getAssertInitDataPath();
 
     /**
@@ -30,19 +38,14 @@ public interface ICacheAble<T> {
     public void onCacheData(T cacheData, boolean outOfDate);
 
     /**
-     * create data
+     * create data when no cache is available.
      */
     public void createDataForCache(CacheManager cacheManager);
 
     /**
-     * disable cache
-     * <p/>
-     * 1. will not load cache
-     * <p/>
-     * 2. data will not set to cache
+     * temporarily disable cache. The data will no be load from cache and will also not put into cache
      *
      * @return
      */
     public boolean disableCache();
-
 }

@@ -2,6 +2,9 @@ package in.srain.cube.cache;
 
 import org.json.JSONObject;
 
+/**
+ * A description for the data in cache system
+ */
 public class CacheInfo {
 
     public String data;

@@ -67,30 +67,36 @@ public class CacheManager {
         return mInstance;
     }
 
-    public <T> void requestCache(ICacheAble<T> cacheAbleRequest) {
-        ReadCacheTask<T> task = new ReadCacheTask<T>(cacheAbleRequest);
+    public <T> void requestCache(ICacheAble<T> cacheAble) {
+        InnerCacheTask<T> task = new InnerCacheTask<T>(cacheAble);
         task.beginQuery();
     }
 
-    public void cacheData(final String cacheKey, final String data) {
+    public <T> void continueAfterCreateData(ICacheAble<T> cacheAble, final String data) {
+        setCacheData(cacheAble, data);
+        InnerCacheTask<T> task = new InnerCacheTask<T>(cacheAble);
+        task.beginConvertDataAsync();
+    }
+
+    public <T> void setCacheData(final ICacheAble<T> cacheAble, final String data) {
+        if (cacheAble.disableCache() || TextUtils.isEmpty(data)) {
+            return;
+        }
+        final String cacheKey = cacheAble.getCacheKey();
         if (DEBUG) {
-            CLog.d(LOG_TAG, "%s, cacheData", cacheKey);
+            CLog.d(LOG_TAG, "%s, setCacheData", cacheKey);
         }
         new Thread(new Runnable() {
             @Override
             public void run() {
                 CacheInfo cacheInfo = CacheInfo.create(data);
-                setCacheData(cacheKey, cacheInfo);
+                putDataToMemoryCache(cacheKey, cacheInfo);
                 mFileCache.write(cacheKey, cacheInfo.getCacheData());
             }
         }, THREAD_NAME).start();
     }
 
-    public <T> void cacheData(final ICacheAble<T> cacheAble, final String data) {
-        cacheData(cacheAble.getCacheKey(), data);
-    }
-
-    private class ReadCacheTask<T1> extends SimpleTask {
+    private class InnerCacheTask<T1> extends SimpleTask {
 
         private ICacheAble<T1> mCacheAble;
 
@@ -99,7 +105,7 @@ public class CacheManager {
         private int mWorkType = 0;
         private int mCurrentStatus = 0;
 
-        public ReadCacheTask(ICacheAble<T1> cacheAble) {
+        public InnerCacheTask(ICacheAble<T1> cacheAble) {
             mCacheAble = cacheAble;
         }
 
@@ -233,7 +239,7 @@ public class CacheManager {
 
             String cacheContent = FileUtil.readAssert(mContext, mCacheAble.getAssertInitDataPath());
             mRawData = CacheInfo.create(cacheContent, -2);
-            setCacheData(mCacheAble.getCacheKey(), mRawData);
+            putDataToMemoryCache(mCacheAble.getCacheKey(), mRawData);
 
             setCurrentStatus(AFTER_READ_FROM_ASSERT);
         }
@@ -266,7 +272,7 @@ public class CacheManager {
         }
     }
 
-    private void setCacheData(String key, CacheInfo data) {
+    private void putDataToMemoryCache(String key, CacheInfo data) {
         if (TextUtils.isEmpty(key)) {
             return;
         }
