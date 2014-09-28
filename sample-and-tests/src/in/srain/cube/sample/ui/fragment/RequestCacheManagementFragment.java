@@ -5,10 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.TextView;
-import in.srain.cube.image.ImageLoader;
-import in.srain.cube.image.ImageLoaderFactory;
-import in.srain.cube.request.RequestCacheManager;
+import in.srain.cube.cache.CacheManager;
 import in.srain.cube.sample.R;
 import in.srain.cube.sample.activity.TitleBaseFragment;
 import in.srain.cube.sample.ui.views.header.TitleAndValue;
@@ -21,7 +18,7 @@ public class RequestCacheManagementFragment extends TitleBaseFragment {
     private TitleAndValue mMemoryCacheMax;
     private TitleAndValue mMemoryCacheUsed;
 
-    private RequestCacheManager mRequestCacheManager;
+    private CacheManager mRequestCacheManager;
     private LinearLayout mList;
 
     @Override
@@ -38,7 +35,7 @@ public class RequestCacheManagementFragment extends TitleBaseFragment {
         mMemoryCacheMax = addTitleAndValue("memory max:");
         mMemoryCacheUsed = addTitleAndValue("memory used:");
 
-        mRequestCacheManager = RequestCacheManager.getInstance();
+        mRequestCacheManager = CacheManager.getInstance();
 
         view.findViewById(R.id.btn_request_cache_management_clear_cache).setOnClickListener(new View.OnClickListener() {
 

@@ -1,18 +1,25 @@
 package in.srain.cube.sample.app;
 
 import android.app.Application;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import in.srain.cube.Cube;
+import in.srain.cube.cache.CacheManager;
 import in.srain.cube.image.ImageLoaderFactory;
-import in.srain.cube.request.RequestCacheManager;
 import in.srain.cube.sample.image.DemoDuiTangImageResizer;
 import in.srain.cube.util.CLog;
 
+import javax.naming.NameNotFoundException;
+
 public class CubeDemoApplication extends Application {
+
+    public static CubeDemoApplication instance;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
+        instance = this;
         // other code
         // ..
 
@@ -22,8 +29,23 @@ public class CubeDemoApplication extends Application {
         CLog.DEBUG_REQUEST_CACHE = true;
         ImageLoaderFactory.setDefaultImageResizer(DemoDuiTangImageResizer.getInstance());
         String dir = "request-cache";
-        RequestCacheManager.getInstance().init(this, dir);
+        CacheManager.getInstance().init(this, dir);
         Cube.onCreate(this);
+
+        try {
+            ActivityInfo[] list = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_ACTIVITIES).activities;
+
+            for (int i = 0; i < list.length; i++) {
+                System.out.println("List of running activities" + list[i].name);
+
+            }
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
+    }
+
+    public void test() {
+        CLog.d("test", "info: %s", this);
     }
 
     @Override

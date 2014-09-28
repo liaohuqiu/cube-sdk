@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 import in.srain.cube.sample.R;
+import in.srain.cube.sample.app.CubeDemoApplication;
 import in.srain.cube.sample.ui.fragment.TestFragment;
 import in.srain.cube.util.CLog;
 import in.srain.cube.views.pager.TabPageIndicator;
@@ -36,6 +37,8 @@ public class PagerTabIndicatorActivity extends FragmentActivity {
             }
         });
         indicator.setViewPager(pager, CONTENT.length - 1);
+
+        CubeDemoApplication.instance.test();
     }
 
     class GoogleMusicAdapter extends FragmentPagerAdapter {

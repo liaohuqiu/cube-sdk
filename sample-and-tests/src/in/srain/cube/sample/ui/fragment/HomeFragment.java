@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import in.srain.cube.request.RequestCacheManager;
 import in.srain.cube.sample.R;
 import in.srain.cube.sample.activity.PagerTabIndicatorActivity;
 import in.srain.cube.sample.activity.TitleBaseFragment;

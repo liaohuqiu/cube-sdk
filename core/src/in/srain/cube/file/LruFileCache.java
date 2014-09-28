@@ -147,22 +147,44 @@ public class LruFileCache implements IFileCache {
     }
 
     public boolean has(String key) {
-        try {
-            Editor editor = mDiskLruCache.edit(key);
-            if (editor != null) {
-                return editor.has(DISK_CACHE_INDEX);
+        synchronized (mDiskCacheLock) {
+            while (mDiskCacheStarting) {
+                try {
+                    if (DEBUG) {
+                        Log.d(TAG, "check has wait " + this);
+                    }
+                    mDiskCacheLock.wait();
+                } catch (InterruptedException e) {
+                }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+            try {
+                Editor editor = mDiskLruCache.edit(key);
+                if (editor != null) {
+                    return editor.has(DISK_CACHE_INDEX);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return false;
     }
 
     public void delete(String key) {
-        try {
-            mDiskLruCache.remove(key);
-        } catch (IOException e) {
-            e.printStackTrace();
+        synchronized (mDiskCacheLock) {
+            while (mDiskCacheStarting) {
+                try {
+                    if (DEBUG) {
+                        Log.d(TAG, "delete wait " + this);
+                    }
+                    mDiskCacheLock.wait();
+                } catch (InterruptedException e) {
+                }
+            }
+            try {
+                mDiskLruCache.remove(key);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
