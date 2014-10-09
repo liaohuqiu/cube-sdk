@@ -43,7 +43,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
     // ===========================================================
     @Override
     public void doSendRequest() {
-        CacheManager.getInstance().requestCache(this);
+        RequestCacheManager.getInstance().requestCache(this);
     }
 
     // ===========================================================
@@ -199,7 +199,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
         }
         // cache the data
         if (!TextUtils.isEmpty(data) && !disableCache()) {
-            CacheManager.getInstance().setCacheData(this, data);
+            RequestCacheManager.getInstance().setCacheData(this, data);
         }
         return super.onDataFromServer(data);
     }

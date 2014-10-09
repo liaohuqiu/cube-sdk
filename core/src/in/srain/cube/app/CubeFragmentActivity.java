@@ -1,14 +1,19 @@
 package in.srain.cube.app;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 import in.srain.cube.app.FragmentParam.TYPE;
+import in.srain.cube.util.CLog;
+
+import java.util.List;
 
 public abstract class CubeFragmentActivity extends FragmentActivity {
 
@@ -34,7 +39,7 @@ public abstract class CubeFragmentActivity extends FragmentActivity {
         param.data = data;
         param.addToBackStack = true;
 
-        processFragement(param);
+        processFragment(param);
     }
 
     public void addFragment(Class<?> cls, Object data) {
@@ -43,7 +48,7 @@ public abstract class CubeFragmentActivity extends FragmentActivity {
         param.cls = cls;
         param.data = data;
         param.addToBackStack = false;
-        processFragement(param);
+        processFragment(param);
     }
 
     public void replaceFragment(Class<?> cls, Object data) {
@@ -54,7 +59,7 @@ public abstract class CubeFragmentActivity extends FragmentActivity {
         param.type = TYPE.REPLACE;
         param.addToBackStack = false;
 
-        processFragement(param);
+        processFragment(param);
     }
 
     protected String getFragmentTag(FragmentParam param) {
@@ -63,7 +68,7 @@ public abstract class CubeFragmentActivity extends FragmentActivity {
         return sb.toString();
     }
 
-    private void processFragement(FragmentParam param) {
+    private void processFragment(FragmentParam param) {
         int containerId = getFragmentContainerId();
         Class<?> cls = param.cls;
         if (cls == null) {
@@ -136,6 +141,23 @@ public abstract class CubeFragmentActivity extends FragmentActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        debugTaskInfo();
+    }
+
+    protected void debugTaskInfo() {
+        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        List<ActivityManager.RunningTaskInfo> taskList = manager.getRunningTasks(10);
+        CLog.d("test", "debugTaskInfo: %s %s", this.getClass().getName(), taskList.size());
+
+        for (int i = 0; i < taskList.size(); i++) {
+            ActivityManager.RunningTaskInfo info = taskList.get(i);
+            CLog.d("test", "RunningTaskInfo: %d %s, %s", info.numActivities, info.topActivity.getClassName(), info.baseActivity.getClassName());
+        }
+    }
+
+    @Override
     public void onBackPressed() {
         boolean enableBackPressed = true;
         if (currentFragment != null) {
@@ -143,9 +165,9 @@ public abstract class CubeFragmentActivity extends FragmentActivity {
         }
         if (enableBackPressed) {
             int cnt = getSupportFragmentManager().getBackStackEntryCount();
-            if (cnt <= 0) {
+            if (cnt <= 0 && isTaskRoot()) {
                 String closeWarningHint = getCloseWarning();
-                if (!mCloseWarned && closeWarningHint != null && closeWarningHint.length() == 0) {
+                if (!mCloseWarned && !TextUtils.isEmpty(closeWarningHint)) {
                     Toast toast = Toast.makeText(this, closeWarningHint, Toast.LENGTH_SHORT);
                     toast.show();
                     mCloseWarned = true;

@@ -16,11 +16,9 @@ import in.srain.cube.util.CLog;
 public class CacheManager {
 
     private static final boolean DEBUG = CLog.DEBUG_REQUEST_CACHE;
-    private static final String LOG_TAG = "cube_request_cache";
+    private static final String LOG_TAG = "cube_cache";
 
     private static final String THREAD_NAME = "Cube-Request-Cache";
-
-    private static CacheManager mInstance;
 
     private LruCache<String, CacheInfo> mMemoryCache;
     private LruFileCache mFileCache;
@@ -35,17 +33,11 @@ public class CacheManager {
 
     private Context mContext;
 
-    private CacheManager() {
+    public CacheManager(Context content, String cacheDir) {
+        this(content, cacheDir, 1024 * 10, 1024 * 10);
     }
 
-    /**
-     * init cache
-     */
-    public void init(Context content, String cacheDir) {
-        init(content, cacheDir, 1024 * 10, 1024 * 10);
-    }
-
-    public void init(Context content, String cacheDir, int memoryCacheSizeInKB, int fileCacheSizeInKB) {
+    public CacheManager(Context content, String cacheDir, int memoryCacheSizeInKB, int fileCacheSizeInKB) {
         mContext = content;
 
         mMemoryCache = new LruCache<String, CacheInfo>(memoryCacheSizeInKB * 1024) {
@@ -59,12 +51,6 @@ public class CacheManager {
         if (DEBUG) {
             CLog.d(LOG_TAG, "init file cache. dir: %s => %s, size: %s, used: %s", cacheDir, mFileCache.getCachePath(), mFileCache.getMaxSize(), mFileCache.getUsedSpace());
         }
-    }
-
-    public static CacheManager getInstance() {
-        if (null == mInstance)
-            mInstance = new CacheManager();
-        return mInstance;
     }
 
     public <T> void requestCache(ICacheAble<T> cacheAble) {

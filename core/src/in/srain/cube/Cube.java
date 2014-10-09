@@ -2,6 +2,7 @@ package in.srain.cube;
 
 import android.app.Application;
 import android.content.Context;
+import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 import in.srain.cube.util.LocalDisplay;
@@ -46,4 +47,8 @@ public class Cube {
         return "cube_sdk";
     }
 
+    public String getAndroidId() {
+        String id = Settings.Secure.getString(mApplication.getContentResolver(), Settings.Secure.ANDROID_ID);
+        return id;
+    }
 }

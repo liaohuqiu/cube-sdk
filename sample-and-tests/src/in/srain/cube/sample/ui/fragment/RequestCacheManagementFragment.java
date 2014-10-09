@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import in.srain.cube.cache.CacheManager;
+import in.srain.cube.request.RequestCacheManager;
 import in.srain.cube.sample.R;
 import in.srain.cube.sample.activity.TitleBaseFragment;
 import in.srain.cube.sample.ui.views.header.TitleAndValue;
@@ -35,7 +36,7 @@ public class RequestCacheManagementFragment extends TitleBaseFragment {
         mMemoryCacheMax = addTitleAndValue("memory max:");
         mMemoryCacheUsed = addTitleAndValue("memory used:");
 
-        mRequestCacheManager = CacheManager.getInstance();
+        mRequestCacheManager = RequestCacheManager.getInstance();
 
         view.findViewById(R.id.btn_request_cache_management_clear_cache).setOnClickListener(new View.OnClickListener() {
 

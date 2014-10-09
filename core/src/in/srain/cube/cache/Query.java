@@ -6,14 +6,15 @@ import in.srain.cube.request.JsonData;
 public class Query<T> implements ICacheAble<T> {
 
     private QueryHandler mHandler;
+    private CacheManager mCacheManager;
 
-    public Query() {
-
+    public Query(CacheManager cacheManager) {
+        mCacheManager = cacheManager;
     }
 
     public void continueAfterCreateData(final String data) {
         if (!TextUtils.isEmpty(data)) {
-            CacheManager.getInstance().continueAfterCreateData(this, data);
+            mCacheManager.continueAfterCreateData(this, data);
         }
     }
 
@@ -22,7 +23,7 @@ public class Query<T> implements ICacheAble<T> {
     }
 
     public void query() {
-        CacheManager.getInstance().requestCache(this);
+        mCacheManager.requestCache(this);
     }
 
     @Override

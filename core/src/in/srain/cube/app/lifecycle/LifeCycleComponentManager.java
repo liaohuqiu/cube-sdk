@@ -15,7 +15,7 @@ public class LifeCycleComponentManager implements IComponentContainer {
         if (context instanceof IComponentContainer) {
             ((IComponentContainer) context).addComponent(component);
         } else {
-            throw new IllegalArgumentException("componentContainerContext should impletemnts IComponentContainer");
+            throw new IllegalArgumentException("componentContainerContext should implements IComponentContainer");
         }
     }
 

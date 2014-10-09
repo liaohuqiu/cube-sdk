@@ -6,10 +6,12 @@ import android.content.pm.PackageManager;
 import in.srain.cube.Cube;
 import in.srain.cube.cache.CacheManager;
 import in.srain.cube.image.ImageLoaderFactory;
+import in.srain.cube.request.RequestData;
 import in.srain.cube.sample.image.DemoDuiTangImageResizer;
 import in.srain.cube.util.CLog;
 
 import javax.naming.NameNotFoundException;
+import java.util.HashMap;
 
 public class CubeDemoApplication extends Application {
 

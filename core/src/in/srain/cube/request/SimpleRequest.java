@@ -15,7 +15,6 @@ public class SimpleRequest<T> extends RequestBase<T> implements IRequest<T> {
 
     @Override
     protected void doSendRequest() {
-        this.prepareRequest();
         SimpleRequestManager.sendRequest(this);
     }
 

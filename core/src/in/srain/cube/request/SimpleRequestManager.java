@@ -3,10 +3,9 @@ package in.srain.cube.request;
 import android.os.Handler;
 import android.os.Message;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import javax.net.ssl.HttpsURLConnection;
+import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -45,9 +44,18 @@ public class SimpleRequestManager {
             public void run() {
                 T data = null;
                 try {
+
+                    RequestData requestData = request.getRequestData();
                     StringBuilder sb = new StringBuilder();
                     URL url = new URL(request.getRequestData().getRequestUrl());
-                    URLConnection urlConnection = url.openConnection();
+                    HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                    if (requestData.shouldPost()) {
+                        urlConnection.setRequestMethod("POST");
+                        OutputStreamWriter writer = new OutputStreamWriter(urlConnection.getOutputStream());
+                        writer.write(requestData.getPostString());
+                        writer.flush();
+                    }
                     InputStream ips = new BufferedInputStream(urlConnection.getInputStream());
                     BufferedReader buf = new BufferedReader(new InputStreamReader(ips, "UTF-8"));
 
