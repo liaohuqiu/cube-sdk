@@ -8,7 +8,7 @@ public class CLog {
     public static boolean DEBUG_LIST = false;
     public static boolean DEBUG_SCROLL_HEADER_FRAME = false;
     public static boolean DEBUG_PTR_FRAME = false;
-    public static boolean DEBUG_REQUEST_CACHE = false;
+    public static boolean DEBUG_CACHE = false;
 
     public static final int LEVEL_NONE = -1;
     public static final int LEVEL_VERBOSE = 0;

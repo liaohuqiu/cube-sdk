@@ -6,12 +6,9 @@ import android.content.pm.PackageManager;
 import in.srain.cube.Cube;
 import in.srain.cube.cache.CacheManager;
 import in.srain.cube.image.ImageLoaderFactory;
-import in.srain.cube.request.RequestData;
+import in.srain.cube.request.RequestCacheManager;
 import in.srain.cube.sample.image.DemoDuiTangImageResizer;
 import in.srain.cube.util.CLog;
-
-import javax.naming.NameNotFoundException;
-import java.util.HashMap;
 
 public class CubeDemoApplication extends Application {
 
@@ -20,18 +17,16 @@ public class CubeDemoApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
         instance = this;
-        // other code
-        // ..
 
         CLog.DEBUG_IMAGE = true;
+        CLog.DEBUG_CACHE = true;
+
         // CLog.DEBUG_SCROLL_HEADER_FRAME = true;
         // CLog.DEBUG_PTR_FRAME = true;
-        CLog.DEBUG_REQUEST_CACHE = true;
         ImageLoaderFactory.setDefaultImageResizer(DemoDuiTangImageResizer.getInstance());
         String dir = "request-cache";
-        CacheManager.getInstance().init(this, dir);
+        RequestCacheManager.init(this, dir, 1024 * 10, 1024 * 10);
         Cube.onCreate(this);
 
         try {

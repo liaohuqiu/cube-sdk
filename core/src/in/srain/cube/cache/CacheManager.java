@@ -15,10 +15,8 @@ import in.srain.cube.util.CLog;
  */
 public class CacheManager {
 
-    private static final boolean DEBUG = CLog.DEBUG_REQUEST_CACHE;
+    private static final boolean DEBUG = CLog.DEBUG_CACHE;
     private static final String LOG_TAG = "cube_cache";
-
-    private static final String THREAD_NAME = "Cube-Request-Cache";
 
     private LruCache<String, CacheInfo> mMemoryCache;
     private LruFileCache mFileCache;
@@ -32,10 +30,6 @@ public class CacheManager {
     private static final int DO_CONVERT = 0x04;
 
     private Context mContext;
-
-    public CacheManager(Context content, String cacheDir) {
-        this(content, cacheDir, 1024 * 10, 1024 * 10);
-    }
 
     public CacheManager(Context content, String cacheDir, int memoryCacheSizeInKB, int fileCacheSizeInKB) {
         mContext = content;
@@ -68,18 +62,28 @@ public class CacheManager {
         if (cacheAble.disableCache() || TextUtils.isEmpty(data)) {
             return;
         }
-        final String cacheKey = cacheAble.getCacheKey();
+        setCacheData(cacheAble.getCacheKey(), data);
+    }
+
+    public void setCacheData(final String cacheKey, final String data) {
+        if (TextUtils.isEmpty(cacheKey) || TextUtils.isEmpty(data)) {
+            return;
+        }
         if (DEBUG) {
             CLog.d(LOG_TAG, "%s, setCacheData", cacheKey);
         }
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                CacheInfo cacheInfo = CacheInfo.create(data);
-                putDataToMemoryCache(cacheKey, cacheInfo);
-                mFileCache.write(cacheKey, cacheInfo.getCacheData());
-            }
-        }, THREAD_NAME).start();
+        SimpleExecutor.getInstance().execute(
+
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        CacheInfo cacheInfo = CacheInfo.create(data);
+                        putDataToMemoryCache(cacheKey, cacheInfo);
+                        mFileCache.write(cacheKey, cacheInfo.getCacheData());
+                        mFileCache.flushDiskCacheAsyncWithDelay(1000);
+                    }
+                }
+        );
     }
 
     private class InnerCacheTask<T1> extends SimpleTask {

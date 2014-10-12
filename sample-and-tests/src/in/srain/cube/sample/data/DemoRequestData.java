@@ -88,7 +88,7 @@ public class DemoRequestData {
 
             @Override
             public int getCacheTime() {
-                return 30;
+                return 300;
             }
 
         };

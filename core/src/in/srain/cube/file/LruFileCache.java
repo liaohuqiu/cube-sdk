@@ -7,7 +7,8 @@ import in.srain.cube.concurrent.SimpleExecutor;
 import in.srain.cube.concurrent.SimpleTask;
 import in.srain.cube.file.DiskLruCache.Editor;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 
 public class LruFileCache implements IFileCache {
 
@@ -29,7 +30,7 @@ public class LruFileCache implements IFileCache {
     private File mDiskCacheDir;
     private int mDiskCacheSize;
 
-    private long mLastFlushTime = 0;
+    private boolean mIsDelayFlushing = false;
 
     protected enum FileCacheTaskType {
         init_cache, close_cache, flush_cache
@@ -158,10 +159,11 @@ public class LruFileCache implements IFileCache {
                 }
             }
             try {
-                Editor editor = mDiskLruCache.edit(key);
-                if (editor != null) {
-                    return editor.has(DISK_CACHE_INDEX);
+                DiskLruCache.Snapshot snapshot = mDiskLruCache.get(key);
+                if (snapshot == null) {
+                    return false;
                 }
+                return snapshot.has(DISK_CACHE_INDEX);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -228,11 +230,7 @@ public class LruFileCache implements IFileCache {
      */
     public void flushDiskCache() {
         synchronized (mDiskCacheLock) {
-            long now = System.currentTimeMillis();
-            if (now - 1000 < mLastFlushTime) {
-                return;
-            }
-            mLastFlushTime = now;
+            mIsDelayFlushing = false;
             if (mDiskLruCache != null) {
                 try {
                     mDiskLruCache.flush();
@@ -303,6 +301,15 @@ public class LruFileCache implements IFileCache {
         void execute() {
             SimpleExecutor.getInstance().execute(this);
         }
+
+        void execute(int delay) {
+            SimpleTask.postDelay(new Runnable() {
+                @Override
+                public void run() {
+                    execute();
+                }
+            }, delay);
+        }
     }
 
     /**
@@ -333,6 +340,20 @@ public class LruFileCache implements IFileCache {
             Log.d(TAG, "flushDishCacheAsync");
         }
         new FileCacheTask(FileCacheTaskType.flush_cache).execute();
+    }
+
+    /**
+     * flush the data to disk cache
+     */
+    public void flushDiskCacheAsyncWithDelay(int delay) {
+        if (DEBUG) {
+            Log.d(TAG, "flushDishCacheAsync");
+        }
+        if (mIsDelayFlushing) {
+            return;
+        }
+        mIsDelayFlushing = true;
+        new FileCacheTask(FileCacheTaskType.flush_cache).execute(delay);
     }
 
     @Override

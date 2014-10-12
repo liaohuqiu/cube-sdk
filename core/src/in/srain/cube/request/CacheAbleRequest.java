@@ -18,8 +18,8 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
         USE_CACHE_ON_FAIL,
     }
 
-    protected static final boolean DEBUG = CLog.DEBUG_REQUEST_CACHE;
-    protected static final String LOG_TAG = "cube_request_cache";
+    protected static final boolean DEBUG = CLog.DEBUG_CACHE;
+    protected static final String LOG_TAG = "cube_cache_request";
 
     private CacheAbleRequestHandler<T> mHandler;
     private CacheAbleRequestPrePreHandler mPreHandler;

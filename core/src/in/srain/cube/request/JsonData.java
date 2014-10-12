@@ -5,19 +5,20 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 @SuppressWarnings("rawtypes")
-public class JsonData {
+public final class JsonData {
 
     private Object mJson;
     private static final String EMPTY_STRING = "";
 
     public static JsonData newMap() {
         return create(new HashMap<String, Object>());
+    }
+
+    public static JsonData newList() {
+        return create(new ArrayList<Object>());
     }
 
     public static JsonData create(String str) {
@@ -39,6 +40,9 @@ public class JsonData {
         }
         if (o instanceof Map) {
             json.mJson = new JSONObject((Map) o);
+        }
+        if (o instanceof Collection) {
+            json.mJson = new JSONArray((Collection) o);
         }
         return json;
     }
