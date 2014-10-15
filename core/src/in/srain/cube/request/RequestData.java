@@ -17,6 +17,7 @@ public class RequestData {
 
     private HashMap<String, Object> mQueryData;
     private HashMap<String, Object> mPostData;
+    private boolean mUsePost = false;
 
     public void setRequestUrl(String url) {
         mUrl = url;
@@ -89,11 +90,15 @@ public class RequestData {
         return mUrl;
     }
 
+    public void usePost(boolean use) {
+        mUsePost = use;
+    }
+
     public String getPostString() {
         return buildQueryString(mPostData, null);
     }
 
     public boolean shouldPost() {
-        return mPostData != null && mPostData.size() > 0;
+        return mUsePost || (mPostData != null && mPostData.size() > 0);
     }
 }
