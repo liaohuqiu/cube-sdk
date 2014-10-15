@@ -35,7 +35,7 @@ public interface ICacheAble<T> {
      * @param cacheData
      * @param outOfDate
      */
-    public void onCacheData(T cacheData, boolean outOfDate);
+    public void onCacheData(CacheResultType cacheResultType, T cacheData, boolean outOfDate);
 
     /**
      * create data when no cache is available.

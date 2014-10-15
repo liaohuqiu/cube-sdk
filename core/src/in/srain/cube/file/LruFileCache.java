@@ -91,13 +91,10 @@ public class LruFileCache implements IFileCache {
         synchronized (mDiskCacheLock) {
             if (mDiskLruCache != null) {
                 try {
-                    DiskLruCache.Snapshot snapshot = mDiskLruCache.get(key);
-                    if (snapshot == null) {
-                        final Editor editor = mDiskLruCache.edit(key);
-                        if (editor != null) {
-                            editor.set(DISK_CACHE_INDEX, str);
-                            editor.commit();
-                        }
+                    final Editor editor = mDiskLruCache.edit(key);
+                    if (editor != null) {
+                        editor.set(DISK_CACHE_INDEX, str);
+                        editor.commit();
                     }
                 } catch (final IOException e) {
                     e.printStackTrace();

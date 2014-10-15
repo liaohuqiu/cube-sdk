@@ -23,10 +23,18 @@ public abstract class ListViewDataAdapterBase<ItemDataType> extends BaseAdapter 
     protected HashSet<Integer> mCreatedTag = new HashSet<Integer>();
     private boolean mEnableCreateViewForMeasure = true;
 
+    public ListViewDataAdapterBase() {
+
+    }
+
     /**
      * @param viewHolderCreator The view holder creator will create a View Holder that extends {@link ViewHolderBase}
      */
     public ListViewDataAdapterBase(ViewHolderCreator<ItemDataType> viewHolderCreator) {
+        mViewHolderCreator = viewHolderCreator;
+    }
+
+    public void setViewHolderCreator(ViewHolderCreator<ItemDataType> viewHolderCreator) {
         mViewHolderCreator = viewHolderCreator;
     }
 
@@ -37,6 +45,9 @@ public abstract class ListViewDataAdapterBase<ItemDataType> extends BaseAdapter 
     @SuppressWarnings("unchecked")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        if (mViewHolderCreator == null) {
+            throw new RuntimeException("view holder creator is null");
+        }
         if (mEnableCreateViewForMeasure && convertView == null) {
 
         }

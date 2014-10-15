@@ -5,6 +5,13 @@ import in.srain.cube.request.JsonData;
 
 public class Query<T> implements ICacheAble<T> {
 
+    public enum RequestType {
+        USE_CACHE_NOT_EXPIRED,
+        USE_DATA_CREATED,
+        USE_CACHE_ANYWAY,
+        FAIL,
+    }
+
     private QueryHandler mHandler;
     private CacheManager mCacheManager;
 
@@ -15,7 +22,13 @@ public class Query<T> implements ICacheAble<T> {
     public void continueAfterCreateData(final String data) {
         if (!TextUtils.isEmpty(data)) {
             mCacheManager.continueAfterCreateData(this, data);
+        } else {
+            queryFail();
         }
+    }
+
+    private void queryFail() {
+        mHandler.onQueryFinish(RequestType.FAIL, null, true);
     }
 
     public <T> void setHandler(QueryHandler<T> handler) {
@@ -59,13 +72,34 @@ public class Query<T> implements ICacheAble<T> {
     }
 
     @Override
-    public void onCacheData(T cacheData, boolean outOfDate) {
+    public void onCacheData(CacheResultType cacheResultType, T cacheData, boolean outOfDate) {
+        switch (cacheResultType) {
+            case FROM_CACHE_FILE:
+                break;
+            case FROM_INIT_FILE:
+                break;
+            case FROM_MEMORY:
+                break;
+            case FROM_CREATED:
+                break;
+        }
+
         if (outOfDate) {
             if (mHandler != null && mHandler.useCacheAnyway()) {
-                mHandler.onQueryFinish(cacheData, outOfDate);
+                mHandler.onQueryFinish(RequestType.USE_CACHE_ANYWAY, cacheData, outOfDate);
             }
         } else {
-            mHandler.onQueryFinish(cacheData, true);
+            switch (cacheResultType) {
+                case FROM_CACHE_FILE:
+                    break;
+                case FROM_INIT_FILE:
+                    break;
+                case FROM_MEMORY:
+                    break;
+                case FROM_CREATED:
+                    break;
+            }
+            mHandler.onQueryFinish(RequestType.USE_CACHE_NOT_EXPIRED, cacheData, true);
         }
     }
 
@@ -74,7 +108,7 @@ public class Query<T> implements ICacheAble<T> {
         if (mHandler != null) {
             continueAfterCreateData(mHandler.createDataForCache(this));
         } else {
-
+            queryFail();
         }
     }
 

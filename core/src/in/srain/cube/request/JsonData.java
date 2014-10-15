@@ -116,10 +116,18 @@ public final class JsonData {
         return new JSONObject();
     }
 
+    private Object valueForPut(Object value) {
+        if (value instanceof JsonData) {
+            return ((JsonData) value).getRawData();
+        } else {
+            return value;
+        }
+    }
+
     public void put(String key, Object value) {
         if (mJson instanceof JSONObject) {
             try {
-                ((JSONObject) mJson).put(key, value);
+                ((JSONObject) mJson).put(key, valueForPut(value));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -128,18 +136,66 @@ public final class JsonData {
 
     public void put(Object value) {
         if (mJson instanceof JSONArray) {
-            ((JSONArray) mJson).put(value);
+            ((JSONArray) mJson).put(valueForPut(value));
         }
     }
 
     public void put(int index, Object value) {
         if (mJson instanceof JSONArray) {
             try {
-                ((JSONArray) mJson).put(index, value);
+                ((JSONArray) mJson).put(index, valueForPut(value));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    public JsonData editMap(int index) {
+        if (has(index)) {
+            return optJson(index);
+        }
+        JsonData map = JsonData.newMap();
+        put(index, map);
+        return map;
+    }
+
+    public JsonData editMap() {
+        JsonData map = JsonData.newMap();
+        put(map);
+        return map;
+    }
+
+    public JsonData editMap(String key) {
+        if (has(key)) {
+            return optJson(key);
+        }
+        JsonData map = JsonData.newMap();
+        put(key, map);
+        return map;
+    }
+
+    public JsonData editList(String key) {
+        if (has(key)) {
+            return optJson(key);
+        }
+        JsonData list = JsonData.newList();
+        put(key, list);
+        return list;
+    }
+
+    public JsonData editList(int index) {
+        if (has(index)) {
+            return optJson(index);
+        }
+        JsonData list = JsonData.newList();
+        put(index, list);
+        return list;
+    }
+
+    public JsonData editList() {
+        JsonData list = JsonData.newList();
+        put(list);
+        return list;
     }
 
     public JSONArray optArrayOrNew() {

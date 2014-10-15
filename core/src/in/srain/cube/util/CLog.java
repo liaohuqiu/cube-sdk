@@ -4,6 +4,7 @@ import android.util.Log;
 
 public class CLog {
 
+    public static boolean DEBUG_PAGE_INDICATOR = false;
     public static boolean DEBUG_IMAGE = false;
     public static boolean DEBUG_LIST = false;
     public static boolean DEBUG_SCROLL_HEADER_FRAME = false;

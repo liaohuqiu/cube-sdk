@@ -26,6 +26,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
+import in.srain.cube.util.CLog;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
@@ -35,6 +36,9 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
  * across different configurations or circumstances.
  */
 public class TabPageIndicator extends HorizontalScrollView implements PageIndicator {
+
+    private static final String LOG_TAG = "cube_page_indicator";
+    private static final boolean DEBUG = CLog.DEBUG_PAGE_INDICATOR;
 
     /**
      * Interface for a callback when the selected tab has been reselected.
@@ -137,7 +141,7 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
         final int newWidth = getMeasuredWidth();
 
         if (lockedExpanded && oldWidth != newWidth) {
-            // Recenter the tab display if we're at a new (scrollable) size.
+            // Re-center the tab display if we're at a new (scrollable) size.
             updateTab(mSelectedTabIndex);
         }
     }
@@ -190,6 +194,9 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
 
     @Override
     public void onPageSelected(int i) {
+        if (DEBUG) {
+            CLog.d(LOG_TAG, "onPageSelected: %s", i);
+        }
         moveToItem(i);
     }
 
@@ -225,10 +232,8 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
             view.setTag(viewHolder);
             mTabLayout.addView(view, new LinearLayout.LayoutParams(0, MATCH_PARENT, 1));
         }
-        if (mSelectedTabIndex > count) {
-            mSelectedTabIndex = count - 1;
-        }
-        moveToItem(mSelectedTabIndex);
+        mSelectedTabIndex = mViewPager.getCurrentItem();
+        updateTab(mSelectedTabIndex);
         requestLayout();
     }
 
@@ -239,6 +244,9 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
     }
 
     public void moveToItem(int item) {
+        if (DEBUG) {
+            CLog.d(LOG_TAG, "moveToItem: %s", item);
+        }
         if (mViewPager == null) {
             throw new IllegalStateException("ViewPager has not been bound.");
         }
@@ -246,7 +254,12 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
             return;
         }
         mSelectedTabIndex = item;
+
+        // will lead to call moveTo item again, but will hit here :)
         mViewPager.setCurrentItem(item);
+        if (DEBUG) {
+            CLog.d(LOG_TAG, "mViewPager.setCurrentItem: %s", item);
+        }
         if (mListener != null) {
             mListener.onPageSelected(item);
         }

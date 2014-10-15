@@ -60,7 +60,7 @@ public class PtrFrame extends RelativeLayout {
     private float mResistance = 1.5f;
 
     private int mDurationClose = 300;
-    private int mDurationToCloseHeader = 300;
+    private int mDurationToCloseHeader = 700;
     private int mRotateAniTime = 150;
 
     private float mRatioOfHeaderToRotate = 1.5f;
@@ -302,17 +302,17 @@ public class PtrFrame extends RelativeLayout {
 
     private void updatePos() {
         int change = mCurrentPos - mLastPos;
-        // if (Version.hasHoneycomb()) {
-        //     mHeaderContainer.offsetTopAndBottom(change);
-        //     mContentViewContainer.offsetTopAndBottom(change);
-        // } else {
-        //     mHeaderContainer.setPadding(0, mCurrentPos, 0, 0);
-        //     mContentViewContainer.setPadding(0, mCurrentPos, 0, 0);
-        //         }
-        RelativeLayout.LayoutParams lyp = (LayoutParams) mHeaderContainer.getLayoutParams();
-        lyp.setMargins(0, mCurrentPos, 0, 0);
-        ((LayoutParams) mContentViewContainer.getLayoutParams()).setMargins(0, mCurrentPos, 0, 0);
-        requestLayout();
+        if (Version.hasHoneycomb()) {
+            mHeaderContainer.offsetTopAndBottom(change);
+            mContentViewContainer.offsetTopAndBottom(change);
+        } else {
+            // mHeaderContainer.setPadding(0, mCurrentPos, 0, 0);
+            // mContentViewContainer.setPadding(0, mCurrentPos, 0, 0);
+            RelativeLayout.LayoutParams lyp = (LayoutParams) mHeaderContainer.getLayoutParams();
+            lyp.setMargins(0, mCurrentPos, 0, 0);
+            ((LayoutParams) mContentViewContainer.getLayoutParams()).setMargins(0, mCurrentPos, 0, 0);
+            requestLayout();
+        }
 
         if (mCurrentPos < mOffsetToRotateView && mLastPos >= mOffsetToRotateView) {
             if (null != mPtrHandler) {

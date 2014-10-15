@@ -36,7 +36,7 @@ public interface QueryHandler<T> {
      * @param cacheData
      * @param outOfDate
      */
-    public void onQueryFinish(T cacheData, boolean outOfDate);
+    public void onQueryFinish(Query.RequestType requestType, T cacheData, boolean outOfDate);
 
     /**
      * just using cache data if existent, no matter it is expired or not

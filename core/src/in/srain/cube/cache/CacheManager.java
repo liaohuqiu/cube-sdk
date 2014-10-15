@@ -21,13 +21,18 @@ public class CacheManager {
     private LruCache<String, CacheInfo> mMemoryCache;
     private LruFileCache mFileCache;
 
-    private static final int AFTER_READ_FROM_FILE = 0x01;
-    private static final int AFTER_READ_FROM_ASSERT = 0x02;
-    private static final int AFTER_CONVERT = 0x04;
+    private static final byte AFTER_READ_FROM_FILE = 0x01;
+    private static final byte AFTER_READ_FROM_ASSERT = 0x02;
+    private static final byte AFTER_CONVERT = 0x04;
 
-    private static final int DO_READ_FROM_FILE = 0x01;
-    private static final int DO_READ_FROM_ASSERT = 0x02;
-    private static final int DO_CONVERT = 0x04;
+    private static final byte DO_READ_FROM_FILE = 0x01;
+    private static final byte DO_READ_FROM_ASSERT = 0x02;
+    private static final byte DO_CONVERT = 0x04;
+
+    private static final byte CONVERT_FOR_MEMORY = 0x03;
+    private static final byte CONVERT_FOR_FILE = 0x01;
+    private static final byte CONVERT_FOR_ASSERT = 0x02;
+    private static final byte CONVERT_FOR_CREATE = 0x04;
 
     private Context mContext;
 
@@ -55,7 +60,7 @@ public class CacheManager {
     public <T> void continueAfterCreateData(ICacheAble<T> cacheAble, final String data) {
         setCacheData(cacheAble, data);
         InnerCacheTask<T> task = new InnerCacheTask<T>(cacheAble);
-        task.beginConvertDataAsync();
+        task.beginConvertDataAsync(CONVERT_FOR_CREATE);
     }
 
     public <T> void setCacheData(final ICacheAble<T> cacheAble, final String data) {
@@ -92,8 +97,9 @@ public class CacheManager {
 
         private CacheInfo mRawData;
         private T1 mResult;
-        private int mWorkType = 0;
-        private int mCurrentStatus = 0;
+        private byte mWorkType = 0;
+        private byte mConvertFor = 0;
+        private byte mCurrentStatus = 0;
 
         public InnerCacheTask(ICacheAble<T1> cacheAble) {
             mCacheAble = cacheAble;
@@ -117,7 +123,7 @@ public class CacheManager {
                 if (DEBUG) {
                     CLog.d(LOG_TAG, "%s, exist in list", mCacheAble.getCacheKey());
                 }
-                beginConvertDataAsync();
+                beginConvertDataAsync(CONVERT_FOR_MEMORY);
                 return;
             }
 
@@ -150,14 +156,17 @@ public class CacheManager {
 
                 case DO_READ_FROM_FILE:
                     doQueryFromCacheFileInBackground();
+                    setCurrentStatus(AFTER_READ_FROM_FILE);
                     break;
 
                 case DO_READ_FROM_ASSERT:
                     doQueryFromAssertCacheFileInBackground();
+                    setCurrentStatus(AFTER_READ_FROM_ASSERT);
                     break;
 
                 case DO_CONVERT:
                     doConvertDataInBackground();
+                    setCurrentStatus(AFTER_CONVERT);
                     break;
 
                 default:
@@ -169,8 +178,10 @@ public class CacheManager {
         public void onFinish() {
             switch (mCurrentStatus) {
                 case AFTER_READ_FROM_FILE:
+                    beginConvertDataAsync(CONVERT_FOR_FILE);
+                    break;
                 case AFTER_READ_FROM_ASSERT:
-                    beginConvertDataAsync();
+                    beginConvertDataAsync(CONVERT_FOR_ASSERT);
                     break;
 
                 case AFTER_CONVERT:
@@ -200,10 +211,11 @@ public class CacheManager {
             SimpleExecutor.getInstance().execute(this);
         }
 
-        private void beginConvertDataAsync() {
+        private void beginConvertDataAsync(byte convertFor) {
             if (DEBUG) {
                 CLog.d(LOG_TAG, "%s, beginConvertDataAsync", mCacheAble.getCacheKey());
             }
+            mConvertFor = convertFor;
             mWorkType = DO_CONVERT;
             restart();
             SimpleExecutor.getInstance().execute(this);
@@ -217,8 +229,6 @@ public class CacheManager {
             String cacheContent = mFileCache.read(mCacheAble.getCacheKey());
             JsonData jsonData = JsonData.create(cacheContent);
             mRawData = CacheInfo.create(jsonData.optString("data"), jsonData.optInt("time"));
-
-            setCurrentStatus(AFTER_READ_FROM_FILE);
         }
 
         private void doQueryFromAssertCacheFileInBackground() {
@@ -230,8 +240,6 @@ public class CacheManager {
             String cacheContent = FileUtil.readAssert(mContext, mCacheAble.getAssertInitDataPath());
             mRawData = CacheInfo.create(cacheContent, -2);
             putDataToMemoryCache(mCacheAble.getCacheKey(), mRawData);
-
-            setCurrentStatus(AFTER_READ_FROM_ASSERT);
         }
 
         private void doConvertDataInBackground() {
@@ -240,10 +248,9 @@ public class CacheManager {
             }
             JsonData data = JsonData.create(mRawData.data);
             mResult = mCacheAble.processRawDataFromCache(data);
-            setCurrentStatus(AFTER_CONVERT);
         }
 
-        private void setCurrentStatus(int status) {
+        private void setCurrentStatus(byte status) {
             mCurrentStatus = status;
             if (DEBUG) {
                 CLog.d(LOG_TAG, "%s, setCurrentStatus: %s", mCacheAble.getCacheKey(), status);
@@ -255,7 +262,21 @@ public class CacheManager {
             int lastTime = mRawData.time;
             long timeInterval = System.currentTimeMillis() / 1000 - lastTime;
             boolean outOfDate = timeInterval > mCacheAble.getCacheTime() || timeInterval < 0;
-            mCacheAble.onCacheData(mResult, outOfDate);
+
+            switch (mConvertFor) {
+                case CONVERT_FOR_ASSERT:
+                    mCacheAble.onCacheData(CacheResultType.FROM_INIT_FILE, mResult, outOfDate);
+                    break;
+                case CONVERT_FOR_CREATE:
+                    mCacheAble.onCacheData(CacheResultType.FROM_CREATED, mResult, outOfDate);
+                    break;
+                case CONVERT_FOR_FILE:
+                    mCacheAble.onCacheData(CacheResultType.FROM_INIT_FILE, mResult, outOfDate);
+                    break;
+                case CONVERT_FOR_MEMORY:
+                    mCacheAble.onCacheData(CacheResultType.FROM_CACHE_FILE, mResult, outOfDate);
+                    break;
+            }
             if (outOfDate) {
                 mCacheAble.createDataForCache(CacheManager.this);
             }
