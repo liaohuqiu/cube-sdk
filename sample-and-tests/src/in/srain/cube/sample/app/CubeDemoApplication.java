@@ -22,7 +22,7 @@ public class CubeDemoApplication extends Application {
         CLog.DEBUG_IMAGE = true;
         CLog.DEBUG_CACHE = true;
 
-        // CLog.DEBUG_SCROLL_HEADER_FRAME = true;
+        CLog.DEBUG_SCROLL_HEADER_FRAME = true;
         // CLog.DEBUG_PTR_FRAME = true;
         ImageLoaderFactory.setDefaultImageResizer(DemoDuiTangImageResizer.getInstance());
         String dir = "request-cache";

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<in.srain.cube.views.ScrollHeaderFrame xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:cube="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/scroll_header_frame"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -22,4 +23,4 @@
         android:background="#ffffff"
         android:orientation="vertical" />
 
-</LinearLayout>
+</in.srain.cube.views.ScrollHeaderFrame>

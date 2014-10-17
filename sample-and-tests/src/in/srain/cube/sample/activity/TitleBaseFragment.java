@@ -29,7 +29,7 @@ public abstract class TitleBaseFragment extends CubeFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_title_base, null);
+        ViewGroup view = (ViewGroup) inflater.inflate(R.layout.fragment_title_base, null);
         LinearLayout contentContainer = (LinearLayout) view.findViewById(R.id.ly_main_content_container);
 
         // 页头逻辑处理
@@ -48,7 +48,7 @@ public abstract class TitleBaseFragment extends CubeFragment {
         }
 
         mContentContainer = contentContainer;
-        View contentView = createView(inflater, container, savedInstanceState);
+        View contentView = createView(inflater, view, savedInstanceState);
         contentView.setLayoutParams(new LinearLayout.LayoutParams(-1, -1));
         contentContainer.addView(contentView);
         return view;

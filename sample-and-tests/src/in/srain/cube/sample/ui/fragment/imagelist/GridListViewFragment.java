@@ -22,6 +22,8 @@ import in.srain.cube.sample.data.Images;
 import in.srain.cube.sample.ui.views.header.ptr.PtrFrameDemo;
 import in.srain.cube.util.CLog;
 import in.srain.cube.util.LocalDisplay;
+import in.srain.cube.views.IScrollHeaderFrameHandler;
+import in.srain.cube.views.ScrollHeaderFrame;
 import in.srain.cube.views.list.ListViewDataAdapter;
 import in.srain.cube.views.list.ViewHolderBase;
 import in.srain.cube.views.list.ViewHolderCreator;
@@ -76,6 +78,16 @@ public class GridListViewFragment extends TitleBaseFragment {
                 ptrFrame.doRefresh();
             }
         }, 150);
+        ScrollHeaderFrame frame = (ScrollHeaderFrame) container.findViewById(R.id.scroll_header_frame);
+        frame.setHandler(new IScrollHeaderFrameHandler() {
+            @Override
+            public boolean hasReachTop() {
+                if (gridListView.getChildCount() == 0) {
+                    return true;
+                }
+                return gridListView.getChildAt(0).getTop() == 0;
+            }
+        });
         return v;
     }
 
