@@ -8,7 +8,7 @@ import android.view.View;
  * <p/>
  * <a href="http://developer.android.com/training/improving-layouts/smooth-scrolling.html">http://developer.android.com/training/improving-layouts/smooth-scrolling.html</a>
  * <p/>
- * Using A View Holder in Listview getView() method is a good practice in using listview;
+ * Using A View Holder in ListView getView() method is a good practice in using ListView;
  * <p/>
  * This class encapsulate the base operate of a View Holder: createView / showData
  *
@@ -26,7 +26,7 @@ public abstract class ViewHolderBase<ItemDataType> {
     public abstract View createView(LayoutInflater layoutInflater);
 
     /**
-     * using the holed views to display data
+     * using the held views to display data
      */
     public abstract void showData(int position, ItemDataType itemData);
 

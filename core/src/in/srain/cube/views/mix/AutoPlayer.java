@@ -1,6 +1,7 @@
 package in.srain.cube.views.mix;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 
 import java.lang.ref.WeakReference;
@@ -47,40 +48,14 @@ public class AutoPlayer {
     private int mTimeInterval = 5000;
     private Playable mPlayable;
 
-    private Timer mTimer;
-    private TimerTask mTimerTask;
+    private Runnable mTimerTask;
 
     private boolean mSkipNext = false;
     private int mTotal;
     private boolean mPlaying = false;
 
-    private final static int PLAY_NEXT_FRAME = 0x1;
-
-    /**
-     * Inner Handler to process the thread-cross action.
-     */
-    private static class InnerHandler extends Handler {
-        WeakReference<AutoPlayer> mPlayer;
-
-        public InnerHandler(AutoPlayer player) {
-            mPlayer = new WeakReference<AutoPlayer>(player);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case PLAY_NEXT_FRAME:
-                    mPlayer.get().playNextFrame();
-                    break;
-
-                default:
-                    break;
-            }
-        }
-    }
-
-    public AutoPlayer(Playable playerable) {
-        mPlayable = playerable;
+    public AutoPlayer(Playable playable) {
+        mPlayable = playable;
     }
 
     public void play() {
@@ -101,17 +76,17 @@ public class AutoPlayer {
         mPlaying = true;
         playTo(start);
 
-        final Handler handler = new InnerHandler(this);
-        mTimerTask = new TimerTask() {
-
+        final Handler handler = new Handler(Looper.myLooper());
+        mTimerTask = new Runnable() {
             @Override
             public void run() {
-                handler.sendEmptyMessage(PLAY_NEXT_FRAME);
+                playNextFrame();
+                if (mPlaying) {
+                    handler.postDelayed(mTimerTask, mTimeInterval);
+                }
             }
         };
-
-        mTimer = new Timer();
-        mTimer.schedule(mTimerTask, mTimeInterval, mTimeInterval);
+        handler.postDelayed(mTimerTask, mTimeInterval);
     }
 
     public void play(int start) {
@@ -124,10 +99,6 @@ public class AutoPlayer {
         }
 
         mPlaying = false;
-
-        mTimerTask.cancel();
-        mTimer.cancel();
-        mTimer = null;
     }
 
     public AutoPlayer setTimeInterval(int timeInterval) {
@@ -135,7 +106,7 @@ public class AutoPlayer {
         return this;
     }
 
-    public AutoPlayer setPlayRecycelMode(PlayRecycleMode playRecycleMode) {
+    public AutoPlayer setPlayRecycleMode(PlayRecycleMode playRecycleMode) {
         mPlayRecycleMode = playRecycleMode;
         return this;
     }
