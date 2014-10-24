@@ -4,16 +4,16 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.taobao</groupId>
-        <artifactId>parent</artifactId>
-        <version>1.0.2</version>
+        <groupId>in.srain</groupId>
+        <artifactId>cube-parent</artifactId>
+        <version>1.1.1</version>
     </parent>
 
     <groupId>in.srain.cube</groupId>
     <artifactId>cube-sdk</artifactId>
     <packaging>apklib</packaging>
     <name>Cube SDK</name>
-    <version>1.0.36-SNAPSHOT</version>
+    <version>1.0.37-SNAPSHOT</version>
 
     <dependencies>
         <dependency>

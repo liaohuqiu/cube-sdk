@@ -33,10 +33,16 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
     private boolean mHasTimeout = false;
     private boolean mUseCacheAnyway = false;
     private boolean mHasNotified = false;
+    protected boolean mForceQueryFromServer = false;
 
     public CacheAbleRequest(CacheAbleRequestPrePreHandler preHandler, final CacheAbleRequestHandler<T> handler) {
         mPreHandler = preHandler;
         mHandler = handler;
+    }
+
+
+    public void forceQueryFromServer(boolean force) {
+        mForceQueryFromServer = force;
     }
 
     // ===========================================================
@@ -125,8 +131,15 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
         SimpleRequestManager.sendRequest(this);
     }
 
+    protected boolean cacheRequestResult() {
+        return mForceQueryFromServer || !disableCache();
+    }
+
     @Override
     public boolean disableCache() {
+        if (mForceQueryFromServer) {
+            return true;
+        }
         if (mPreHandler != null) {
             return mPreHandler.disableCache();
         }
@@ -199,8 +212,8 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
             CLog.d(LOG_TAG, "%s, onDataFromServer", getCacheKey());
         }
         // cache the data
-        if (!TextUtils.isEmpty(data) && !disableCache()) {
-            RequestCacheManager.getInstance().setCacheData(this, data);
+        if (!TextUtils.isEmpty(data) && cacheRequestResult()) {
+            RequestCacheManager.getInstance().setCacheData(this.getCacheKey(), data);
         }
         return super.onDataFromServer(data);
     }

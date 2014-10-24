@@ -28,7 +28,7 @@ public class LruFileCache implements IFileCache {
     private boolean mDiskCacheStarting = true;
     private boolean mDiskCacheReady = false;
     private File mDiskCacheDir;
-    private int mDiskCacheSize;
+    private long mDiskCacheSize;
 
     private boolean mIsDelayFlushing = false;
 
@@ -39,6 +39,11 @@ public class LruFileCache implements IFileCache {
     public LruFileCache(Context context, String path, int size) {
         mDiskCacheSize = size;
         mDiskCacheDir = FileUtil.getDiskCacheDir(context, path, size);
+        long usableSpace = FileUtil.getUsableSpace(mDiskCacheDir);
+        if (usableSpace < mDiskCacheSize) {
+            mDiskCacheSize = size;
+            Log.e(TAG, String.format("no enough space for initDiskCache %s %s", usableSpace, mDiskCacheSize));
+        }
     }
 
     public static LruFileCache getDefault(Context context) {
@@ -63,17 +68,13 @@ public class LruFileCache implements IFileCache {
                     if (!mDiskCacheDir.exists()) {
                         mDiskCacheDir.mkdirs();
                     }
-                    if (FileUtil.getUsableSpace(mDiskCacheDir) > mDiskCacheSize) {
-                        try {
-                            mDiskLruCache = DiskLruCache.open(mDiskCacheDir, 1, 1, mDiskCacheSize);
-                            if (DEBUG) {
-                                Log.d(TAG, "Disk cache initialized " + this);
-                            }
-                        } catch (final IOException e) {
-                            Log.e(TAG, "initDiskCache - " + e);
+                    try {
+                        mDiskLruCache = DiskLruCache.open(mDiskCacheDir, 1, 1, mDiskCacheSize);
+                        if (DEBUG) {
+                            Log.d(TAG, "Disk cache initialized " + this);
                         }
-                    } else {
-                        Log.e(TAG, String.format("no enough space for initDiskCache %s %s", FileUtil.getUsableSpace(mDiskCacheDir), mDiskCacheSize));
+                    } catch (final IOException e) {
+                        Log.e(TAG, "initDiskCache - " + e);
                     }
                 }
             }
@@ -155,14 +156,16 @@ public class LruFileCache implements IFileCache {
                 } catch (InterruptedException e) {
                 }
             }
-            try {
-                DiskLruCache.Snapshot snapshot = mDiskLruCache.get(key);
-                if (snapshot == null) {
-                    return false;
+            if (mDiskLruCache != null) {
+                try {
+                    DiskLruCache.Snapshot snapshot = mDiskLruCache.get(key);
+                    if (snapshot == null) {
+                        return false;
+                    }
+                    return snapshot.has(DISK_CACHE_INDEX);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-                return snapshot.has(DISK_CACHE_INDEX);
-            } catch (IOException e) {
-                e.printStackTrace();
             }
         }
         return false;
@@ -368,6 +371,6 @@ public class LruFileCache implements IFileCache {
 
     @Override
     public int getMaxSize() {
-        return mDiskCacheSize;
+        return (int) mDiskCacheSize;
     }
 }

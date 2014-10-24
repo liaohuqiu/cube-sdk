@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="SliderBanner">
+        <attr name="slider_banner_indicator" format="reference" />
+        <attr name="slider_banner_pager" format="reference" />
+        <attr name="slider_banner_time_interval" format="integer" />
+    </declare-styleable>
+
+</resources>

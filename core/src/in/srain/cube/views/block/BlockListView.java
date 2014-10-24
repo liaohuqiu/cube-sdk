@@ -80,7 +80,7 @@ public class BlockListView extends RelativeLayout {
         int len = mBlockListAdpater.getCount();
         int w = mBlockListAdpater.getBlockWidth();
         int h = mBlockListAdpater.getBlockHeight();
-        int cloumnNum = mBlockListAdpater.getCloumnNum();
+        int columnNum = mBlockListAdpater.getCloumnNum();
 
         int horizontalSpacing = mBlockListAdpater.getHorizontalSpacing();
         int verticalSpacing = mBlockListAdpater.getVerticalSpacing();
@@ -90,8 +90,8 @@ public class BlockListView extends RelativeLayout {
         for (int i = 0; i < len; i++) {
 
             RelativeLayout.LayoutParams lyp = new RelativeLayout.LayoutParams(w, h);
-            int row = i / cloumnNum;
-            int clo = i % cloumnNum;
+            int row = i / columnNum;
+            int clo = i % columnNum;
             int left = 0;
             int top = 0;
 

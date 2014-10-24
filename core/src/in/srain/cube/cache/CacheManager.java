@@ -58,16 +58,9 @@ public class CacheManager {
     }
 
     public <T> void continueAfterCreateData(ICacheAble<T> cacheAble, final String data) {
-        setCacheData(cacheAble, data);
+        setCacheData(cacheAble.getCacheKey(), data);
         InnerCacheTask<T> task = new InnerCacheTask<T>(cacheAble);
         task.beginConvertDataAsync(CONVERT_FOR_CREATE);
-    }
-
-    public <T> void setCacheData(final ICacheAble<T> cacheAble, final String data) {
-        if (cacheAble.disableCache() || TextUtils.isEmpty(data)) {
-            return;
-        }
-        setCacheData(cacheAble.getCacheKey(), data);
     }
 
     public void setCacheData(final String cacheKey, final String data) {

@@ -20,8 +20,7 @@ public abstract class ListViewDataAdapterBase<ItemDataType> extends BaseAdapter 
     private static String LOG_TAG = "cube_list";
 
     protected ViewHolderCreator<ItemDataType> mViewHolderCreator;
-    protected HashSet<Integer> mCreatedTag = new HashSet<Integer>();
-    private boolean mEnableCreateViewForMeasure = true;
+    protected boolean mForceCreateView = false;
 
     public ListViewDataAdapterBase() {
 
@@ -38,8 +37,8 @@ public abstract class ListViewDataAdapterBase<ItemDataType> extends BaseAdapter 
         mViewHolderCreator = viewHolderCreator;
     }
 
-    public void setEnableCreateViewForMeasure(boolean enable) {
-        mEnableCreateViewForMeasure = enable;
+    public void forceCreateView(boolean yes) {
+        mForceCreateView = yes;
     }
 
     @SuppressWarnings("unchecked")
@@ -48,31 +47,28 @@ public abstract class ListViewDataAdapterBase<ItemDataType> extends BaseAdapter 
         if (mViewHolderCreator == null) {
             throw new RuntimeException("view holder creator is null");
         }
-        if (mEnableCreateViewForMeasure && convertView == null) {
-
-        }
         if (CLog.DEBUG_LIST) {
             Log.d(LOG_TAG, String.format("getView %s", position));
         }
         ItemDataType itemData = getItem(position);
-        if (convertView == null) {
+        ViewHolderBase<ItemDataType> holderBase = null;
+        if (mForceCreateView || convertView == null) {
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-            ViewHolderBase<ItemDataType> holderBase = mViewHolderCreator.createViewHolder();
-
+            holderBase = mViewHolderCreator.createViewHolder();
             if (holderBase != null) {
                 convertView = holderBase.createView(inflater);
                 if (convertView != null) {
-                    holderBase.setItemData(position);
-                    holderBase.showData(position, itemData);
-                    convertView.setTag(holderBase);
+                    if (!mForceCreateView) {
+                        convertView.setTag(holderBase);
+                    }
                 }
             }
         } else {
-            ViewHolderBase<ItemDataType> holderBase = (ViewHolderBase<ItemDataType>) convertView.getTag();
-            if (holderBase != null) {
-                holderBase.setItemData(position);
-                holderBase.showData(position, itemData);
-            }
+            holderBase = (ViewHolderBase<ItemDataType>) convertView.getTag();
+        }
+        if (holderBase != null) {
+            holderBase.setItemData(position);
+            holderBase.showData(position, itemData);
         }
         return convertView;
     }

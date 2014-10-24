@@ -251,11 +251,11 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
             throw new IllegalStateException("ViewPager has not been bound.");
         }
         if (mSelectedTabIndex == item) {
-            return;
+            // return;
         }
         mSelectedTabIndex = item;
 
-        // will lead to call moveTo item again, but will hit here :)
+        // will lead to call moveToItem again, but will not hit here :)
         mViewPager.setCurrentItem(item);
         if (DEBUG) {
             CLog.d(LOG_TAG, "mViewPager.setCurrentItem: %s", item);

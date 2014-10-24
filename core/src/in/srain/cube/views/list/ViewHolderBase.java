@@ -39,7 +39,7 @@ public abstract class ViewHolderBase<ItemDataType> {
     /**
      * Check if the View Holder is still display the same data after back to screen.
      * <p/>
-     * A view in a listview or gridview may go down the screen and then back,
+     * A view in a ListView or GridView may go down the screen and then back,
      * <p/>
      * for efficiency, in getView() method, a convertView will be reused.
      * <p/>

@@ -17,14 +17,17 @@ public class FileUtil {
 
     /**
      * Get a usable cache directory (external if available, internal otherwise).
+     * .
+     * Check if media is mounted or storage is built-in, if so, try and use external cache folder
+     * otherwise use internal cache folder
+     * .
+     * If both of them can not meet the requirement, use the bigger one.
      *
      * @param context    The context to use
      * @param uniqueName A unique folder name to append to the cache folder
      * @return The cache folder
      */
     public static File getDiskCacheDir(Context context, String uniqueName, int requireSpace) {
-        // Check if media is mounted or storage is built-in, if so, try and use external cache folder
-        // otherwise use internal cache folder
         File sdPath = null;
         File internalPath = null;
         File cacheFile = null;
@@ -34,18 +37,19 @@ public class FileUtil {
             sdPath = getExternalCacheDir(context);
             sdCardFree = getUsableSpace(sdPath);
         }
+
+        // sd card can not meet the requirement
+        // try to use the build-in storage
         if (sdPath == null || sdCardFree < requireSpace) {
             internalPath = context.getCacheDir();
             internalFree = getUsableSpace(internalPath);
 
+            // both lower then requirement, choose the bigger one
             if (internalFree < requireSpace) {
-
                 cacheFile = internalFree > sdCardFree ? internalPath : sdPath;
-
             } else {
                 cacheFile = internalPath;
             }
-
         } else {
             cacheFile = sdPath;
         }

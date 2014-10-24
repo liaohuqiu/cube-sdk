@@ -214,18 +214,19 @@ public class ScrollHeaderFrame extends RelativeLayout {
                     Log.d(LOG_TAG, String.format("ACTION_MOVE: %s, speed: %s, moveUp: %s, canMoveUp: %s, moveDown: %s, canMoveDown: %s", speed, deltaY, moveUp, canMoveUp, moveDown, canMoveDown));
                 }
 
-                if (speed >= 5 && moveDown && mIScrollHeaderFrameHandler != null) {
-                    moveTo(0);
-                }
                 // disable move when header not reach top
                 if (moveDown && mIScrollHeaderFrameHandler != null && !mIScrollHeaderFrameHandler.hasReachTop()) {
                     return handled;
                 }
 
-                if (mIScrollHeaderFrameHandler != null) {
-                    CLog.d(LOG_TAG, "hasReachTop: %s", mIScrollHeaderFrameHandler.hasReachTop());
+                if (speed >= 5 && moveDown && mIScrollHeaderFrameHandler != null) {
+                    moveTo(0);
+                    return handled;
                 }
-                CLog.d(LOG_TAG, "setHandler: %s", this);
+                if (speed >= 5 && moveUp && mIScrollHeaderFrameHandler != null) {
+                    moveTo(-mHeaderHeight);
+                    return handled;
+                }
 
                 if ((moveUp && canMoveUp) || (moveDown && canMoveDown)) {
                     tryToMove(deltaY);

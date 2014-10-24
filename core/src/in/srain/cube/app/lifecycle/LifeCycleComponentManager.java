@@ -9,7 +9,7 @@ import java.util.Map.Entry;
 
 public class LifeCycleComponentManager implements IComponentContainer {
 
-    private HashMap<String, WeakReference<LifeCycleComponent>> mComponentList;
+    private HashMap<String, LifeCycleComponent> mComponentList;
 
     public static void tryAddComponentToContainer(LifeCycleComponent component, Context context) {
         if (context instanceof IComponentContainer) {
@@ -20,68 +20,89 @@ public class LifeCycleComponentManager implements IComponentContainer {
     }
 
     public LifeCycleComponentManager() {
-        mComponentList = new HashMap<String, WeakReference<LifeCycleComponent>>();
     }
 
     public void addComponent(LifeCycleComponent component) {
         if (component != null) {
-            mComponentList.put(component.toString(), new WeakReference<LifeCycleComponent>(component));
+            getList().put(component.toString(), component);
         }
+    }
+
+    private HashMap<String, LifeCycleComponent> getList() {
+        if (mComponentList == null) {
+            mComponentList = new HashMap<String, LifeCycleComponent>();
+        }
+        return mComponentList;
     }
 
     public void onRestart() {
 
-        for (Iterator<Entry<String, WeakReference<LifeCycleComponent>>> it = mComponentList.entrySet().iterator(); it.hasNext(); ) {
-            LifeCycleComponent component = it.next().getValue().get();
-            if (null != component) {
+        if (mComponentList == null) {
+            return;
+        }
+
+        Iterator<Entry<String, LifeCycleComponent>> it = getIterator();
+        while (it.hasNext()) {
+            LifeCycleComponent component = it.next().getValue();
+            if (component != null) {
                 component.onRestart();
-            } else {
-                it.remove();
             }
         }
     }
 
+    private Iterator<Entry<String, LifeCycleComponent>> getIterator() {
+        Iterator<Entry<String, LifeCycleComponent>> it = mComponentList.entrySet().iterator();
+        return it;
+    }
+
     public void onStop() {
-        Iterator<Entry<String, WeakReference<LifeCycleComponent>>> it = mComponentList.entrySet().iterator();
+        if (mComponentList == null) {
+            return;
+        }
+        Iterator<Entry<String, LifeCycleComponent>> it = getIterator();
         while (it.hasNext()) {
-            LifeCycleComponent component = it.next().getValue().get();
-            if (null != component) {
+            LifeCycleComponent component = it.next().getValue();
+            if (component != null) {
                 component.onStop();
-            } else {
-                it.remove();
             }
         }
     }
 
     public void onPause() {
-        for (Iterator<Entry<String, WeakReference<LifeCycleComponent>>> it = mComponentList.entrySet().iterator(); it.hasNext(); ) {
-            LifeCycleComponent component = it.next().getValue().get();
-            if (null != component) {
+        if (mComponentList == null) {
+            return;
+        }
+        Iterator<Entry<String, LifeCycleComponent>> it = getIterator();
+        while (it.hasNext()) {
+            LifeCycleComponent component = it.next().getValue();
+            if (component != null) {
                 component.onPause();
-            } else {
-                it.remove();
             }
         }
     }
 
     public void onResume() {
-        for (Iterator<Entry<String, WeakReference<LifeCycleComponent>>> it = mComponentList.entrySet().iterator(); it.hasNext(); ) {
-            LifeCycleComponent component = it.next().getValue().get();
-            if (null != component) {
+        if (mComponentList == null) {
+            return;
+        }
+        Iterator<Entry<String, LifeCycleComponent>> it = getIterator();
+        while (it.hasNext()) {
+            LifeCycleComponent component = it.next().getValue();
+            if (component != null) {
                 component.onResume();
-            } else {
-                it.remove();
             }
         }
     }
 
     public void onDestroy() {
-        for (Iterator<Entry<String, WeakReference<LifeCycleComponent>>> it = mComponentList.entrySet().iterator(); it.hasNext(); ) {
-            LifeCycleComponent component = it.next().getValue().get();
-            if (null != component) {
+        if (mComponentList == null) {
+            return;
+        }
+        Iterator<Entry<String, LifeCycleComponent>> it = getIterator();
+        while (it.hasNext()) {
+            LifeCycleComponent component = it.next().getValue();
+            if (component != null) {
                 component.onDestroy();
-            } else {
-                it.remove();
             }
         }
     }
