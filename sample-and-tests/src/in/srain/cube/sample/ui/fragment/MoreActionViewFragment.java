@@ -13,8 +13,6 @@ public class MoreActionViewFragment extends TitleBaseFragment {
     protected View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         setHeaderTitle("More Action View Demo");
 
-        mTitleHeaderBar.showMoreMenu();
-
         View view = inflater.inflate(R.layout.fragment_more_action_view, null);
         return view;
     }

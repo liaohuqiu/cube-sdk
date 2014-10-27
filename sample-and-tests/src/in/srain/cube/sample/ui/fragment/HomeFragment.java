@@ -11,9 +11,11 @@ import android.widget.TextView;
 import in.srain.cube.sample.R;
 import in.srain.cube.sample.activity.PagerTabIndicatorActivity;
 import in.srain.cube.sample.activity.TitleBaseFragment;
+import in.srain.cube.sample.activity.imagelist.BigImageListActivity;
+import in.srain.cube.sample.activity.imagelist.GridListImageActivity;
+import in.srain.cube.sample.activity.imagelist.SmallListImageActivity;
 import in.srain.cube.sample.ui.fragment.imagelist.BigListViewFragment;
 import in.srain.cube.sample.ui.fragment.imagelist.GridListViewFragment;
-import in.srain.cube.sample.ui.fragment.imagelist.SmallListViewFragment;
 import in.srain.cube.util.LocalDisplay;
 import in.srain.cube.views.block.BlockListAdapter;
 import in.srain.cube.views.block.BlockListView;
@@ -27,7 +29,7 @@ public class HomeFragment extends TitleBaseFragment {
     private ArrayList<ItemInfo> mItemInfos = new ArrayList<HomeFragment.ItemInfo>();
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    protected View createView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, null);
         mBlockListView = (BlockListView) view.findViewById(R.id.ly_home_container);
 
@@ -37,7 +39,9 @@ public class HomeFragment extends TitleBaseFragment {
 
             @Override
             public void onClick(View v) {
-                getContext().pushFragmentToBackStatck(BigListViewFragment.class, null);
+                Intent intent = new Intent();
+                intent.setClass(getContext(), BigImageListActivity.class);
+                startActivity(intent);
             }
         }));
 
@@ -45,7 +49,9 @@ public class HomeFragment extends TitleBaseFragment {
 
             @Override
             public void onClick(View v) {
-                getContext().pushFragmentToBackStatck(GridListViewFragment.class, null);
+                Intent intent = new Intent();
+                intent.setClass(getContext(), GridListImageActivity.class);
+                startActivity(intent);
             }
         }));
 
@@ -53,7 +59,9 @@ public class HomeFragment extends TitleBaseFragment {
 
             @Override
             public void onClick(View v) {
-                getContext().pushFragmentToBackStatck(SmallListViewFragment.class, null);
+                Intent intent = new Intent();
+                intent.setClass(getContext(), SmallListImageActivity.class);
+                startActivity(intent);
             }
         }));
 

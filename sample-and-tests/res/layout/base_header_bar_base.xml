@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="44dp"
-    android:background="@color/base_background" >
+    android:background="#f1f1f1">
 
     <RelativeLayout
         android:id="@+id/ly_title_bar_left"
@@ -11,16 +11,15 @@
         android:layout_alignParentLeft="true"
         android:gravity="center_vertical"
         android:paddingLeft="12dp"
-        android:paddingRight="20dp" >
-    </RelativeLayout>
+        android:paddingRight="20dp" />
 
     <RelativeLayout
         android:id="@+id/ly_title_bar_center"
         android:layout_width="200dp"
         android:layout_height="match_parent"
         android:layout_centerHorizontal="true"
-        android:gravity="center" >
-    </RelativeLayout>
+        android:gravity="center" />
+
 
     <RelativeLayout
         android:id="@+id/ly_title_bar_right"
@@ -29,7 +28,6 @@
         android:layout_alignParentRight="true"
         android:gravity="center_vertical"
         android:paddingLeft="20dp"
-        android:paddingRight="12dp" >
-    </RelativeLayout>
+        android:paddingRight="12dp" />
 
 </RelativeLayout>

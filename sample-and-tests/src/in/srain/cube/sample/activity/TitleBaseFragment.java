@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import in.srain.cube.app.CubeFragment;
 import in.srain.cube.sample.R;
-import in.srain.cube.sample.ui.views.header.TitleHeaderBar;
+import in.srain.cube.sample.activity.base.TitleHeaderBar;
 
 /**
  * 带页头的 页面基类
@@ -35,7 +35,6 @@ public abstract class TitleBaseFragment extends CubeFragment {
         // 页头逻辑处理
         mTitleHeaderBar = (TitleHeaderBar) view.findViewById(R.id.ly_header_bar_title_wrap);
         if (enableDefaultBack()) {
-            mTitleHeaderBar.getLeftTextView().setText(R.string.base_title_return);
             mTitleHeaderBar.setLeftOnClickListener(new OnClickListener() {
 
                 @Override
