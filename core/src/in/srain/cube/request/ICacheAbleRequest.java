@@ -5,7 +5,7 @@ import in.srain.cube.cache.ICacheAble;
 public interface ICacheAbleRequest<T> extends ICacheAble<T>, IRequest<T> {
 
     /**
-     * disable cache
+     * check cache is disabled
      * <p/>
      * 1. will not load cache
      * <p/>
@@ -13,7 +13,7 @@ public interface ICacheAbleRequest<T> extends ICacheAble<T>, IRequest<T> {
      *
      * @return
      */
-    public boolean disableCache();
+    public boolean cacheIsDisabled();
 
     /**
      * set a timeout, when request time over this value, cache data will be used.

@@ -18,10 +18,6 @@ public class Cube {
         instance = new Cube(app);
     }
 
-    public static void onTerminate() {
-
-    }
-
     private Cube(Application application) {
         mApplication = application;
 
@@ -41,10 +37,6 @@ public class Cube {
 
     public Context getContext() {
         return mApplication;
-    }
-
-    public String getRootDirNameInSDCard() {
-        return "cube_sdk";
     }
 
     public String getAndroidId() {

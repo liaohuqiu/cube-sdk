@@ -47,5 +47,5 @@ public interface ICacheAble<T> {
      *
      * @return
      */
-    public boolean disableCache();
+    public boolean cacheIsDisabled();
 }

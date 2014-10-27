@@ -113,7 +113,7 @@ public class Query<T> implements ICacheAble<T> {
     }
 
     @Override
-    public boolean disableCache() {
+    public boolean cacheIsDisabled() {
         return mHandler != null && mHandler.disableCache();
     }
 }

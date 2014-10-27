@@ -20,9 +20,9 @@ public class SliderBanner extends RelativeLayout {
     private PagerIndicator mPagerIndicator;
     private AutoPlayer mAutoPlayer;
 
-    private int mIdForViewPager;
-    private int mIdForIndicator;
-    private int mTimeInterval = 2000;
+    protected int mIdForViewPager;
+    protected int mIdForIndicator;
+    protected int mTimeInterval = 2000;
 
     public SliderBanner(Context context) {
         this(context, null);

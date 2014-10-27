@@ -154,15 +154,14 @@ public class FileUtil {
         }
     }
 
-    public static String wantFilesPath(Context context, boolean externalStorageFirst, String specifiedPathForExtenalStoage) {
-
+    /**
+     * external: "/storage/emulated/0/Android/data/in.srain.sample/files"
+     * internal: "/data/data/in.srain.sample/files"
+     */
+    public static String wantFilesPath(Context context, boolean externalStorageFirst) {
         String path = null;
         if (externalStorageFirst && hasSDCardMounted()) {
-            if (specifiedPathForExtenalStoage != null && specifiedPathForExtenalStoage.length() != 0)
-                path = Environment.getExternalStorageDirectory() + "/" + specifiedPathForExtenalStoage + "/files";
-            else {
-                path = Environment.getExternalStorageDirectory() + "/" + context.getPackageName() + "/files";
-            }
+            path = context.getExternalFilesDir("").getAbsolutePath();
         } else {
             path = context.getFilesDir().getAbsolutePath();
         }

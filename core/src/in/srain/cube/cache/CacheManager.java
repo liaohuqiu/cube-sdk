@@ -100,7 +100,7 @@ public class CacheManager {
 
         void beginQuery() {
 
-            if (mCacheAble.disableCache()) {
+            if (mCacheAble.cacheIsDisabled()) {
                 if (DEBUG) {
                     CLog.d(LOG_TAG, "%s, Cache is disabled, query from server", mCacheAble.getCacheKey());
                 }

@@ -39,4 +39,9 @@ public abstract class RequestBase<T> implements IRequest<T> {
      * implement this method to process request data
      */
     protected abstract void doSendRequest();
+
+    /**
+     * prepare request
+     */
+    protected abstract void prepareRequest();
 }

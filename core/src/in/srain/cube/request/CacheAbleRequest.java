@@ -23,7 +23,6 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
     protected static final String LOG_TAG = "cube_cache_request";
 
     private CacheAbleRequestHandler<T> mHandler;
-    private CacheAbleRequestPrePreHandler mPreHandler;
 
     private T mCacheData;
     private boolean mOutOfDate;
@@ -35,11 +34,20 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
     private boolean mHasNotified = false;
     protected boolean mForceQueryFromServer = false;
 
-    public CacheAbleRequest(CacheAbleRequestPrePreHandler preHandler, final CacheAbleRequestHandler<T> handler) {
-        mPreHandler = preHandler;
-        mHandler = handler;
+    private String mInitDataPath;
+    private boolean mDisableCache = false;
+    private int mCacheTime;
+
+    public CacheAbleRequest() {
     }
 
+    public CacheAbleRequest(final CacheAbleRequestHandler<T> handler) {
+        setCacheAbleRequestHandler(handler);
+    }
+
+    public void setCacheAbleRequestHandler(CacheAbleRequestHandler<T> handler) {
+        mHandler = handler;
+    }
 
     public void forceQueryFromServer(boolean force) {
         mForceQueryFromServer = force;
@@ -51,6 +59,14 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
     @Override
     public void doSendRequest() {
         RequestCacheManager.getInstance().requestCache(this);
+    }
+
+    /**
+     * prepare request
+     */
+    @Override
+    protected void prepareRequest() {
+
     }
 
     // ===========================================================
@@ -88,16 +104,6 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
     }
 
     @Override
-    public void prepareRequest() {
-        if (DEBUG) {
-            CLog.d(LOG_TAG, "%s, prepareRequest", getCacheKey());
-        }
-        if (mPreHandler != null) {
-            mPreHandler.prepareRequest(this);
-        }
-    }
-
-    @Override
     public void onRequestFail(FailData failData) {
         if (DEBUG) {
             CLog.d(LOG_TAG, "%s, onRequestFail", getCacheKey());
@@ -107,7 +113,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
         }
         if (null != mHandler) {
             mHandler.onRequestFail(failData);
-            if (mCacheData != null && !disableCache() && !mUseCacheAnyway) {
+            if (mCacheData != null && !cacheIsDisabled() && !mUseCacheAnyway) {
                 notifyRequestFinish(ResultType.USE_CACHE_ON_FAIL, true);
             } else {
                 mHandler.onRequestFail(null);
@@ -132,18 +138,15 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
     }
 
     protected boolean cacheRequestResult() {
-        return mForceQueryFromServer || !disableCache();
+        return mForceQueryFromServer || !cacheIsDisabled();
     }
 
     @Override
-    public boolean disableCache() {
+    public boolean cacheIsDisabled() {
         if (mForceQueryFromServer) {
             return true;
         }
-        if (mPreHandler != null) {
-            return mPreHandler.disableCache();
-        }
-        return false;
+        return mDisableCache;
     }
 
     // ===========================================================
@@ -174,27 +177,27 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
 
     @Override
     public int getCacheTime() {
-        return mPreHandler.getCacheTime();
+        return mCacheTime;
     }
 
     @Override
     public String getCacheKey() {
         if (mCacheKey == null) {
-            String cacheKey = mPreHandler.getSpecificCacheKey();
-            if (TextUtils.isEmpty(cacheKey)) {
-
-                String url = getRequestData().getRequestUrl();
-                try {
-                    URI uri = null;
-                    uri = new URI(url);
-                    cacheKey = uri.getPath();
-                    if (cacheKey.startsWith("/")) {
-                        cacheKey = cacheKey.substring(1);
-                    }
-                    cacheKey = cacheKey.replace("/", "-");
-                } catch (URISyntaxException e) {
-                    e.printStackTrace();
+            String cacheKey = null;
+            String url = getRequestData().getRequestUrl();
+            try {
+                URI uri = null;
+                uri = new URI(url);
+                cacheKey = uri.getPath();
+                if (cacheKey.startsWith("/")) {
+                    cacheKey = cacheKey.substring(1);
                 }
+                cacheKey = cacheKey.replace("/", "-");
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+            if (TextUtils.isEmpty(cacheKey)) {
+                throw new RuntimeException("Cache key is null");
             }
             mCacheKey = cacheKey;
         }
@@ -203,7 +206,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
 
     @Override
     public String getAssertInitDataPath() {
-        return mPreHandler.getInitFileAssertPath();
+        return mInitDataPath;
     }
 
     @Override
@@ -261,5 +264,25 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
                 }
             }, mTimeout);
         }
+    }
+
+    public CacheAbleRequest setCacheKey(String cacheKey) {
+        mCacheKey = cacheKey;
+        return this;
+    }
+
+    public CacheAbleRequest setDisableCache(boolean disable) {
+        mDisableCache = disable;
+        return this;
+    }
+
+    public CacheAbleRequest setInitDataPath(String path) {
+        mInitDataPath = path;
+        return this;
+    }
+
+    public CacheAbleRequest setCacheTime(int cacheTime) {
+        mCacheTime = cacheTime;
+        return this;
     }
 }
