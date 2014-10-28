@@ -2,7 +2,7 @@ package in.srain.cube.util;
 
 import java.lang.reflect.Field;
 
-public class Resource {
+public class ResourceMan {
 
     public static int getResId(String variableName, Class<?> c) {
         try {
