@@ -1,6 +1,6 @@
 `Cube` is a light package for Android development. 
 
-![Screen Shot](https://raw.githubusercontent.com/liaohuqiu/android-GridViewWithHeaderAndFooter/master/screen-shot.png)
+![Screen Shot](https://raw.githubusercontent.com/etao-open-source/cube-sdk/dev/screen-shot.png)
 
 #### Marven
 
