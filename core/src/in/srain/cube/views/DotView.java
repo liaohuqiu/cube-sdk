@@ -7,7 +7,6 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.LinearLayout;
 import in.srain.cube.R;
 import in.srain.cube.views.banner.PagerIndicator;

@@ -4,7 +4,6 @@ import android.app.Application;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import in.srain.cube.Cube;
-import in.srain.cube.cache.CacheManager;
 import in.srain.cube.image.ImageLoaderFactory;
 import in.srain.cube.request.RequestCacheManager;
 import in.srain.cube.sample.image.DemoDuiTangImageResizer;
@@ -43,15 +42,5 @@ public class CubeDemoApplication extends Application {
 
     public void test() {
         CLog.d("test", "info: %s", this);
-    }
-
-    @Override
-    public void onTerminate() {
-        super.onTerminate();
-
-        // other code
-        // ...
-
-        Cube.onTerminate();
     }
 }

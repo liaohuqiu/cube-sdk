@@ -26,8 +26,6 @@
         android:id="@+id/ly_title_bar_center"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_toRightOf="@+id/ly_title_bar_left"
-        android:layout_toLeftOf="@+id/ly_title_bar_right"
         android:gravity="center">
 
         <TextView

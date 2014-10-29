@@ -3,9 +3,7 @@ package in.srain.cube.sample.ui.views.header;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import in.srain.cube.sample.R;
 

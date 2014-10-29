@@ -7,8 +7,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import in.srain.cube.util.CLog;
 
-import java.util.HashSet;
-
 /**
  * A adapter using View Holder to display the item of a list view;
  *
@@ -52,7 +50,7 @@ public abstract class ListViewDataAdapterBase<ItemDataType> extends BaseAdapter 
         }
         ItemDataType itemData = getItem(position);
         ViewHolderBase<ItemDataType> holderBase = null;
-        if (mForceCreateView || convertView == null) {
+        if (mForceCreateView || convertView == null || (!(convertView.getTag() instanceof ViewHolderBase<?>))) {
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
             holderBase = mViewHolderCreator.createViewHolder();
             if (holderBase != null) {

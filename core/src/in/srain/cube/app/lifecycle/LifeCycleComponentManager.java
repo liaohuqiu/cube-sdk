@@ -2,7 +2,6 @@ package in.srain.cube.app.lifecycle;
 
 import android.content.Context;
 
-import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;

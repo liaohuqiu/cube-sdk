@@ -3,7 +3,6 @@ package in.srain.cube.image.iface;
 import in.srain.cube.cache.IFileCache;
 
 import java.io.FileInputStream;
-import java.io.InputStream;
 
 public interface ImageFileProvider extends IFileCache {
     public FileInputStream getInputStream(String key);

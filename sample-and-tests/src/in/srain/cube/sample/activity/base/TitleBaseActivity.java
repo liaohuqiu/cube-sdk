@@ -24,7 +24,7 @@ public abstract class TitleBaseActivity extends BaseActivity {
 
         // 页头逻辑处理
         mTitleHeaderBar = (TitleHeaderBar) findViewById(R.id.ly_header_bar_title_wrap);
-        mContainer = (LinearLayout) findViewById(R.id.ly_base_activity_container);
+        mContainer = (LinearLayout) findViewById(R.id.ly_main_content_container);
 
         if (enableDefaultBack()) {
             mTitleHeaderBar.setLeftOnClickListener(new OnClickListener() {

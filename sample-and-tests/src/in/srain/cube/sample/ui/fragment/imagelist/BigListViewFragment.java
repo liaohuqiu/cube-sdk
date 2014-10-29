@@ -1,7 +1,5 @@
 package in.srain.cube.sample.ui.fragment.imagelist;
 
-import android.annotation.TargetApi;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;

@@ -20,7 +20,13 @@
             <groupId>in.srain.cube</groupId>
             <artifactId>cube-sdk</artifactId>
             <type>apklib</type>
-            <version>1.0.36-SNAPSHOT</version>
+            <version>1.0.37-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>in.srain.cube</groupId>
+            <artifactId>grid-view-with-header-footer</artifactId>
+            <type>jar</type>
+            <version>1.0.1</version>
         </dependency>
         <dependency>
             <groupId>com.google.android</groupId>

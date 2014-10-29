@@ -1,7 +1,5 @@
 package in.srain.cube.cache;
 
-import java.io.InputStream;
-
 public interface IFileCache {
 
     public String getCachePath();

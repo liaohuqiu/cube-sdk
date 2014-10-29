@@ -3,10 +3,8 @@ package in.srain.cube.sample.activity.imagelist;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.GridView;
+import android.widget.*;
 import android.widget.ImageView.ScaleType;
-import android.widget.LinearLayout;
-import android.widget.Toast;
 import in.srain.cube.image.CubeImageView;
 import in.srain.cube.image.ImageLoader;
 import in.srain.cube.image.ImageLoaderFactory;
@@ -19,6 +17,7 @@ import in.srain.cube.sample.data.DemoRequestData;
 import in.srain.cube.sample.data.Images;
 import in.srain.cube.sample.ui.views.header.ptr.PtrFrameDemo;
 import in.srain.cube.util.LocalDisplay;
+import in.srain.cube.views.GridViewWithHeaderAndFooter;
 import in.srain.cube.views.IScrollHeaderFrameHandler;
 import in.srain.cube.views.ScrollHeaderFrame;
 import in.srain.cube.views.list.ListViewDataAdapter;
@@ -39,7 +38,13 @@ public class GridListImageActivity extends TitleBaseActivity {
         mImageLoader = ImageLoaderFactory.create(this);
         setContentView(R.layout.activity_image_gird);
         final View v = mContainer;
-        final GridView gridListView = (GridView) v.findViewById(R.id.ly_image_list_grid);
+        final GridViewWithHeaderAndFooter gridListView = (GridViewWithHeaderAndFooter) v.findViewById(R.id.ly_image_list_grid);
+
+        LayoutInflater layoutInflater = LayoutInflater.from(this);
+        View headerView = layoutInflater.inflate(R.layout.test_header_view, null);
+        View footerView = layoutInflater.inflate(R.layout.test_footer_view, null);
+        gridListView.addHeaderView(headerView);
+        gridListView.addFooterView(footerView);
 
         final ListViewDataAdapter<JsonData> adapter = new ListViewDataAdapter<JsonData>(new ViewHolderCreator<JsonData>() {
             @Override
@@ -48,7 +53,7 @@ public class GridListImageActivity extends TitleBaseActivity {
             }
         });
         gridListView.setAdapter(adapter);
-        setHeaderTitle("Grid");
+        setHeaderTitle("GridViewWithHeaderAndFooter");
 
         final PtrFrameDemo ptrFrame = (PtrFrameDemo) v.findViewById(R.id.ly_ptr_frame);
         ptrFrame.setKeepHeaderWhenRefresh(true);

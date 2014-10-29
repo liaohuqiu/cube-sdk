@@ -18,15 +18,6 @@ public class DemoRequestData {
      */
     public static void reverse(final String str, final RequestJsonHandler handler) {
 
-        RequestPreHandler preHandler = new RequestPreHandler() {
-
-            public <T> void prepareRequest(RequestBase<T> request) {
-                String url = "http://cube-server.liaohuqiu.net/api_demo/reverse.php?str=" + str;
-                request.getRequestData().setRequestUrl(url);
-
-            }
-        };
-
         RequestHandler<JsonData> requestHandler = new RequestHandler<JsonData>() {
             @Override
             public JsonData processOriginData(JsonData jsonData) {
@@ -45,7 +36,9 @@ public class DemoRequestData {
             }
         };
 
-        SimpleRequest<JsonData> request = new SimpleRequest<JsonData>(preHandler, handler);
+        SimpleRequest<JsonData> request = new SimpleRequest<JsonData>(handler);
+        String url = "http://cube-server.liaohuqiu.net/api_demo/reverse.php?str=" + str;
+        request.getRequestData().setRequestUrl(url);
         request.send();
     }
 
@@ -62,36 +55,6 @@ public class DemoRequestData {
      * @param noCache
      */
     public static void getImageList(final boolean noCache, final ImageListDataHandler handler) {
-
-        CacheAbleRequestPrePreHandler prePreHandler = new CacheAbleRequestPrePreHandler() {
-
-            @Override
-            public <T> void prepareRequest(RequestBase<T> request) {
-                String url = "http://cube-server.liaohuqiu.net/api_demo/image-list.php";
-                request.getRequestData().setRequestUrl(url);
-            }
-
-            @Override
-            public String getSpecificCacheKey() {
-                return "image-list-1";
-            }
-
-            @Override
-            public String getInitFileAssertPath() {
-                return "request_init/demo/image-list.json";
-            }
-
-            @Override
-            public boolean disableCache() {
-                return noCache;
-            }
-
-            @Override
-            public int getCacheTime() {
-                return 300;
-            }
-
-        };
 
         CacheAbleRequestHandler requestHandler = new CacheAbleRequestHandler<JsonData>() {
             @Override
@@ -125,8 +88,12 @@ public class DemoRequestData {
             }
         };
 
-        CacheAbleRequest<JsonData> request =
-                new CacheAbleRequest<JsonData>(prePreHandler, requestHandler);
+        CacheAbleRequest<JsonData> request = new CacheAbleRequest<JsonData>(requestHandler);
+
+        String url = "http://cube-server.liaohuqiu.net/api_demo/image-list.php";
+        request.getRequestData().setRequestUrl(url);
+        request.setInitDataPath("request_init/demo/image-list.json");
+        request.setCacheKey("image-list-1");
 
         // Uncomment following line to use the data from cache when cache is available
         // no matter whether it is expired or not.

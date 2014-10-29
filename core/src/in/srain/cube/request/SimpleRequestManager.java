@@ -3,11 +3,9 @@ package in.srain.cube.request;
 import android.os.Handler;
 import android.os.Message;
 
-import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 
 /**
  * @author http://www.liaohuqiu.net

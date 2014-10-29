@@ -2,11 +2,6 @@ package in.srain.cube.views.mix;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.os.Message;
-
-import java.lang.ref.WeakReference;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * A player who can play a @Playable object. It can play next till end and play previous till head.

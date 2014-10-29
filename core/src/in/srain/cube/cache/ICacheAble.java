@@ -1,6 +1,5 @@
 package in.srain.cube.cache;
 
-import in.srain.cube.cache.CacheManager;
 import in.srain.cube.request.JsonData;
 
 /**

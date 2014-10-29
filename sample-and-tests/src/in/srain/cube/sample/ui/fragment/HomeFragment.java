@@ -14,8 +14,6 @@ import in.srain.cube.sample.activity.TitleBaseFragment;
 import in.srain.cube.sample.activity.imagelist.BigImageListActivity;
 import in.srain.cube.sample.activity.imagelist.GridListImageActivity;
 import in.srain.cube.sample.activity.imagelist.SmallListImageActivity;
-import in.srain.cube.sample.ui.fragment.imagelist.BigListViewFragment;
-import in.srain.cube.sample.ui.fragment.imagelist.GridListViewFragment;
 import in.srain.cube.util.LocalDisplay;
 import in.srain.cube.views.block.BlockListAdapter;
 import in.srain.cube.views.block.BlockListView;
