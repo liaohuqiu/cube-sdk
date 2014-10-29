@@ -38,13 +38,14 @@ public class GridListImageActivity extends TitleBaseActivity {
         mImageLoader = ImageLoaderFactory.create(this);
         setContentView(R.layout.activity_image_gird);
         final View v = mContainer;
-        final GridViewWithHeaderAndFooter gridListView = (GridViewWithHeaderAndFooter) v.findViewById(R.id.ly_image_list_grid);
+
+        final GridViewWithHeaderAndFooter gridView = (GridViewWithHeaderAndFooter) v.findViewById(R.id.ly_image_list_grid);
 
         LayoutInflater layoutInflater = LayoutInflater.from(this);
         View headerView = layoutInflater.inflate(R.layout.test_header_view, null);
         View footerView = layoutInflater.inflate(R.layout.test_footer_view, null);
-        gridListView.addHeaderView(headerView);
-        gridListView.addFooterView(footerView);
+        gridView.addHeaderView(headerView);
+        gridView.addFooterView(footerView);
 
         final ListViewDataAdapter<JsonData> adapter = new ListViewDataAdapter<JsonData>(new ViewHolderCreator<JsonData>() {
             @Override
@@ -52,7 +53,7 @@ public class GridListImageActivity extends TitleBaseActivity {
                 return new ViewHolder();
             }
         });
-        gridListView.setAdapter(adapter);
+        gridView.setAdapter(adapter);
         setHeaderTitle("GridViewWithHeaderAndFooter");
 
         final PtrFrameDemo ptrFrame = (PtrFrameDemo) v.findViewById(R.id.ly_ptr_frame);
@@ -85,10 +86,10 @@ public class GridListImageActivity extends TitleBaseActivity {
         frame.setHandler(new IScrollHeaderFrameHandler() {
             @Override
             public boolean hasReachTop() {
-                if (gridListView.getChildCount() == 0) {
+                if (gridView.getChildCount() == 0) {
                     return true;
                 }
-                return gridListView.getChildAt(0).getTop() == 0;
+                return gridView.getChildAt(0).getTop() == 0;
             }
         });
     }
