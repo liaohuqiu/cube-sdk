@@ -37,7 +37,7 @@
             <groupId>in.srain.cube</groupId>
             <artifactId>grid-view-with-header-footer</artifactId>
             <type>jar</type>
-            <version>1.0.3</version>
+            <version>1.0.4</version>
         </dependency>
     </dependencies>
 
