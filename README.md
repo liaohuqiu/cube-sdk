@@ -18,3 +18,5 @@ It's in Maven Central:
 ###[`Github Pages`](http://cube-sdk.liaohuqiu.net)
 
 ###[`中文版文档`](http://cube-sdk.liaohuqiu.net/cn)
+
+QQ交流群: 271918140
