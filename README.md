@@ -19,4 +19,10 @@ It's in Maven Central:
 
 ###[`中文版文档`](http://cube-sdk.liaohuqiu.net/cn)
 
-QQ交流群: 271918140
+---
+
+* srain@php.net
+* twitter: https://twitter.com/liaohuqiu
+* weibo: http://weibo.com/liaohuqiu
+* QQ交流群: 271918140
+
