@@ -13,7 +13,7 @@
     <artifactId>cube-sdk</artifactId>
     <packaging>apklib</packaging>
     <name>Cube SDK</name>
-    <version>1.0.37-SNAPSHOT</version>
+    <version>1.0.38-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
@@ -27,6 +27,12 @@
             <groupId>com.google.android</groupId>
             <artifactId>support-v4</artifactId>
             <version>r18</version>
+        </dependency>
+
+        <dependency>
+            <groupId>in.srain.cube</groupId>
+            <artifactId>clog</artifactId>
+            <version>1.0.1</version>
         </dependency>
     </dependencies>
 

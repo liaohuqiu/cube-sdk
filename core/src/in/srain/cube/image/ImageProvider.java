@@ -15,7 +15,7 @@ import in.srain.cube.image.iface.ImageMemoryCache;
 import in.srain.cube.image.iface.ImageResizer;
 import in.srain.cube.image.impl.DefaultMemoryCache;
 import in.srain.cube.image.impl.LruImageFileProvider;
-import in.srain.cube.util.CLog;
+import in.srain.cube.util.Debug;
 import in.srain.cube.util.Version;
 
 import java.io.FileDescriptor;
@@ -32,7 +32,7 @@ import java.io.InputStream;
  */
 public class ImageProvider {
 
-    protected static final boolean DEBUG = CLog.DEBUG_IMAGE;
+    protected static final boolean DEBUG = Debug.DEBUG_IMAGE;
 
     protected static final String TAG = "image_provider";
 

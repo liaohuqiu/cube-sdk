@@ -6,11 +6,11 @@ import android.util.Log;
 import in.srain.cube.image.ImageProvider;
 import in.srain.cube.image.drawable.RecyclingBitmapDrawable;
 import in.srain.cube.image.iface.ImageMemoryCache;
-import in.srain.cube.util.CLog;
+import in.srain.cube.util.Debug;
 
 public class DefaultMemoryCache implements ImageMemoryCache {
 
-    protected static final boolean DEBUG = CLog.DEBUG_IMAGE;
+    protected static final boolean DEBUG = Debug.DEBUG_IMAGE;
     protected static final String TAG = "image_provider";
     private LruCache<String, BitmapDrawable> mMemoryCache;
 

@@ -12,7 +12,7 @@ import in.srain.cube.image.iface.ImageTaskExecutor;
 import in.srain.cube.image.impl.DefaultImageLoadHandler;
 import in.srain.cube.image.impl.DefaultImageResizer;
 import in.srain.cube.image.impl.DefaultImageTaskExecutor;
-import in.srain.cube.util.CLog;
+import in.srain.cube.util.Debug;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -32,7 +32,7 @@ public class ImageLoader {
     private static final String MSG_TASK_CANCEL = "%s onCancel";
     private static final String MSG_TASK_HIT_CACHE = "%s hit cache %s %s";
 
-    protected static final boolean DEBUG = CLog.DEBUG_IMAGE;
+    protected static final boolean DEBUG = Debug.DEBUG_IMAGE;
     protected static final String Log_TAG = "cube_image";
 
     protected ImageTaskExecutor mImageTaskExecutor;

@@ -9,13 +9,14 @@ import in.srain.cube.file.FileUtil;
 import in.srain.cube.file.LruFileCache;
 import in.srain.cube.request.JsonData;
 import in.srain.cube.util.CLog;
+import in.srain.cube.util.Debug;
 
 /**
  * @author http://www.liaohuqiu.net
  */
 public class CacheManager {
 
-    private static final boolean DEBUG = CLog.DEBUG_CACHE;
+    private static final boolean DEBUG = Debug.DEBUG_CACHE;
     private static final String LOG_TAG = "cube_cache";
 
     private LruCache<String, CacheInfo> mMemoryCache;

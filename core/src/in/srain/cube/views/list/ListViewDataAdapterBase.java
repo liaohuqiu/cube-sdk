@@ -5,7 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import in.srain.cube.util.CLog;
+import in.srain.cube.util.Debug;
 
 /**
  * A adapter using View Holder to display the item of a list view;
@@ -45,7 +45,7 @@ public abstract class ListViewDataAdapterBase<ItemDataType> extends BaseAdapter 
         if (mViewHolderCreator == null) {
             throw new RuntimeException("view holder creator is null");
         }
-        if (CLog.DEBUG_LIST) {
+        if (Debug.DEBUG_LIST) {
             Log.d(LOG_TAG, String.format("getView %s", position));
         }
         ItemDataType itemData = getItem(position);

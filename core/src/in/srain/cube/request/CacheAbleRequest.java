@@ -5,6 +5,7 @@ import in.srain.cube.cache.CacheManager;
 import in.srain.cube.cache.CacheResultType;
 import in.srain.cube.concurrent.SimpleTask;
 import in.srain.cube.util.CLog;
+import in.srain.cube.util.Debug;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -19,7 +20,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
         USE_CACHE_ON_FAIL,
     }
 
-    protected static final boolean DEBUG = CLog.DEBUG_CACHE;
+    protected static final boolean DEBUG = Debug.DEBUG_CACHE;
     protected static final String LOG_TAG = "cube_cache_request";
 
     private CacheAbleRequestHandler<T> mHandler;

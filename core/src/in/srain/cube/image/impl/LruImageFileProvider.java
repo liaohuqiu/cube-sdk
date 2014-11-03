@@ -10,7 +10,7 @@ import in.srain.cube.file.DiskLruCache;
 import in.srain.cube.file.DiskLruCache.Editor;
 import in.srain.cube.file.FileUtil;
 import in.srain.cube.image.iface.ImageFileProvider;
-import in.srain.cube.util.CLog;
+import in.srain.cube.util.Debug;
 
 import java.io.*;
 
@@ -23,7 +23,7 @@ import java.io.*;
  */
 public class LruImageFileProvider implements ImageFileProvider {
 
-    protected static final boolean DEBUG = CLog.DEBUG_IMAGE;
+    protected static final boolean DEBUG = Debug.DEBUG_IMAGE;
 
     protected static final String TAG = "image_provider";
 

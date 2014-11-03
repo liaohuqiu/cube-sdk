@@ -31,13 +31,18 @@
             <groupId>in.srain.cube</groupId>
             <artifactId>cube-sdk</artifactId>
             <type>apklib</type>
-            <version>1.0.37-SNAPSHOT</version>
+            <version>1.0.38-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>in.srain.cube</groupId>
             <artifactId>grid-view-with-header-footer</artifactId>
             <type>jar</type>
             <version>1.0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>in.srain.cube</groupId>
+            <artifactId>clog</artifactId>
+            <version>1.0.1</version>
         </dependency>
     </dependencies>
 

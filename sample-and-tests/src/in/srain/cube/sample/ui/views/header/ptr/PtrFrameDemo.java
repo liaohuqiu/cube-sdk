@@ -1,6 +1,7 @@
 package in.srain.cube.sample.ui.views.header.ptr;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.TextView;
@@ -12,6 +13,8 @@ public class PtrFrameDemo extends PtrFrame {
 
     private TextView mTitleTextView;
     private Handler mHandler;
+
+    private SwipeProgressBar mProcessBar;
 
     public static abstract class DefaultHandler implements Handler {
 
@@ -47,6 +50,13 @@ public class PtrFrameDemo extends PtrFrame {
     public PtrFrameDemo(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         initViews();
+        mProcessBar = new SwipeProgressBar(this);
+    }
+
+    @Override
+    public void draw(Canvas canvas) {
+        super.draw(canvas);
+        mProcessBar.draw(canvas);
     }
 
     /**

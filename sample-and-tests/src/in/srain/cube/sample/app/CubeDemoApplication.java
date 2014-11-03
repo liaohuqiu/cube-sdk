@@ -18,10 +18,26 @@ public class CubeDemoApplication extends Application {
         super.onCreate();
         instance = this;
 
-        CLog.DEBUG_IMAGE = true;
-        CLog.DEBUG_CACHE = true;
+        String environment = "";
 
-        CLog.DEBUG_SCROLL_HEADER_FRAME = true;
+        if (environment.equals("production")) {
+            CLog.setLogLevel(CLog.LEVEL_ERROR);
+        } else if (environment.equals("beta")) {
+            CLog.setLogLevel(CLog.LEVEL_WARNING);
+        } else {
+            // development
+            CLog.setLogLevel(CLog.LEVEL_VERBOSE);
+        }
+
+        CLog.d("sample", "Here is a debug message");
+        CLog.d("sample", "Here is a debug message with parameters: %d", 1);
+        Exception ex = new RuntimeException();
+        CLog.d("sample", "Here is a debug message with parameters: %d", ex);
+
+        // CLog.DEBUG_IMAGE = true;
+        // CLog.DEBUG_CACHE = true;
+        // CLog.DEBUG_SCROLL_HEADER_FRAME = true;
+
         // CLog.DEBUG_PTR_FRAME = true;
         ImageLoaderFactory.setDefaultImageResizer(DemoDuiTangImageResizer.getInstance());
         String dir = "request-cache";

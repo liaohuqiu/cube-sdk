@@ -14,11 +14,12 @@ import android.widget.RelativeLayout;
 import android.widget.Scroller;
 import in.srain.cube.R;
 import in.srain.cube.util.CLog;
+import in.srain.cube.util.Debug;
 import in.srain.cube.util.Version;
 
 public class PtrFrame extends RelativeLayout {
 
-    private static final boolean DEBUG = CLog.DEBUG_PTR_FRAME;
+    private static final boolean DEBUG = Debug.DEBUG_PTR_FRAME;
     private static int ID = 1;
     private final String LOG_TAG = "PtrFrame" + ++ID;
 
@@ -93,6 +94,7 @@ public class PtrFrame extends RelativeLayout {
     private boolean mIsRefreshing = false;
     private boolean mPreventForHorizontal = false;
     private boolean mIsInTouching = false;
+    private boolean mDisableWhenHorizontalMove = false;
 
     public PtrFrame(Context context) {
         this(context, null);
@@ -240,8 +242,8 @@ public class PtrFrame extends RelativeLayout {
                 float offsetX = e.getX() - mPtLastMove.x;
                 float offsetY = (int) (e.getY() - mPtLastMove.y);
                 mPtLastMove.set(e.getX(), e.getY());
-                if (!mPreventForHorizontal && (Math.abs(offsetX) > mPagingTouchSlop || Math.abs(offsetX) > 2 * Math.abs(offsetY))) {
-                    if (frameIsMoved()) {
+                if (mDisableWhenHorizontalMove && !mPreventForHorizontal && (Math.abs(offsetX) > mPagingTouchSlop || Math.abs(offsetX) > 3 * Math.abs(offsetY))) {
+                    if (frameIsNotMoved()) {
                         mPreventForHorizontal = true;
                     }
                 }
@@ -256,7 +258,7 @@ public class PtrFrame extends RelativeLayout {
                 boolean canMoveUp = mCurrentPos > 0;
 
                 if (DEBUG) {
-                    // CLog.d(LOG_TAG, "ACTION_MOVE: offsetY:%s, mCurrentPos: %s, moveUp: %s, canMoveUp: %s, moveDown: %s", offsetY, mCurrentPos, moveUp, canMoveUp, moveDown);
+                    CLog.d(LOG_TAG, "ACTION_MOVE: offsetY:%s, mCurrentPos: %s, moveUp: %s, canMoveUp: %s, moveDown: %s", offsetY, mCurrentPos, moveUp, canMoveUp, moveDown);
                 }
 
                 // disable move when header not reach top
@@ -380,8 +382,8 @@ public class PtrFrame extends RelativeLayout {
         }
     }
 
-    private boolean frameIsMoved() {
-        return mLastPos == -mHeaderHeight;
+    private boolean frameIsNotMoved() {
+        return mCurrentPos == 0;
     }
 
     public void refreshComplete() {
@@ -401,6 +403,10 @@ public class PtrFrame extends RelativeLayout {
 
     public void reset() {
         mIsRefreshing = false;
+    }
+
+    public void disableWhenHorizontalMove(boolean disable) {
+        mDisableWhenHorizontalMove = disable;
     }
 
     public View getContent() {

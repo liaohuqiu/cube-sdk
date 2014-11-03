@@ -4,6 +4,7 @@ import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import in.srain.cube.image.iface.ImageLoadHandler;
 import in.srain.cube.util.CLog;
+import in.srain.cube.util.Debug;
 import in.srain.cube.util.Encrypt;
 
 import java.lang.ref.WeakReference;
@@ -82,7 +83,7 @@ public class ImageTask {
                 sPoolSize--;
                 return m;
             }
-            if (CLog.DEBUG_IMAGE) {
+            if (Debug.DEBUG_IMAGE) {
                 CLog.d(Log_TAG, "obtain, pool remain: %d", sPoolSize);
             }
         }
@@ -102,7 +103,7 @@ public class ImageTask {
                 sTop = this;
                 sPoolSize++;
             }
-            if (CLog.DEBUG_IMAGE) {
+            if (Debug.DEBUG_IMAGE) {
                 CLog.d(Log_TAG, "recycle, pool remain: %d", sPoolSize);
             }
         }
