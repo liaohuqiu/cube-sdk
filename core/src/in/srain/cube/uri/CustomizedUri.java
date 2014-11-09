@@ -1,11 +1,14 @@
 package in.srain.cube.uri;
 
+import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.text.TextUtils;
 import in.srain.cube.request.JsonData;
 
 public class CustomizedUri {
 
+    private static final String KEY = "CUBE_URL";
     private JsonData mQueryData;
     private String mPath = null;
     private String mQuery = null;
@@ -40,6 +43,21 @@ public class CustomizedUri {
             return null;
         }
         return new CustomizedUri(url, customizedSchema.length());
+    }
+
+    public void writeToBundle(Intent intent) {
+        intent.putExtra(KEY, getUrl());
+    }
+
+    public static CustomizedUri fromIntent(Intent intent, String schema) {
+        if (intent == null) {
+            return null;
+        }
+        String url = intent.getStringExtra(KEY);
+        if (TextUtils.isEmpty(url)) {
+            return null;
+        }
+        return parse(url, schema);
     }
 
     private CustomizedUri(String url, int len) {

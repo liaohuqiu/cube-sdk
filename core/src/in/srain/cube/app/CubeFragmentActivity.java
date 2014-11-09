@@ -181,7 +181,7 @@ public abstract class CubeFragmentActivity extends FragmentActivity {
         }
     }
 
-    private void returnBack() {
+    protected void returnBack() {
         super.onBackPressed();
     }
 

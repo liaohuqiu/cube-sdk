@@ -3,6 +3,7 @@ package in.srain.cube.views.ptr;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.PointF;
+import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
+import android.widget.AbsListView;
 import android.widget.RelativeLayout;
 import android.widget.Scroller;
 import in.srain.cube.R;
@@ -31,7 +33,7 @@ public class PtrFrame extends RelativeLayout {
          * if content is empty or the first child is in view, should do refresh
          * after release
          */
-        public boolean checkCanDoRefresh();
+        public boolean checkCanDoRefresh(PtrFrame frame, View content, View header);
 
         public void onRefresh();
 
@@ -39,9 +41,39 @@ public class PtrFrame extends RelativeLayout {
 
         public void onRelease();
 
+        public void onRefreshComplete();
+
         public void crossRotateLineFromTop(boolean isInTouching);
 
+        public void onPercentageChange(int oldPosition, int newPosition, float oldPercent, float newPercent);
+
         public void crossRotateLineFromBottom(boolean isInTouching);
+    }
+
+    public static abstract class DefaultPtrHandler implements PtrHandler {
+
+        @Override
+        public boolean checkCanDoRefresh(PtrFrame frame, View content, View header) {
+            return checkCanScrollUp(frame, content, header);
+        }
+    }
+
+    public static boolean checkCanScrollUp(PtrFrame frame, View content, View header) {
+        if (!(content instanceof ViewGroup)) {
+            return true;
+        }
+        if (android.os.Build.VERSION.SDK_INT < 14) {
+            if (content instanceof AbsListView) {
+                final AbsListView absListView = (AbsListView) content;
+                return absListView.getChildCount() > 0
+                        && (absListView.getFirstVisiblePosition() > 0 || absListView.getChildAt(0)
+                        .getTop() < absListView.getPaddingTop());
+            } else {
+                return content.getScrollY() > 0;
+            }
+        } else {
+            return ViewCompat.canScrollVertically(content, -1);
+        }
     }
 
     // ===========================================================
@@ -66,7 +98,7 @@ public class PtrFrame extends RelativeLayout {
 
     private float mRatioOfHeaderToRotate = 1.5f;
     private float mRatioOfHeaderToRefresh = 1.5f;
-    private boolean mKeepHeaderWhenRefresh = false;
+    private boolean mKeepHeaderWhenRefresh = true;
 
     private int mOffsetToRotateView = 0;
     private int mOffsetToRefresh = 0;
@@ -76,7 +108,7 @@ public class PtrFrame extends RelativeLayout {
 
     protected View mRotateView;
     protected View mHeaderContainer;
-    protected ViewGroup mContentViewContainer;
+    protected View mContentViewContainer;
 
     private State mState;
     private int mHeaderHeight;
@@ -158,7 +190,7 @@ public class PtrFrame extends RelativeLayout {
             mHeaderContainer = findViewById(mHeaderId);
         }
         if (mContainerId != 0) {
-            mContentViewContainer = (ViewGroup) findViewById(mContainerId);
+            mContentViewContainer = findViewById(mContainerId);
         }
         if (mRotateViewId != 0) {
             mRotateView = findViewById(mRotateViewId);
@@ -262,7 +294,7 @@ public class PtrFrame extends RelativeLayout {
                 }
 
                 // disable move when header not reach top
-                if (moveDown && mPtrHandler != null && !mPtrHandler.checkCanDoRefresh()) {
+                if (moveDown && mPtrHandler != null && !mPtrHandler.checkCanDoRefresh(this, mContentViewContainer, mHeaderContainer)) {
                     return super.dispatchTouchEvent(e);
                 }
 
@@ -308,8 +340,6 @@ public class PtrFrame extends RelativeLayout {
             mHeaderContainer.offsetTopAndBottom(change);
             mContentViewContainer.offsetTopAndBottom(change);
         } else {
-            // mHeaderContainer.setPadding(0, mCurrentPos, 0, 0);
-            // mContentViewContainer.setPadding(0, mCurrentPos, 0, 0);
             RelativeLayout.LayoutParams lyp = (LayoutParams) mHeaderContainer.getLayoutParams();
             lyp.setMargins(0, mCurrentPos, 0, 0);
             ((LayoutParams) mContentViewContainer.getLayoutParams()).setMargins(0, mCurrentPos, 0, 0);
@@ -337,12 +367,15 @@ public class PtrFrame extends RelativeLayout {
                 }
             }
         }
-        invalidate();
+        mPtrHandler.onPercentageChange(mLastPos, mCurrentPos, mLastPos / mHeaderHeight, mCurrentPos / mHeaderHeight);
         onUpdatePos(mLastPos, mCurrentPos);
     }
 
     protected void onUpdatePos(int last, int now) {
+    }
 
+    public int getHeaderHeight() {
+        return mHeaderHeight;
     }
 
     private void release() {
@@ -391,6 +424,9 @@ public class PtrFrame extends RelativeLayout {
             mIsRefreshing = false;
             if (mKeepHeaderWhenRefresh) {
                 mScrollChecker.scrollTo(0, mDurationToCloseHeader);
+            }
+            if (mPtrHandler != null) {
+                mPtrHandler.onRefreshComplete();
             }
         }
     }

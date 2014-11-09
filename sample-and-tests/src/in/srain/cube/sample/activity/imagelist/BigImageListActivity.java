@@ -1,5 +1,6 @@
 package in.srain.cube.sample.activity.imagelist;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,7 @@ import in.srain.cube.image.ImageReuseInfo;
 import in.srain.cube.sample.R;
 import in.srain.cube.sample.activity.base.TitleBaseActivity;
 import in.srain.cube.sample.data.Images;
+import in.srain.cube.util.CLog;
 import in.srain.cube.util.LocalDisplay;
 import in.srain.cube.views.list.ListViewDataAdapter;
 import in.srain.cube.views.list.ViewHolderBase;
@@ -34,6 +36,10 @@ public class BigImageListActivity extends TitleBaseActivity {
         setHeaderTitle("Big Image");
         setContentView(R.layout.activity_image_list_big);
         mImageLoader = ImageLoaderFactory.create(this);
+        Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
+        Bundle bundle1 = intent.getBundleExtra("bundle");
+        CLog.d("test", "key1: %s key2:%s", intent.getStringExtra("key1"), intent.getStringExtra("key2"));
 
         final View v = mContainer;
         ListView listView = (ListView) v.findViewById(R.id.ly_image_list_big);

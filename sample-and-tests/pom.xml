@@ -39,11 +39,6 @@
             <type>jar</type>
             <version>1.0.4</version>
         </dependency>
-        <dependency>
-            <groupId>in.srain.cube</groupId>
-            <artifactId>clog</artifactId>
-            <version>1.0.1</version>
-        </dependency>
     </dependencies>
 
     <properties>

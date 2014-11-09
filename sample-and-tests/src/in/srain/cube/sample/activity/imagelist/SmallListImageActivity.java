@@ -63,7 +63,7 @@ public class SmallListImageActivity extends TitleBaseActivity {
                     public void run() {
                         ptrFrame.refreshComplete();
                     }
-                }, 1000);
+                }, 3000);
             }
         });
     }

@@ -73,32 +73,64 @@ public final class JsonData {
         return optMapOrNew().optString(name);
     }
 
+    public String optString(String name, String fallback) {
+        return optMapOrNew().optString(name, fallback);
+    }
+
     public String optString(int index) {
         return optArrayOrNew().optString(index);
+    }
+
+    public String optString(int index, String fallback) {
+        return optArrayOrNew().optString(index, fallback);
     }
 
     public int optInt(String name) {
         return optMapOrNew().optInt(name);
     }
 
+    public int optInt(String name, int fallback) {
+        return optMapOrNew().optInt(name, fallback);
+    }
+
     public int optInt(int index) {
         return optArrayOrNew().optInt(index);
+    }
+
+    public int optInt(int index, int fallback) {
+        return optArrayOrNew().optInt(index, fallback);
     }
 
     public boolean optBoolean(String name) {
         return optMapOrNew().optBoolean(name);
     }
 
+    public boolean optBoolean(String name, boolean fallback) {
+        return optMapOrNew().optBoolean(name, fallback);
+    }
+
     public boolean optBoolean(int index) {
         return optArrayOrNew().optBoolean(index);
+    }
+
+    public boolean optBoolean(int index, boolean fallback) {
+        return optArrayOrNew().optBoolean(index, fallback);
     }
 
     public double optDouble(String name) {
         return optMapOrNew().optDouble(name);
     }
 
+    public double optDouble(String name, double fallback) {
+        return optMapOrNew().optDouble(name, fallback);
+    }
+
     public double optDouble(int index) {
         return optArrayOrNew().optDouble(index);
+    }
+
+    public double optDouble(int index, double fallback) {
+        return optArrayOrNew().optDouble(index, fallback);
     }
 
     public boolean has(String name) {

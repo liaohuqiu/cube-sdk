@@ -19,6 +19,7 @@ public abstract class ViewHolderBase<ItemDataType> {
 
     protected int mLastPosition;
     protected int mPosition = -1;
+    protected View mCurrentView;
 
     /**
      * create a view from resource Xml file, and hold the view that may be used in displaying data.
@@ -30,10 +31,10 @@ public abstract class ViewHolderBase<ItemDataType> {
      */
     public abstract void showData(int position, ItemDataType itemData);
 
-    public void setItemData(int position) {
-
+    public void setItemData(int position, View view) {
         mLastPosition = mPosition;
         mPosition = position;
+        mCurrentView = view;
     }
 
     /**

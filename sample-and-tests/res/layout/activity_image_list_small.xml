@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:background="#f1f1f1"
     android:layout_height="match_parent">
 
     <in.srain.cube.sample.ui.views.header.ptr.PtrFrameDemo xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/ly_ptr_frame"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
+        app:ptr_duration_to_close_header="2000"
+        app:ptr_duration_to_close="1000"
         app:ptr_content="@+id/ly_image_list_small">
 
         <ListView

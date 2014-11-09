@@ -65,7 +65,7 @@ public abstract class ListViewDataAdapterBase<ItemDataType> extends BaseAdapter 
             holderBase = (ViewHolderBase<ItemDataType>) convertView.getTag();
         }
         if (holderBase != null) {
-            holderBase.setItemData(position);
+            holderBase.setItemData(position, convertView);
             holderBase.showData(position, itemData);
         }
         return convertView;

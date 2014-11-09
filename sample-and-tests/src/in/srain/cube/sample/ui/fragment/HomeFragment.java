@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import in.srain.cube.sample.R;
 import in.srain.cube.sample.activity.PagerTabIndicatorActivity;
+import in.srain.cube.sample.activity.PtrStoreHouseHeaderActivity;
 import in.srain.cube.sample.activity.TitleBaseFragment;
 import in.srain.cube.sample.activity.imagelist.BigImageListActivity;
 import in.srain.cube.sample.activity.imagelist.GridListImageActivity;
@@ -107,6 +108,16 @@ public class HomeFragment extends TitleBaseFragment {
             public void onClick(View v) {
                 Intent intent = new Intent();
                 Class<?> dstClassName = PagerTabIndicatorActivity.class;
+                intent.setClass(getActivity(), dstClassName);
+                startActivity(intent);
+            }
+        }));
+        mItemInfos.add(new ItemInfo("SwipeProgress", "#4d90fe", new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                Class<?> dstClassName = PtrStoreHouseHeaderActivity.class;
                 intent.setClass(getActivity(), dstClassName);
                 startActivity(intent);
             }
