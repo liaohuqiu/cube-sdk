@@ -41,6 +41,33 @@ public class StoreHouseHeader extends View {
     private float mBarDarkAlpha = 0.4f;
 
     private Transformation mTransformation = new Transformation();
+    private boolean mIsInLoading = false;
+
+    private Animation.AnimationListener animationListener = new Animation.AnimationListener() {
+
+        @Override
+        public void onAnimationStart(Animation animation) {
+            if (!mIsInLoading) {
+                return;
+            }
+            if (!(animation instanceof StoreHouseBarItem)) {
+                return;
+            }
+            StoreHouseBarItem item = (StoreHouseBarItem) animation;
+            if (item.getIndex() == mItemList.size() - 1) {
+                beginLoading();
+            }
+        }
+
+        @Override
+        public void onAnimationEnd(Animation animation) {
+        }
+
+        @Override
+        public void onAnimationRepeat(Animation animation) {
+
+        }
+    };
 
     public StoreHouseHeader(Context context) {
         super(context);
@@ -63,7 +90,6 @@ public class StoreHouseHeader extends View {
     }
 
     public void setBounds(int width, int height) {
-        CLog.d("ptr-test", "setBounds: %s %s %s", width, height, this);
         mBoundsWidth = width;
         mBoundHeight = height;
 
@@ -93,7 +119,6 @@ public class StoreHouseHeader extends View {
             }
         }
 
-
         for (int i = 0; i < startX.length; i++) {
 
             Point startPoint = new Point(startX[i], startY[i]);
@@ -105,46 +130,21 @@ public class StoreHouseHeader extends View {
         }
     }
 
-    private boolean mIsInLoading = false;
-
     public void beginLoading() {
         mIsInLoading = true;
         for (int i = 0; i < mItemList.size(); i++) {
             StoreHouseBarItem item = mItemList.get(i);
-            item.setStartOffset(1000 * i);
+            item.setFillAfter(false);
+            item.setFillEnabled(true);
+            item.setFillBefore(false);
+            item.setStartOffset(100 * i);
             item.setDuration(400);
-            item.start();
             item.setAnimationListener(animationListener);
+            item.start();
         }
         CLog.d("ptr-test", "beginLoading");
         invalidate();
     }
-
-    private Animation.AnimationListener animationListener = new Animation.AnimationListener() {
-
-        @Override
-        public void onAnimationStart(Animation animation) {
-        }
-
-        @Override
-        public void onAnimationEnd(Animation animation) {
-            if (!mIsInLoading) {
-                return;
-            }
-            if (!(animation instanceof StoreHouseBarItem)) {
-                return;
-            }
-            StoreHouseBarItem item = (StoreHouseBarItem) animation;
-            if (item.getIndex() == mItemList.size() - 1) {
-                beginLoading();
-            }
-        }
-
-        @Override
-        public void onAnimationRepeat(Animation animation) {
-
-        }
-    };
 
     public void loadFinish() {
         mIsInLoading = false;
@@ -153,10 +153,8 @@ public class StoreHouseHeader extends View {
 
     @Override
     public void onDraw(Canvas canvas) {
-        // CLog.d("ptr", "%s %s", getDrawingTime(), AnimationUtils.currentAnimationTimeMillis());
         float progress = mProgress;
         int c1 = canvas.save();
-        // canvas.translate(0, mTop - mBoundHeight);
         int len = mItemList.size();
 
         for (int i = 0; i < mItemList.size(); i++) {

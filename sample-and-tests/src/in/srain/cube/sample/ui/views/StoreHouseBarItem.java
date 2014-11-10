@@ -14,31 +14,18 @@ import java.util.Random;
  */
 public class StoreHouseBarItem extends Animation {
 
+    private final Paint mPaint = new Paint();
+    public Point midPoint;
+    public float translationX;
     private Point mStartPoint;
     private Point mEndPoint;
-
     private float mFromAlpha = 1.0f;
     private float mToAlpha = 0.4f;
-
     private Point mCStartPoint;
     private Point mCEndPoint;
-
-    public Point midPoint;
     private int mLineWidth;
     private int mColor;
-    public float translationX;
     private int mIndex;
-    private final Paint mPaint = new Paint();
-
-    public int getIndex() {
-        return mIndex;
-    }
-
-    public void reset(int horizontalRandomness) {
-        Random random = new Random();
-        int randomNumber = -random.nextInt(horizontalRandomness * 2) + horizontalRandomness;
-        translationX = randomNumber;
-    }
 
     public StoreHouseBarItem(int index, Point start, Point end, int color, int lineWidth) {
         mIndex = index;
@@ -58,6 +45,16 @@ public class StoreHouseBarItem extends Animation {
         mPaint.setStyle(Paint.Style.STROKE);
     }
 
+    public int getIndex() {
+        return mIndex;
+    }
+
+    public void reset(int horizontalRandomness) {
+        Random random = new Random();
+        int randomNumber = -random.nextInt(horizontalRandomness * 2) + horizontalRandomness;
+        translationX = randomNumber;
+    }
+
     @Override
     protected void applyTransformation(float interpolatedTime, Transformation t) {
         float alpha = mFromAlpha;
@@ -66,7 +63,6 @@ public class StoreHouseBarItem extends Animation {
     }
 
     public void setAlpha(float alpha) {
-        CLog.d("ptr-test", "setAlpha %s %.3f", mIndex, alpha);
         mPaint.setAlpha((int) (alpha * 255));
     }
 
