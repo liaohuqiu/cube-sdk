@@ -57,6 +57,9 @@ public class StoreHouseBarItem extends Animation {
 
     @Override
     protected void applyTransformation(float interpolatedTime, Transformation t) {
+        if (mIndex == 15) {
+            CLog.d("ptr-test", "applyTransformation: %s", interpolatedTime);
+        }
         float alpha = mFromAlpha;
         alpha = alpha + ((mToAlpha - alpha) * interpolatedTime);
         setAlpha(alpha);

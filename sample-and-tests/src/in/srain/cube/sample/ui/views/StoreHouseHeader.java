@@ -43,32 +43,6 @@ public class StoreHouseHeader extends View {
     private Transformation mTransformation = new Transformation();
     private boolean mIsInLoading = false;
 
-    private Animation.AnimationListener animationListener = new Animation.AnimationListener() {
-
-        @Override
-        public void onAnimationStart(Animation animation) {
-            if (!mIsInLoading) {
-                return;
-            }
-            if (!(animation instanceof StoreHouseBarItem)) {
-                return;
-            }
-            StoreHouseBarItem item = (StoreHouseBarItem) animation;
-            if (item.getIndex() == mItemList.size() - 1) {
-                beginLoading();
-            }
-        }
-
-        @Override
-        public void onAnimationEnd(Animation animation) {
-        }
-
-        @Override
-        public void onAnimationRepeat(Animation animation) {
-
-        }
-    };
-
     public StoreHouseHeader(Context context) {
         super(context);
         init();
@@ -139,9 +113,16 @@ public class StoreHouseHeader extends View {
             item.setFillBefore(false);
             item.setStartOffset(100 * i);
             item.setDuration(400);
-            item.setAnimationListener(animationListener);
             item.start();
         }
+        postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (mIsInLoading) {
+                    beginLoading();
+                }
+            }
+        }, mItemList.size() * 100);
         CLog.d("ptr-test", "beginLoading");
         invalidate();
     }

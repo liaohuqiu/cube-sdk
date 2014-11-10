@@ -97,12 +97,12 @@ public class PtrFrame extends RelativeLayout {
 
     private float mResistance = 1.5f;
 
-    private int mDurationClose = 300;
-    private int mDurationToCloseHeader = 700;
+    private int mDurationClose = 100;
+    private int mDurationToCloseHeader = 1000;
     private int mRotateAniTime = 150;
 
-    private float mRatioOfHeaderToRotate = 1.5f;
-    private float mRatioOfHeaderToRefresh = 1.5f;
+    private float mRatioOfHeaderToRotate = 1.0f;
+    private float mRatioOfHeaderToRefresh = 1.0f;
     private boolean mKeepHeaderWhenRefresh = true;
 
     private int mOffsetToRotateView = 0;
@@ -393,7 +393,7 @@ public class PtrFrame extends RelativeLayout {
         if (mKeepHeaderWhenRefresh && mCurrentPos >= mOffsetToRefresh) {
             mScrollChecker.scrollTo(mHeaderHeight, mDurationClose);
         } else {
-            mScrollChecker.scrollTo(0, mDurationClose);
+            mScrollChecker.scrollTo(0, mDurationToCloseHeader);
         }
     }
 

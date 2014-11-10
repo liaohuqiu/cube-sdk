@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:ptr_content="@+id/store_house_ptr_image_content"
-        app:ptr_duration_to_close="1000"
+        app:ptr_duration_to_close="300"
         app:ptr_duration_to_close_header="2000"
         app:ptr_header="@+id/store_house_ptr_header">
 
