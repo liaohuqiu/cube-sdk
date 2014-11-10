@@ -82,6 +82,7 @@ public class GridListImageActivity extends TitleBaseActivity {
                 ptrFrame.doRefresh();
             }
         }, 150);
+        /*
         ScrollHeaderFrame frame = (ScrollHeaderFrame) findViewById(R.id.scroll_header_frame);
         frame.setHandler(new IScrollHeaderFrameHandler() {
             @Override
@@ -92,6 +93,7 @@ public class GridListImageActivity extends TitleBaseActivity {
                 return gridView.getChildAt(0).getTop() == 0;
             }
         });
+        */
     }
 
     private class ViewHolder extends ViewHolderBase<JsonData> {

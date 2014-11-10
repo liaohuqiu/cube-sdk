@@ -40,7 +40,7 @@ public class Query<T> implements ICacheAble<T> {
     }
 
     @Override
-    public int getCacheTime() {
+    public long getCacheTime() {
         if (mHandler != null) {
             return mHandler.getCacheTime();
         }

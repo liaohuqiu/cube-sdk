@@ -17,7 +17,7 @@ public interface QueryHandler<T> {
         }
     }
 
-    public int getCacheTime();
+    public long getCacheTime();
 
     public String getCacheKey();
 

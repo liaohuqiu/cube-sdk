@@ -27,7 +27,12 @@ public class StoreHouseBarItem extends Animation {
     private int mLineWidth;
     private int mColor;
     public float translationX;
+    private int mIndex;
     private final Paint mPaint = new Paint();
+
+    public int getIndex() {
+        return mIndex;
+    }
 
     public void reset(int horizontalRandomness) {
         Random random = new Random();
@@ -35,7 +40,8 @@ public class StoreHouseBarItem extends Animation {
         translationX = randomNumber;
     }
 
-    public StoreHouseBarItem(Point start, Point end, int color, int lineWidth) {
+    public StoreHouseBarItem(int index, Point start, Point end, int color, int lineWidth) {
+        mIndex = index;
         mStartPoint = start;
         mEndPoint = end;
 
@@ -54,18 +60,15 @@ public class StoreHouseBarItem extends Animation {
 
     @Override
     protected void applyTransformation(float interpolatedTime, Transformation t) {
-        final float alpha = mFromAlpha;
-        t.setAlpha(alpha + ((mToAlpha - alpha) * interpolatedTime));
-        mCurrentAlpha = alpha + ((mToAlpha - alpha) * interpolatedTime);
-        CLog.d("ptr-test", "%,3f", mCurrentAlpha);
-        mPaint.setAlpha((int) (mCurrentAlpha * 255));
+        float alpha = mFromAlpha;
+        alpha = alpha + ((mToAlpha - alpha) * interpolatedTime);
+        setAlpha(alpha);
     }
 
     public void setAlpha(float alpha) {
+        CLog.d("ptr-test", "setAlpha %s %.3f", mIndex, alpha);
         mPaint.setAlpha((int) (alpha * 255));
     }
-
-    private float mCurrentAlpha;
 
     public void draw(Canvas canvas) {
         canvas.drawLine(mCStartPoint.x, mCStartPoint.y, mCEndPoint.x, mCEndPoint.y, mPaint);

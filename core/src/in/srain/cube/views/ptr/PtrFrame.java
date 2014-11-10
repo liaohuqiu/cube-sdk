@@ -62,6 +62,8 @@ public class PtrFrame extends RelativeLayout {
         if (!(content instanceof ViewGroup)) {
             return true;
         }
+
+        ViewGroup viewGroup = (ViewGroup) content;
         if (android.os.Build.VERSION.SDK_INT < 14) {
             if (content instanceof AbsListView) {
                 final AbsListView absListView = (AbsListView) content;
@@ -72,7 +74,10 @@ public class PtrFrame extends RelativeLayout {
                 return content.getScrollY() > 0;
             }
         } else {
-            return ViewCompat.canScrollVertically(content, -1);
+            if (viewGroup.getChildCount() == 0) {
+                return true;
+            }
+            return viewGroup.getChildAt(0).getTop() == 0;
         }
     }
 

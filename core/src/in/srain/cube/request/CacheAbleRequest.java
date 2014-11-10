@@ -37,7 +37,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
 
     private String mInitDataPath;
     private boolean mDisableCache = false;
-    private int mCacheTime;
+    private long mCacheTime;
 
     public CacheAbleRequest() {
     }
@@ -177,7 +177,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
     }
 
     @Override
-    public int getCacheTime() {
+    public long getCacheTime() {
         return mCacheTime;
     }
 
@@ -282,7 +282,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
         return this;
     }
 
-    public CacheAbleRequest setCacheTime(int cacheTime) {
+    public CacheAbleRequest setCacheTime(long cacheTime) {
         mCacheTime = cacheTime;
         return this;
     }

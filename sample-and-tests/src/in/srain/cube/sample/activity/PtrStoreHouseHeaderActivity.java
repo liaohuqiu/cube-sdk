@@ -44,7 +44,7 @@ public class PtrStoreHouseHeaderActivity extends TitleBaseActivity {
                     public void run() {
                         frame.refreshComplete();
                     }
-                }, 3000);
+                }, 10000);
             }
 
             @Override

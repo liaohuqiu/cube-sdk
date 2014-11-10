@@ -9,7 +9,6 @@ import android.graphics.Point;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.animation.Transformation;
 import in.srain.cube.util.CLog;
 import in.srain.cube.util.LocalDisplay;
@@ -39,7 +38,7 @@ public class StoreHouseHeader extends View {
     private int mBoundsWidth;
     private int mOffsetX = 0;
     private int mOffsetY = 0;
-    private float kbarDarkAlpha = 0.4f;
+    private float mBarDarkAlpha = 0.4f;
 
     private Transformation mTransformation = new Transformation();
 
@@ -100,7 +99,7 @@ public class StoreHouseHeader extends View {
             Point startPoint = new Point(startX[i], startY[i]);
             Point endPoint = new Point(endX[i], endY[i]);
 
-            StoreHouseBarItem item = new StoreHouseBarItem(startPoint, endPoint, Color.WHITE, lineWidth);
+            StoreHouseBarItem item = new StoreHouseBarItem(i, startPoint, endPoint, Color.WHITE, lineWidth);
             item.reset(horizontalRandomness);
             mItemList.add(item);
         }
@@ -112,15 +111,40 @@ public class StoreHouseHeader extends View {
         mIsInLoading = true;
         for (int i = 0; i < mItemList.size(); i++) {
             StoreHouseBarItem item = mItemList.get(i);
-            item.setStartOffset(100 * i);
-            item.setDuration(800);
-            item.setRepeatMode(Animation.RESTART);
-            item.setRepeatCount(30);
+            item.setStartOffset(1000 * i);
+            item.setDuration(400);
             item.start();
+            item.setAnimationListener(animationListener);
         }
         CLog.d("ptr-test", "beginLoading");
         invalidate();
     }
+
+    private Animation.AnimationListener animationListener = new Animation.AnimationListener() {
+
+        @Override
+        public void onAnimationStart(Animation animation) {
+        }
+
+        @Override
+        public void onAnimationEnd(Animation animation) {
+            if (!mIsInLoading) {
+                return;
+            }
+            if (!(animation instanceof StoreHouseBarItem)) {
+                return;
+            }
+            StoreHouseBarItem item = (StoreHouseBarItem) animation;
+            if (item.getIndex() == mItemList.size() - 1) {
+                beginLoading();
+            }
+        }
+
+        @Override
+        public void onAnimationRepeat(Animation animation) {
+
+        }
+    };
 
     public void loadFinish() {
         mIsInLoading = false;
@@ -158,7 +182,7 @@ public class StoreHouseHeader extends View {
                 // done
                 if (progress == 1 || progress >= 1 - endPadding) {
                     canvas.translate(offsetX, offsetY);
-                    storeHouseBarItem.setAlpha(kbarDarkAlpha);
+                    storeHouseBarItem.setAlpha(mBarDarkAlpha);
                 } else {
                     float realProgress;
                     if (progress <= startPadding) {
@@ -172,7 +196,7 @@ public class StoreHouseHeader extends View {
                     matrix.postRotate((float) (360 * realProgress));
                     matrix.postScale(realProgress, realProgress);
                     matrix.postTranslate(offsetX, offsetY);
-                    storeHouseBarItem.setAlpha(kbarDarkAlpha * realProgress);
+                    storeHouseBarItem.setAlpha(mBarDarkAlpha * realProgress);
                     canvas.concat(matrix);
                 }
             }
@@ -180,7 +204,6 @@ public class StoreHouseHeader extends View {
             canvas.restore();
         }
         if (mIsInLoading) {
-            CLog.d("ptr-test", "invalidate");
             invalidate();
         }
         canvas.restoreToCount(c1);

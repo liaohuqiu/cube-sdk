@@ -8,11 +8,11 @@ import in.srain.cube.request.JsonData;
 public interface ICacheAble<T> {
 
     /**
-     * In millisecond
+     * In seconds
      *
      * @return
      */
-    public int getCacheTime();
+    public long getCacheTime();
 
     public String getCacheKey();
 

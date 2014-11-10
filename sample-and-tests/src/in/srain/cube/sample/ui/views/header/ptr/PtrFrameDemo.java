@@ -21,28 +21,12 @@ public class PtrFrameDemo extends PtrFrame {
     private TextView mTitleTextView;
     private Handler mHandler;
 
-    private SwipeProgressBar mProgressBar;
 
     public static abstract class DefaultHandler implements Handler {
 
         @Override
-        public boolean canDoRefresh(PtrFrameDemo frame) {
-            return frame.canChildScrollUp();
-        }
-    }
-
-    private boolean canChildScrollUp() {
-        if (android.os.Build.VERSION.SDK_INT < 14) {
-            if (mContentViewContainer instanceof AbsListView) {
-                final AbsListView absListView = (AbsListView) mContentViewContainer;
-                return absListView.getChildCount() > 0
-                        && (absListView.getFirstVisiblePosition() > 0 || absListView.getChildAt(0)
-                        .getTop() < absListView.getPaddingTop());
-            } else {
-                return mContentViewContainer.getScrollY() > 0;
-            }
-        } else {
-            return ViewCompat.canScrollVertically(mContentViewContainer, -1);
+        public boolean canDoRefresh(PtrFrame frame, View content, View header) {
+            return PtrFrame.checkCanScrollUp(frame, content, header);
         }
     }
 
@@ -50,7 +34,7 @@ public class PtrFrameDemo extends PtrFrame {
 
         public void onRefresh();
 
-        public boolean canDoRefresh(PtrFrameDemo frame);
+        public boolean canDoRefresh(PtrFrame frame, View content, View header);
     }
 
     public PtrFrameDemo(Context context) {
@@ -70,7 +54,7 @@ public class PtrFrameDemo extends PtrFrame {
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
-        mProgressBar.draw(canvas);
+        // mProgressBar.draw(canvas);
     }
 
     private void setColorScheme(int colorRes1, int colorRes2, int colorRes3, int colorRes4) {
@@ -79,7 +63,7 @@ public class PtrFrameDemo extends PtrFrame {
         final int color2 = res.getColor(colorRes2);
         final int color3 = res.getColor(colorRes3);
         final int color4 = res.getColor(colorRes4);
-        mProgressBar.setColorScheme(color1, color2, color3, color4);
+        // mProgressBar.setColorScheme(color1, color2, color3, color4);
     }
 
     /**
@@ -94,8 +78,8 @@ public class PtrFrameDemo extends PtrFrame {
         mHeaderContainer.setLayoutParams(new LayoutParams(-1, LocalDisplay.dp2px(50)));
         addView(mHeaderContainer);
 
-        mProgressBar = new SwipeProgressBar(this);
-        mProgressBar.setBounds(0, 0, LocalDisplay.SCREEN_WIDTH_PIXELS, LocalDisplay.dp2px(50));
+        // mProgressBar = new SwipeProgressBar(this);
+        // mProgressBar.setBounds(0, 0, LocalDisplay.SCREEN_WIDTH_PIXELS, LocalDisplay.dp2px(50));
         setColorScheme(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light, android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
@@ -121,7 +105,7 @@ public class PtrFrameDemo extends PtrFrame {
              */
             @Override
             public boolean checkCanDoRefresh(PtrFrame frame, View content, View header) {
-                return mHandler.canDoRefresh(PtrFrameDemo.this);
+                return mHandler.canDoRefresh(frame, content, header);
             }
 
             @Override
@@ -130,7 +114,7 @@ public class PtrFrameDemo extends PtrFrame {
                 mRotateView.setVisibility(INVISIBLE);
                 mTitleTextView.setVisibility(VISIBLE);
                 mTitleTextView.setText("updating...");
-                mProgressBar.start();
+                // mProgressBar.start();
             }
 
             @Override
@@ -149,7 +133,7 @@ public class PtrFrameDemo extends PtrFrame {
 
             @Override
             public void onRefreshComplete() {
-                mProgressBar.stop();
+                // mProgressBar.stop();
             }
 
             @Override
@@ -164,7 +148,7 @@ public class PtrFrameDemo extends PtrFrame {
             public void onPercentageChange(int oldPosition, int newPosition, float oldPercent, float newPercent) {
                 float f = newPosition * 1f / getHeaderHeight();
                 if (f > 1) f = 1;
-                mProgressBar.setTriggerPercentage(f);
+                // mProgressBar.setTriggerPercentage(f);
                 invalidate();
             }
 
