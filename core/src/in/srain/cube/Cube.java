@@ -22,10 +22,7 @@ public class Cube {
         mApplication = application;
 
         // local display
-        DisplayMetrics dm = new DisplayMetrics();
-        WindowManager wm = (WindowManager) application.getSystemService(Context.WINDOW_SERVICE);
-        wm.getDefaultDisplay().getMetrics(dm);
-        LocalDisplay.init(dm);
+        LocalDisplay.init(application);
 
         // network status
         NetworkStatusManager.init(application);

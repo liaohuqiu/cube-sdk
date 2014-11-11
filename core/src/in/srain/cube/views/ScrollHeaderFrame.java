@@ -182,7 +182,7 @@ public class ScrollHeaderFrame extends RelativeLayout {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent e) {
-        if (mDisabled) {
+        if (!isEnabled() || mDisabled) {
             return super.dispatchTouchEvent(e);
         }
         boolean handled = super.dispatchTouchEvent(e);

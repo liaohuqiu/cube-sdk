@@ -73,6 +73,16 @@ public class BlockListView extends RelativeLayout {
         }
     };
 
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        super.onLayout(changed, l, t, r, b);
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    }
+
     public void onDataListChange() {
 
         removeAllViews();
@@ -109,5 +119,6 @@ public class BlockListView extends RelativeLayout {
             view.setTag(INDEX_TAG, i);
             addView(view, lyp);
         }
+        requestLayout();
     }
 }

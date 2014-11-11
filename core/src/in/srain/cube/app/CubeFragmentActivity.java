@@ -33,7 +33,7 @@ public abstract class CubeFragmentActivity extends FragmentActivity {
     protected CubeFragment currentFragment;
     private boolean mCloseWarned;
 
-    public void pushFragmentToBackStatck(Class<?> cls, Object data) {
+    public void pushFragmentToBackStack(Class<?> cls, Object data) {
         FragmentParam param = new FragmentParam();
         param.cls = cls;
         param.data = data;
