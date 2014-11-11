@@ -2,10 +2,7 @@ package in.srain.cube.sample.ui.views;
 
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Matrix;
-import android.graphics.Point;
+import android.graphics.*;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.Animation;
@@ -25,10 +22,16 @@ public class StoreHouseHeader extends View {
     private float internalAnimationFactor = 0.7f;
     private int horizontalRandomness = 850;
 
-    private int[] startX = new int[]{0, 30, 52, 26, 60, 60, 85, 108, 108, 147, 177, 147, 176, 206, 228, 202};
-    private int[] startY = new int[]{30, 0, 30, 30, 15, 30, 15, 0, 30, 0, 0, 32, 30, 0, 30, 30};
-    private int[] endX = new int[]{22, 22, 30, 0, 60, 60, 60, 85, 85, 117, 147, 147, 198, 198, 206, 176};
-    private int[] endY = new int[]{0, 0, 0, 30, 0, 15, 15, 15, 15, 0, 0, 0, 0, 0, 0, 30};
+    // private int[] startX = new int[]{0, 30, 52, 26, 60, 60, 85, 108, 108, 147, 177, 147, 176, 206, 228, 202};
+    // private int[] startY = new int[]{30, 0, 30, 30, 15, 30, 15, 0, 30, 0, 0, 32, 30, 0, 30, 30};
+    // private int[] endX = new int[]{22, 22, 30, 0, 60, 60, 60, 85, 85, 117, 147, 147, 198, 198, 206, 176};
+    // private int[] endY = new int[]{0, 0, 0, 30, 0, 15, 15, 15, 15, 0, 0, 0, 0, 0, 0, 30};
+
+    private int[] startX = new int[]{50, 0, 0, 50, 50, 62, 62, 110, 110, 62, 62, 147, 147, 123, 171, 123, 181, 208, 181, 246, 246, 292};
+    private int[] startY = new int[]{0, 0, 36, 36, 72, 0, 0, 0, 36, 36, 36, 1, 1, 23, 23, 49, 1, 1, 72, 0, 0, 72};
+    private int[] endX = new int[]{0, 0, 50, 50, 0, 62, 110, 110, 62, 62, 110, 123, 171, 123, 171, 171, 232, 208, 232, 246, 292, 292};
+    private int[] endY = new int[]{0, 36, 36, 72, 72, 36, 0, 36, 36, 72, 72, 23, 23, 72, 72, 49, 1, 72, 72, 72, 72, 0};
+
 
     private float mProgress = 0;
 
@@ -72,7 +75,32 @@ public class StoreHouseHeader extends View {
     }
 
     private void init() {
+        // ArrayList<float[]> pointList = StoreHousePath.getPath("ABCDEFGHIJKLMNOPQRSTUVWXYZ", 0.2f, 11);
+        ArrayList<float[]> pointList = StoreHousePath.getPath("ALIBABA", 0.2f, 11);
+        // ArrayList<float[]> pointList = StoreHousePath.getPath("SRAIN", 0.2f, 11);
+        // ArrayList<float[]> pointList = StoreHousePath.getPath("ETAO", 0.2f, 11);
 
+        float drawWidth = 0;
+        float drawHeight = 0;
+        for (int i = 0; i < pointList.size(); i++) {
+            float[] line = pointList.get(i);
+            if (line[0] > drawWidth) {
+                drawWidth = line[0];
+            }
+            if (line[1] > drawWidth) {
+                drawWidth = line[1];
+            }
+            if (line[2] > drawHeight) {
+                drawHeight = line[2];
+            }
+            if (line[3] > drawHeight) {
+                drawHeight = line[3];
+            }
+        }
+        mDrawWidth = LocalDisplay.dp2px(drawWidth);
+        mDrawHeight = LocalDisplay.dp2px(mDrawHeight);
+
+        /*
         for (int i = 0; i < startX.length; i++) {
             startX[i] = LocalDisplay.dp2px(startX[i] / 2);
             startY[i] = LocalDisplay.dp2px(startY[i] / 2);
@@ -92,11 +120,12 @@ public class StoreHouseHeader extends View {
                 mDrawHeight = endY[i];
             }
         }
+        */
 
-        for (int i = 0; i < startX.length; i++) {
-
-            Point startPoint = new Point(startX[i], startY[i]);
-            Point endPoint = new Point(endX[i], endY[i]);
+        for (int i = 0; i < pointList.size(); i++) {
+            float[] line = pointList.get(i);
+            PointF startPoint = new PointF(LocalDisplay.dp2px(line[0]), LocalDisplay.dp2px(line[1]));
+            PointF endPoint = new PointF(LocalDisplay.dp2px(line[2]), LocalDisplay.dp2px(line[3]));
 
             StoreHouseBarItem item = new StoreHouseBarItem(i, startPoint, endPoint, Color.WHITE, lineWidth);
             item.reset(horizontalRandomness);
@@ -142,8 +171,8 @@ public class StoreHouseHeader extends View {
 
             canvas.save();
             StoreHouseBarItem storeHouseBarItem = mItemList.get(i);
-            int offsetX = mOffsetX + storeHouseBarItem.midPoint.x;
-            int offsetY = mOffsetY + storeHouseBarItem.midPoint.y;
+            float offsetX = mOffsetX + storeHouseBarItem.midPoint.x;
+            float offsetY = mOffsetY + storeHouseBarItem.midPoint.y;
 
             if (mIsInLoading) {
                 storeHouseBarItem.getTransformation(getDrawingTime(), mTransformation);

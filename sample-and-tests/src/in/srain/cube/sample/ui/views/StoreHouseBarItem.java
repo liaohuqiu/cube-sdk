@@ -15,27 +15,27 @@ import java.util.Random;
 public class StoreHouseBarItem extends Animation {
 
     private final Paint mPaint = new Paint();
-    public Point midPoint;
+    public PointF midPoint;
     public float translationX;
-    private Point mStartPoint;
-    private Point mEndPoint;
+    private PointF mStartPoint;
+    private PointF mEndPoint;
     private float mFromAlpha = 1.0f;
     private float mToAlpha = 0.4f;
-    private Point mCStartPoint;
-    private Point mCEndPoint;
+    private PointF mCStartPoint;
+    private PointF mCEndPoint;
     private int mLineWidth;
     private int mColor;
     private int mIndex;
 
-    public StoreHouseBarItem(int index, Point start, Point end, int color, int lineWidth) {
+    public StoreHouseBarItem(int index, PointF start, PointF end, int color, int lineWidth) {
         mIndex = index;
         mStartPoint = start;
         mEndPoint = end;
 
-        midPoint = new Point((start.x + end.x) / 2, (start.y + end.y) / 2);
+        midPoint = new PointF((start.x + end.x) / 2, (start.y + end.y) / 2);
 
-        mCStartPoint = new Point(mStartPoint.x - midPoint.x, mStartPoint.y - midPoint.y);
-        mCEndPoint = new Point(mEndPoint.x - midPoint.x, mEndPoint.y - midPoint.y);
+        mCStartPoint = new PointF(mStartPoint.x - midPoint.x, mStartPoint.y - midPoint.y);
+        mCEndPoint = new PointF(mEndPoint.x - midPoint.x, mEndPoint.y - midPoint.y);
         mColor = color;
         mLineWidth = lineWidth;
 
