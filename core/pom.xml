@@ -11,9 +11,9 @@
 
     <groupId>in.srain.cube</groupId>
     <artifactId>cube-sdk</artifactId>
-    <packaging>apklib</packaging>
+    <packaging>aar</packaging>
     <name>Cube SDK</name>
-    <version>1.0.38-SNAPSHOT</version>
+    <version>1.0.39-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
@@ -37,8 +37,8 @@
     </dependencies>
 
     <properties>
-        <android.maven.plugin.version>3.7.0</android.maven.plugin.version>
-        <android.compile.apilevel>16</android.compile.apilevel>
+        <android.maven.plugin.version>3.8.2</android.maven.plugin.version>
+        <android.compile.api_level>19</android.compile.api_level>
     </properties>
 
     <build>
@@ -52,8 +52,7 @@
                 <version>${android.maven.plugin.version}</version>
                 <configuration>
                     <sdk>
-                        <path>${env.ANDROID_HOME}</path>
-                        <platform>${android.compile.apilevel}</platform>
+                        <platform>${android.compile.api_level}</platform>
                     </sdk>
                     <sign>
                         <debug>false</debug>

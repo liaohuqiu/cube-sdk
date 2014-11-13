@@ -76,7 +76,7 @@ public class CacheManager {
                 new Runnable() {
                     @Override
                     public void run() {
-                        CacheInfo cacheInfo = CacheInfo.create(data);
+                        CacheInfo cacheInfo = CacheInfo.createForNow(data);
                         putDataToMemoryCache(cacheKey, cacheInfo);
                         mFileCache.write(cacheKey, cacheInfo.getCacheData());
                         mFileCache.flushDiskCacheAsyncWithDelay(1000);
@@ -222,7 +222,7 @@ public class CacheManager {
 
             String cacheContent = mFileCache.read(mCacheAble.getCacheKey());
             JsonData jsonData = JsonData.create(cacheContent);
-            mRawData = CacheInfo.create(jsonData.optString("data"), jsonData.optInt("time"));
+            mRawData = CacheInfo.createFromJson(jsonData);
         }
 
         private void doQueryFromAssertCacheFileInBackground() {
@@ -232,7 +232,7 @@ public class CacheManager {
             }
 
             String cacheContent = FileUtil.readAssert(mContext, mCacheAble.getAssertInitDataPath());
-            mRawData = CacheInfo.create(cacheContent, -2);
+            mRawData = CacheInfo.createInvalidated(cacheContent);
             putDataToMemoryCache(mCacheAble.getCacheKey(), mRawData);
         }
 
@@ -240,7 +240,7 @@ public class CacheManager {
             if (DEBUG) {
                 CLog.d(LOG_TAG, "%s, doConvertDataInBackground", mCacheAble.getCacheKey());
             }
-            JsonData data = JsonData.create(mRawData.data);
+            JsonData data = JsonData.create(mRawData.getData());
             mResult = mCacheAble.processRawDataFromCache(data);
         }
 
@@ -253,7 +253,7 @@ public class CacheManager {
 
         private void done() {
 
-            int lastTime = mRawData.time;
+            long lastTime = mRawData.getTime();
             long timeInterval = System.currentTimeMillis() / 1000 - lastTime;
             boolean outOfDate = timeInterval > mCacheAble.getCacheTime() || timeInterval < 0;
 

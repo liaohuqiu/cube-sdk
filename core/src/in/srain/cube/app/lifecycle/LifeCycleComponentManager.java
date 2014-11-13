@@ -34,7 +34,7 @@ public class LifeCycleComponentManager implements IComponentContainer {
         return mComponentList;
     }
 
-    public void onRestart() {
+    public void onReturnFromTotallyInvisible() {
 
         if (mComponentList == null) {
             return;
@@ -54,7 +54,7 @@ public class LifeCycleComponentManager implements IComponentContainer {
         return it;
     }
 
-    public void onStop() {
+    public void onTurnToBeInvisibleTotally() {
         if (mComponentList == null) {
             return;
         }
@@ -67,7 +67,7 @@ public class LifeCycleComponentManager implements IComponentContainer {
         }
     }
 
-    public void onPause() {
+    public void onTurnToBeInvisiblePartly() {
         if (mComponentList == null) {
             return;
         }
@@ -80,7 +80,7 @@ public class LifeCycleComponentManager implements IComponentContainer {
         }
     }
 
-    public void onResume() {
+    public void onReturnFromInvisiblePartly() {
         if (mComponentList == null) {
             return;
         }

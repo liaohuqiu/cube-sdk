@@ -1,5 +1,6 @@
 package in.srain.cube.cache;
 
+import in.srain.cube.request.JsonData;
 import org.json.JSONObject;
 
 /**
@@ -7,24 +8,32 @@ import org.json.JSONObject;
  */
 public class CacheInfo {
 
-    public String data;
-    public int time;
-    public int mSize;
+    private String mData;
+    private long mTime;
+    private int mSize;
 
-    public static CacheInfo create(String data) {
+    public static CacheInfo createForNow(String data) {
         CacheInfo info = new CacheInfo(data);
-        info.time = (int) (System.currentTimeMillis() / 1000);
+        info.mTime = (int) (System.currentTimeMillis() / 1000);
         return info;
     }
 
-    public static CacheInfo create(String data, int time) {
+    public static CacheInfo createInvalidated(String data) {
+        return create(data, -2);
+    }
+
+    public static CacheInfo createFromJson(JsonData jsonData) {
+        return create(jsonData.optString("data"), jsonData.optInt("time"));
+    }
+
+    private static CacheInfo create(String data, long time) {
         CacheInfo cacheInfo = new CacheInfo(data);
-        cacheInfo.time = time;
+        cacheInfo.mTime = time;
         return cacheInfo;
     }
 
     private CacheInfo(String data) {
-        this.data = data;
+        this.mData = data;
         mSize = (data.getBytes().length + 8);
     }
 
@@ -32,11 +41,19 @@ public class CacheInfo {
         return mSize;
     }
 
+    public long getTime() {
+        return mTime;
+    }
+
+    public String getData() {
+        return mData;
+    }
+
     public String getCacheData() {
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("time", time);
-            jsonObject.put("data", data);
+            jsonObject.put("time", mTime);
+            jsonObject.put("data", mData);
         } catch (Exception e) {
         }
         return jsonObject.toString();
