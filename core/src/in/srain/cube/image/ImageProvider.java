@@ -276,11 +276,11 @@ public class ImageProvider {
         }
     }
 
-    public int getMemoryCacheMaxSpace() {
+    public long getMemoryCacheMaxSpace() {
         return mMemoryCache.getMaxSize();
     }
 
-    public int getMemoryCacheUsedSpace() {
+    public long getMemoryCacheUsedSpace() {
         return mMemoryCache.getUsedSpace();
     }
 

@@ -15,7 +15,7 @@ import in.srain.cube.util.Debug;
 /**
  * Implement {@link ICubeFragment}, {@link IComponentContainer}
  * <p/>
- * Ignore {@link LifeCycleComponentManager#onTurnToBeInvisiblePartly}
+ * Ignore {@link LifeCycleComponentManager#onBecomesPartiallyInvisible}
  */
 public abstract class CubeFragment extends Fragment implements ICubeFragment, IComponentContainer {
 
@@ -37,10 +37,10 @@ public abstract class CubeFragment extends Fragment implements ICubeFragment, IC
      * ===========================================================
      */
     @Override
-    public void onComeIn(Object data) {
+    public void onEnter(Object data) {
         mDataIn = data;
         if (DEBUG) {
-            showStatus("onComeIn");
+            showStatus("onEnter");
         }
     }
 
@@ -49,7 +49,7 @@ public abstract class CubeFragment extends Fragment implements ICubeFragment, IC
         if (DEBUG) {
             showStatus("onLeave");
         }
-        mComponentContainer.onTurnToBeInvisibleTotally();
+        mComponentContainer.onBecomesTotallyInvisible();
     }
 
     @Override
@@ -57,7 +57,7 @@ public abstract class CubeFragment extends Fragment implements ICubeFragment, IC
         if (DEBUG) {
             showStatus("onBackWithData");
         }
-        mComponentContainer.onReturnFromTotallyInvisible();
+        mComponentContainer.onBecomesVisibleFromTotallyInvisible();
     }
 
     @Override
@@ -70,7 +70,7 @@ public abstract class CubeFragment extends Fragment implements ICubeFragment, IC
         if (DEBUG) {
             showStatus("onBack");
         }
-        mComponentContainer.onReturnFromTotallyInvisible();
+        mComponentContainer.onBecomesVisibleFromTotallyInvisible();
     }
 
     /**
@@ -97,16 +97,16 @@ public abstract class CubeFragment extends Fragment implements ICubeFragment, IC
 
     /**
      * Only when Activity resume, not very precise.
-     * When activity recover from partly invisible, onResume will be triggered.
+     * When activity recover from partly invisible, onBecomesPartiallyInvisible will be triggered.
      */
     @Override
     public void onResume() {
         super.onResume();
-        if (mFirstResume) {
-            mFirstResume = false;
-        }
         if (!mFirstResume) {
             onBack();
+        }
+        if (mFirstResume) {
+            mFirstResume = false;
         }
         if (DEBUG) {
             showStatus("onResume");

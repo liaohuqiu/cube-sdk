@@ -5,15 +5,15 @@
 
     <parent>
         <groupId>in.srain</groupId>
-        <artifactId>cube-parent</artifactId>
-        <version>1.1.1</version>
+        <artifactId>cube-parent-for-oss</artifactId>
+        <version>1.0.1</version>
     </parent>
 
     <groupId>in.srain.cube</groupId>
     <artifactId>cube-sdk</artifactId>
-    <packaging>aar</packaging>
+    <packaging>apklib</packaging>
     <name>Cube SDK</name>
-    <version>1.0.39-SNAPSHOT</version>
+    <version>1.0.40-SNAPSHOT</version>
 
     <dependencies>
         <dependency>

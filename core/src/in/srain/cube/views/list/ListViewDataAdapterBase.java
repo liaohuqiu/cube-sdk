@@ -1,10 +1,10 @@
 package in.srain.cube.views.list;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import in.srain.cube.util.CLog;
 import in.srain.cube.util.Debug;
 
 /**
@@ -46,7 +46,7 @@ public abstract class ListViewDataAdapterBase<ItemDataType> extends BaseAdapter 
             throw new RuntimeException("view holder creator is null");
         }
         if (Debug.DEBUG_LIST) {
-            Log.d(LOG_TAG, String.format("getView %s", position));
+            CLog.d(LOG_TAG, "getView %s", position);
         }
         ItemDataType itemData = getItem(position);
         ViewHolderBase<ItemDataType> holderBase = null;

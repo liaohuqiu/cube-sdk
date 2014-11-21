@@ -14,7 +14,7 @@ public interface ICubeFragment {
      *
      * @param data
      */
-    void onComeIn(Object data);
+    void onEnter(Object data);
 
     void onLeave();
 

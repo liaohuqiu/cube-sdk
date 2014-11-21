@@ -8,7 +8,7 @@ public interface IFileCache {
 
     public void clearCache();
 
-    public int getMaxSize();
+    public long getMaxSize();
 
     public boolean has(String key);
 }

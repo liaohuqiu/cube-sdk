@@ -5,13 +5,11 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
+import in.srain.cube.app.lifecycle.LifeCycleComponent;
 import in.srain.cube.concurrent.SimpleTask;
 import in.srain.cube.image.iface.ImageLoadHandler;
 import in.srain.cube.image.iface.ImageResizer;
 import in.srain.cube.image.iface.ImageTaskExecutor;
-import in.srain.cube.image.impl.DefaultImageLoadHandler;
-import in.srain.cube.image.impl.DefaultImageResizer;
-import in.srain.cube.image.impl.DefaultImageTaskExecutor;
 import in.srain.cube.util.Debug;
 
 import java.util.HashMap;
@@ -19,11 +17,9 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 
 /**
- * Manager the ImageTask loading list,
- *
  * @author http://www.liaohuqiu.net
  */
-public class ImageLoader {
+public class ImageLoader implements LifeCycleComponent {
 
     private static final String MSG_ATTACK_TO_RUNNING_TASK = "%s attach to running: %s";
 
@@ -63,11 +59,6 @@ public class ImageLoader {
         mImageLoadHandler = imageLoadHandler;
 
         mLoadWorkList = new HashMap<String, LoadImageTask>();
-    }
-
-    public static ImageLoader createDefault(Context context) {
-        DefaultImageLoadHandler imageLoadHandler = new DefaultImageLoadHandler(context);
-        return new ImageLoader(context, ImageProvider.getDefault(context), DefaultImageTaskExecutor.getInstance(), DefaultImageResizer.getInstance(), imageLoadHandler);
     }
 
     public void setImageLoadHandler(ImageLoadHandler imageLoadHandler) {
@@ -378,5 +369,49 @@ public class ImageLoader {
             }
         }
         mLoadWorkList.clear();
+    }
+
+    /**
+     * The UI becomes partially invisible.
+     * like {@link android.app.Activity#onPause}
+     */
+    @Override
+    public void onBecomesPartiallyInvisible() {
+        pauseWork();
+    }
+
+    /**
+     * The UI becomes visible from partially invisible.
+     * like {@link android.app.Activity#onResume}
+     */
+    @Override
+    public void onBecomesVisible() {
+        resumeWork();
+    }
+
+    /**
+     * The UI becomes totally invisible.
+     * like {@link android.app.Activity#onStop}
+     */
+    @Override
+    public void onBecomesTotallyInvisible() {
+        stopWork();
+    }
+
+    /**
+     * The UI becomes visible from totally invisible.
+     * like {@link android.app.Activity#onRestart}
+     */
+    @Override
+    public void onBecomesVisibleFromTotallyInvisible() {
+        recoverWork();
+    }
+
+    /**
+     * like {@link android.app.Activity#onDestroy}
+     */
+    @Override
+    public void onDestroy() {
+        destroy();
     }
 }

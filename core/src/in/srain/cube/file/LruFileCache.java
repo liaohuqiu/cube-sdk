@@ -36,13 +36,13 @@ public class LruFileCache implements IFileCache {
         init_cache, close_cache, flush_cache
     }
 
-    public LruFileCache(Context context, String path, int size) {
+    public LruFileCache(Context context, String path, long size) {
         mDiskCacheSize = size;
-        mDiskCacheDir = FileUtil.getDiskCacheDir(context, path, size);
-        long usableSpace = FileUtil.getUsableSpace(mDiskCacheDir);
-        if (usableSpace < mDiskCacheSize) {
-            mDiskCacheSize = size;
-            Log.e(TAG, String.format("no enough space for initDiskCache %s %s", usableSpace, mDiskCacheSize));
+        FileUtil.CacheDirInfo cacheDirInfo = FileUtil.getDiskCacheDir(context, path, size);
+        mDiskCacheDir = cacheDirInfo.path;
+        mDiskCacheSize = cacheDirInfo.realSize;
+        if (cacheDirInfo.isNotEnough) {
+            Log.e(TAG, String.format("no enough space for initDiskCache %s %s", cacheDirInfo.requireSize, cacheDirInfo.realSize));
         }
     }
 
@@ -370,7 +370,7 @@ public class LruFileCache implements IFileCache {
     }
 
     @Override
-    public int getMaxSize() {
-        return (int) mDiskCacheSize;
+    public long getMaxSize() {
+        return mDiskCacheSize;
     }
 }

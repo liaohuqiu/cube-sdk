@@ -12,7 +12,17 @@ public interface ImageMemoryCache {
 
     public void delete(String key);
 
-    public int getMaxSize();
+    /**
+     * max byte
+     *
+     * @return
+     */
+    public long getMaxSize();
 
-    public int getUsedSpace();
+    /**
+     * used byte
+     *
+     * @return
+     */
+    public long getUsedSpace();
 }

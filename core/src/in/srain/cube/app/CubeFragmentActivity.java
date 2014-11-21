@@ -65,7 +65,7 @@ public abstract class CubeFragmentActivity extends FragmentActivity {
             if (currentFragment != null && currentFragment != fragment) {
                 currentFragment.onLeave();
             }
-            fragment.onComeIn(param.data);
+            fragment.onEnter(param.data);
 
             FragmentTransaction ft = fm.beginTransaction();
             if (fragment.isAdded()) {

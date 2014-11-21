@@ -41,7 +41,7 @@ public class LruImageFileProvider implements ImageFileProvider {
     private boolean mDiskCacheStarting = true;
     private boolean mDiskCacheReady = false;
     private File mDiskCacheDir;
-    private int mDiskCacheSize;
+    private long mDiskCacheSize;
 
     private long mLastFlushTime = 0;
 
@@ -69,14 +69,15 @@ public class LruImageFileProvider implements ImageFileProvider {
         init_cache, close_cache, flush_cache
     }
 
-    public LruImageFileProvider(int sizeInKB, File path) {
-        mDiskCacheSize = sizeInKB;
+    public LruImageFileProvider(long size, File path) {
+        mDiskCacheSize = size;
         mDiskCacheDir = path;
     }
 
     public static LruImageFileProvider getDefault(Context context) {
         if (null == sDefault) {
-            sDefault = new LruImageFileProvider(DEFAULT_CACHE_SIZE, FileUtil.getDiskCacheDir(context, DEFAULT_CACHE_DIR, DEFAULT_CACHE_SIZE));
+            FileUtil.CacheDirInfo cacheDirInfo = FileUtil.getDiskCacheDir(context, DEFAULT_CACHE_DIR, DEFAULT_CACHE_SIZE);
+            sDefault = new LruImageFileProvider(cacheDirInfo.realSize, cacheDirInfo.path);
             sDefault.initDiskCacheAsync();
         }
         return sDefault;
@@ -359,7 +360,7 @@ public class LruImageFileProvider implements ImageFileProvider {
     }
 
     @Override
-    public int getMaxSize() {
+    public long getMaxSize() {
         return mDiskCacheSize;
     }
 

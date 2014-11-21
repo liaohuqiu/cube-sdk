@@ -3,24 +3,31 @@ package in.srain.cube.app.lifecycle;
 public interface LifeCycleComponent {
 
     /**
-     * back to UI
+     * The UI becomes partially invisible.
+     * like {@link android.app.Activity#onPause}
      */
-    public void onRestart();
+    public void onBecomesPartiallyInvisible();
 
     /**
-     * the UI is hidden partly
+     * The UI becomes visible from partially or totally invisible.
+     * like {@link android.app.Activity#onResume}
      */
-    public void onPause();
+    public void onBecomesVisible();
 
     /**
-     * back to UI after leave partly
+     * The UI becomes totally invisible.
+     * like {@link android.app.Activity#onStop}
      */
-    public void onResume();
+    public void onBecomesTotallyInvisible();
 
     /**
-     * the whole UI is invisible
+     * The UI becomes visible from totally invisible.
+     * like {@link android.app.Activity#onRestart}
      */
-    public void onStop();
+    public void onBecomesVisibleFromTotallyInvisible();
 
+    /**
+     * like {@link android.app.Activity#onDestroy}
+     */
     public void onDestroy();
 }

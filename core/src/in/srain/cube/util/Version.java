@@ -51,41 +51,41 @@ public class Version {
     public static boolean hasFroyo() {
         // Can use static final constants like FROYO, declared in later versions
         // of the OS since they are inlined at compile time. This is guaranteed behavior.
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO;
+        return Build.VERSION.SDK_INT >= VERSION_CODES.FROYO;
     }
 
     /**
      * API level is or higher than 9
      */
     public static boolean hasGingerbread() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD;
+        return Build.VERSION.SDK_INT >= VERSION_CODES.GINGERBREAD;
     }
 
     /**
      * API level is or higher than 11
      */
     public static boolean hasHoneycomb() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB;
+        return Build.VERSION.SDK_INT >= 11; // VERSION_CODES.HONEYCOMB;
     }
 
     /**
      * API level is or higher than 12
      */
     public static boolean hasHoneycombMR1() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1;
+        return Build.VERSION.SDK_INT >= 12; // VERSION_CODES.HONEYCOMB_MR1;
     }
 
     /**
      * API level is or higher than 16
      */
     public static boolean hasJellyBean() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN;
+        return Build.VERSION.SDK_INT >= 16; // VERSION_CODES.JELLY_BEAN;
     }
 
     /**
      * API level is higher than 19
      */
     public static boolean hasKitKat() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+        return Build.VERSION.SDK_INT >= 19; //VERSION_CODES.KITKAT;
     }
 }

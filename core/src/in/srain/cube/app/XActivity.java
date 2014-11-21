@@ -20,7 +20,7 @@ public abstract class XActivity extends CubeFragmentActivity implements ICompone
     @Override
     protected void onRestart() {
         super.onStart();
-        mComponentContainer.onReturnFromTotallyInvisible();
+        mComponentContainer.onBecomesVisibleFromTotallyInvisible();
         if (DEBUG) {
             showStatus("onRestart");
         }
@@ -29,6 +29,7 @@ public abstract class XActivity extends CubeFragmentActivity implements ICompone
     @Override
     protected void onPause() {
         super.onPause();
+        mComponentContainer.onBecomesPartiallyInvisible();
         if (DEBUG) {
             showStatus("onPause");
         }
@@ -37,7 +38,7 @@ public abstract class XActivity extends CubeFragmentActivity implements ICompone
     @Override
     protected void onResume() {
         super.onResume();
-        mComponentContainer.onReturnFromInvisiblePartly();
+        mComponentContainer.onBecomesVisibleFromPartiallyInvisible();
         if (DEBUG) {
             showStatus("onResume");
         }
@@ -54,7 +55,7 @@ public abstract class XActivity extends CubeFragmentActivity implements ICompone
     @Override
     protected void onStop() {
         super.onStop();
-        mComponentContainer.onTurnToBeInvisibleTotally();
+        mComponentContainer.onBecomesTotallyInvisible();
         if (DEBUG) {
             showStatus("onStop");
         }

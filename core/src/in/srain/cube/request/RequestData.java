@@ -19,38 +19,6 @@ public class RequestData {
     private HashMap<String, Object> mPostData;
     private boolean mUsePost = false;
 
-    public void setRequestUrl(String url) {
-        mUrl = url;
-    }
-
-    public void addPostData(String key, Object data) {
-        if (mPostData == null) {
-            mPostData = new HashMap<String, Object>();
-        }
-        mPostData.put(key, data);
-    }
-
-    public void addPostData(Map<String, ?> data) {
-        if (mPostData == null) {
-            mPostData = new HashMap<String, Object>();
-        }
-        mPostData.putAll(data);
-    }
-
-    public void addQueryData(String key, Object data) {
-        if (mQueryData == null) {
-            mQueryData = new HashMap<String, Object>();
-        }
-        mQueryData.put(key, data);
-    }
-
-    public void addQueryData(Map<String, ?> data) {
-        if (mQueryData == null) {
-            mQueryData = new HashMap<String, Object>();
-        }
-        mQueryData.putAll(data);
-    }
-
     public static String buildQueryString(Map<String, ?> data, String url) {
 
         StringBuilder sb = new StringBuilder();
@@ -83,11 +51,51 @@ public class RequestData {
         return sb.toString();
     }
 
+    public void addPostData(String key, Object data) {
+        if (mPostData == null) {
+            mPostData = new HashMap<String, Object>();
+        }
+        mPostData.put(key, data);
+    }
+
+    public void addPostData(Map<String, ?> data) {
+        if (mPostData == null) {
+            mPostData = new HashMap<String, Object>();
+        }
+        mPostData.putAll(data);
+    }
+
+    public void addQueryData(String key, Object data) {
+        if (mQueryData == null) {
+            mQueryData = new HashMap<String, Object>();
+        }
+        mQueryData.put(key, data);
+    }
+
+    public void addQueryData(Map<String, ?> data) {
+        if (mQueryData == null) {
+            mQueryData = new HashMap<String, Object>();
+        }
+        mQueryData.putAll(data);
+    }
+
     public String getRequestUrl() {
         if (mQueryData != null) {
             return buildQueryString(mQueryData, mUrl);
         }
         return mUrl;
+    }
+
+    public void setRequestUrl(String url) {
+        mUrl = url;
+    }
+
+    public HashMap<String, Object> getQueryData() {
+        return mQueryData;
+    }
+
+    public HashMap<String, Object> getPostData() {
+        return mPostData;
     }
 
     public void usePost(boolean use) {

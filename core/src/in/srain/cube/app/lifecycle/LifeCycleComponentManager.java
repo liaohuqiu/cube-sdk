@@ -10,6 +10,9 @@ public class LifeCycleComponentManager implements IComponentContainer {
 
     private HashMap<String, LifeCycleComponent> mComponentList;
 
+    public LifeCycleComponentManager() {
+    }
+
     public static void tryAddComponentToContainer(LifeCycleComponent component, Context context) {
         if (context instanceof IComponentContainer) {
             ((IComponentContainer) context).addComponent(component);
@@ -18,77 +21,65 @@ public class LifeCycleComponentManager implements IComponentContainer {
         }
     }
 
-    public LifeCycleComponentManager() {
-    }
-
     public void addComponent(LifeCycleComponent component) {
         if (component != null) {
-            getList().put(component.toString(), component);
+            if (mComponentList == null) {
+                mComponentList = new HashMap<String, LifeCycleComponent>();
+            }
+            mComponentList.put(component.toString(), component);
         }
     }
 
-    private HashMap<String, LifeCycleComponent> getList() {
-        if (mComponentList == null) {
-            mComponentList = new HashMap<String, LifeCycleComponent>();
-        }
-        return mComponentList;
-    }
-
-    public void onReturnFromTotallyInvisible() {
+    public void onBecomesVisibleFromTotallyInvisible() {
 
         if (mComponentList == null) {
             return;
         }
 
-        Iterator<Entry<String, LifeCycleComponent>> it = getIterator();
-        while (it.hasNext()) {
-            LifeCycleComponent component = it.next().getValue();
-            if (component != null) {
-                component.onRestart();
-            }
-        }
-    }
-
-    private Iterator<Entry<String, LifeCycleComponent>> getIterator() {
         Iterator<Entry<String, LifeCycleComponent>> it = mComponentList.entrySet().iterator();
-        return it;
-    }
-
-    public void onTurnToBeInvisibleTotally() {
-        if (mComponentList == null) {
-            return;
-        }
-        Iterator<Entry<String, LifeCycleComponent>> it = getIterator();
         while (it.hasNext()) {
             LifeCycleComponent component = it.next().getValue();
             if (component != null) {
-                component.onStop();
+                component.onBecomesVisibleFromTotallyInvisible();
             }
         }
     }
 
-    public void onTurnToBeInvisiblePartly() {
+    public void onBecomesTotallyInvisible() {
         if (mComponentList == null) {
             return;
         }
-        Iterator<Entry<String, LifeCycleComponent>> it = getIterator();
+        Iterator<Entry<String, LifeCycleComponent>> it = mComponentList.entrySet().iterator();
         while (it.hasNext()) {
             LifeCycleComponent component = it.next().getValue();
             if (component != null) {
-                component.onPause();
+                component.onBecomesTotallyInvisible();
             }
         }
     }
 
-    public void onReturnFromInvisiblePartly() {
+    public void onBecomesPartiallyInvisible() {
         if (mComponentList == null) {
             return;
         }
-        Iterator<Entry<String, LifeCycleComponent>> it = getIterator();
+        Iterator<Entry<String, LifeCycleComponent>> it = mComponentList.entrySet().iterator();
         while (it.hasNext()) {
             LifeCycleComponent component = it.next().getValue();
             if (component != null) {
-                component.onResume();
+                component.onBecomesPartiallyInvisible();
+            }
+        }
+    }
+
+    public void onBecomesVisibleFromPartiallyInvisible() {
+        if (mComponentList == null) {
+            return;
+        }
+        Iterator<Entry<String, LifeCycleComponent>> it = mComponentList.entrySet().iterator();
+        while (it.hasNext()) {
+            LifeCycleComponent component = it.next().getValue();
+            if (component != null) {
+                component.onBecomesVisible();
             }
         }
     }
@@ -97,7 +88,7 @@ public class LifeCycleComponentManager implements IComponentContainer {
         if (mComponentList == null) {
             return;
         }
-        Iterator<Entry<String, LifeCycleComponent>> it = getIterator();
+        Iterator<Entry<String, LifeCycleComponent>> it = mComponentList.entrySet().iterator();
         while (it.hasNext()) {
             LifeCycleComponent component = it.next().getValue();
             if (component != null) {

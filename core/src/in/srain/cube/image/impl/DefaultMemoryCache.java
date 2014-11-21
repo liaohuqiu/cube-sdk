@@ -107,12 +107,12 @@ public class DefaultMemoryCache implements ImageMemoryCache {
     }
 
     @Override
-    public int getMaxSize() {
+    public long getMaxSize() {
         return mMemoryCache.maxSize() * 1024;
     }
 
     @Override
-    public int getUsedSpace() {
+    public long getUsedSpace() {
         return mMemoryCache.size() * 1024;
     }
 }
