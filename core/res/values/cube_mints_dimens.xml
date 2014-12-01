@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="cube_mints_header_height">44dp</dimen>
+    <dimen name="cube_mints_content_view_padding">12.5dp</dimen>
+</resources>

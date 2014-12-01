@@ -61,7 +61,7 @@ public abstract class CubeFragment extends Fragment implements ICubeFragment, IC
     }
 
     @Override
-    public boolean stayWhenBackPressed() {
+    public boolean processBackPressed() {
         return false;
     }
 

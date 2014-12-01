@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <in.srain.cube.mints.base.TitleHeaderBar
+        android:id="@+id/cube_mints_content_frame_title_header"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/cube_mints_header_height"
+        android:background="@color/cube_mints_app_base_background" />
+
+    <LinearLayout
+        android:id="@+id/cube_mints_content_frame_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/cube_mints_white"
+        android:clickable="true"
+        android:orientation="vertical" />
+
+</LinearLayout>

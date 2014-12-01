@@ -15,6 +15,7 @@ import in.srain.cube.util.Debug;
 public abstract class XActivity extends CubeFragmentActivity implements IComponentContainer {
 
     private LifeCycleComponentManager mComponentContainer = new LifeCycleComponentManager();
+
     private static final boolean DEBUG = Debug.DEBUG_LIFE_CYCLE;
 
     @Override

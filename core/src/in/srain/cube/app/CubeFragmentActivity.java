@@ -136,11 +136,31 @@ public abstract class CubeFragmentActivity extends FragmentActivity {
         }
     }
 
+    /**
+     * process the return back logic
+     * return true if back pressed event has been processed and should stay in current view
+     *
+     * @return
+     */
+    protected boolean processBackPressed() {
+        return false;
+    }
+
+    /**
+     * process back pressed
+     */
     @Override
     public void onBackPressed() {
+
+        // process back for fragment
+        if (processBackPressed()) {
+            return;
+        }
+
+        // process back for fragment
         boolean enableBackPressed = true;
         if (currentFragment != null) {
-            enableBackPressed = !currentFragment.stayWhenBackPressed();
+            enableBackPressed = !currentFragment.processBackPressed();
         }
         if (enableBackPressed) {
             int cnt = getSupportFragmentManager().getBackStackEntryCount();
@@ -151,11 +171,11 @@ public abstract class CubeFragmentActivity extends FragmentActivity {
                     toast.show();
                     mCloseWarned = true;
                 } else {
-                    returnBack();
+                    doReturnBack();
                 }
             } else {
                 mCloseWarned = false;
-                returnBack();
+                doReturnBack();
             }
         }
     }
@@ -174,7 +194,7 @@ public abstract class CubeFragmentActivity extends FragmentActivity {
         return false;
     }
 
-    protected void returnBack() {
+    protected void doReturnBack() {
         int count = getSupportFragmentManager().getBackStackEntryCount();
         if (count <= 1) {
             finish();

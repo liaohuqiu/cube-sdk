@@ -24,8 +24,9 @@ public interface ICubeFragment {
 
     /**
      * process the return back logic
+     * return true if back pressed event has been processed and should stay in current view
      *
-     * @return return true if need stay
+     * @return
      */
-    boolean stayWhenBackPressed();
+    boolean processBackPressed();
 }
