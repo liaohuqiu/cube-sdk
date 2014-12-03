@@ -55,17 +55,14 @@ public class SimpleRequestManager {
                         writer.flush();
                     }
                     InputStream ips = new BufferedInputStream(urlConnection.getInputStream());
-                    BufferedReader buf = new BufferedReader(new InputStreamReader(ips, "UTF-8"));
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(ips, "UTF-8"));
 
-                    String s;
-                    while (true) {
-                        s = buf.readLine();
-                        if (s == null || s.length() == 0)
-                            break;
-                        sb.append(s);
-
+                    char[] buffer = new char[1024];
+                    int bufferLength;
+                    while ((bufferLength = reader.read(buffer, 0, buffer.length)) > 0) {
+                        sb.append(buffer, 0, bufferLength);
                     }
-                    buf.close();
+                    reader.close();
                     ips.close();
                     data = request.onDataFromServer(sb.toString());
                 } catch (Exception e) {
