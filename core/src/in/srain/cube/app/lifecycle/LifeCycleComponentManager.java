@@ -1,7 +1,5 @@
 package in.srain.cube.app.lifecycle;
 
-import android.content.Context;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -13,11 +11,25 @@ public class LifeCycleComponentManager implements IComponentContainer {
     public LifeCycleComponentManager() {
     }
 
-    public static void tryAddComponentToContainer(LifeCycleComponent component, Context context) {
-        if (context instanceof IComponentContainer) {
-            ((IComponentContainer) context).addComponent(component);
+    /**
+     * Try to add component to container
+     *
+     * @param component
+     * @param matrixContainer
+     */
+    public static void tryAddComponentToContainer(LifeCycleComponent component, Object matrixContainer) {
+        tryAddComponentToContainer(component, matrixContainer, true);
+    }
+
+    public static boolean tryAddComponentToContainer(LifeCycleComponent component, Object matrixContainer, boolean throwEx) {
+        if (matrixContainer instanceof IComponentContainer) {
+            ((IComponentContainer) matrixContainer).addComponent(component);
+            return true;
         } else {
-            throw new IllegalArgumentException("componentContainerContext should implements IComponentContainer");
+            if (throwEx) {
+                throw new IllegalArgumentException("componentContainerContext should implements IComponentContainer");
+            }
+            return false;
         }
     }
 

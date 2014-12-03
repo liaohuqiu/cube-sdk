@@ -5,7 +5,9 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
+import in.srain.cube.app.CubeFragment;
 import in.srain.cube.app.lifecycle.LifeCycleComponent;
+import in.srain.cube.app.lifecycle.LifeCycleComponentManager;
 import in.srain.cube.concurrent.SimpleTask;
 import in.srain.cube.image.iface.ImageLoadHandler;
 import in.srain.cube.image.iface.ImageResizer;
@@ -86,7 +88,6 @@ public class ImageLoader implements LifeCycleComponent {
      */
     public void preLoadImages(String[] urls) {
         int len = urls.length;
-        len = 10;
         for (int i = 0; i < len; i++) {
             final ImageTask imageTask = createImageTask(urls[i], 0, 0, null);
             addImageTask(imageTask, null);
@@ -194,6 +195,15 @@ public class ImageLoader implements LifeCycleComponent {
     public void setTaskOrder(ImageTaskOrder order) {
         if (null != mImageTaskExecutor) {
             mImageTaskExecutor.setTaskOrder(order);
+        }
+    }
+
+    /**
+     * flush un-cached image to disk
+     */
+    public void flushFileCache() {
+        if (mImageProvider != null) {
+            mImageProvider.flushFileCache();
         }
     }
 
@@ -347,9 +357,7 @@ public class ImageLoader implements LifeCycleComponent {
         mExitTasksEarly = true;
         setPause(false);
 
-        if (null != mImageProvider) {
-            mImageProvider.flushFileCache();
-        }
+        flushFileCache();
     }
 
     /**
@@ -413,5 +421,20 @@ public class ImageLoader implements LifeCycleComponent {
     @Override
     public void onDestroy() {
         destroy();
+    }
+
+    public void tryToAttachToContainer(Object object) {
+        tryToAttachToContainer(object, true);
+    }
+
+    public void tryToAttachToContainer(Object object, boolean throwEx) {
+        LifeCycleComponentManager.tryAddComponentToContainer(this, object, throwEx);
+    }
+
+    public void attachToCubeFragment(CubeFragment fragment) {
+        if (fragment == null) {
+            return;
+        }
+        LifeCycleComponentManager.tryAddComponentToContainer(this, fragment);
     }
 }

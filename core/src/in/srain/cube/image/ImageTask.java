@@ -271,17 +271,21 @@ public class ImageTask {
     public void onLoading(ImageLoadHandler handler) {
         mFlag = mFlag | STATUS_LOADING;
 
-        if (null == handler || null == mFirstImageViewHolder) {
+        if (null == handler) {
             return;
         }
 
-        ImageViewHolder holder = mFirstImageViewHolder;
-        do {
-            final CubeImageView imageView = holder.getImageView();
-            if (null != imageView) {
-                handler.onLoading(this, imageView);
-            }
-        } while ((holder = holder.mNext) != null);
+        if (mFirstImageViewHolder == null) {
+            handler.onLoading(this, null);
+        } else {
+            ImageViewHolder holder = mFirstImageViewHolder;
+            do {
+                final CubeImageView imageView = holder.getImageView();
+                if (null != imageView) {
+                    handler.onLoading(this, imageView);
+                }
+            } while ((holder = holder.mNext) != null);
+        }
     }
 
     /**
@@ -294,23 +298,25 @@ public class ImageTask {
         mFlag &= ~STATUS_LOADING;
         mFlag |= STATUS_DONE;
 
-        if (null == handler || null == mFirstImageViewHolder) {
+        if (null == handler) {
             return;
         }
 
         if (null != mImageTaskStatistics) {
             mImageTaskStatistics.showBegin();
         }
-
-        ImageViewHolder holder = mFirstImageViewHolder;
-        do {
-            final CubeImageView imageView = holder.getImageView();
-            if (null != imageView) {
-                imageView.onLoadFinish();
-                handler.onLoadFinish(this, imageView, drawable);
-            }
-        } while ((holder = holder.mNext) != null);
-
+        if (mFirstImageViewHolder == null) {
+            handler.onLoadFinish(this, null, drawable);
+        } else {
+            ImageViewHolder holder = mFirstImageViewHolder;
+            do {
+                final CubeImageView imageView = holder.getImageView();
+                if (null != imageView) {
+                    imageView.onLoadFinish();
+                    handler.onLoadFinish(this, imageView, drawable);
+                }
+            } while ((holder = holder.mNext) != null);
+        }
         if (null != mImageTaskStatistics) {
             mImageTaskStatistics.showComplete(ImageProvider.getBitmapSize(drawable));
         }

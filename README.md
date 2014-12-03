@@ -11,14 +11,14 @@ It's in Maven Central:
     <groupId>in.srain.cube</groupId>
     <artifactId>cube-sdk</artifactId>
     <type>apklib</type>
-    <version>1.0.34</version>
+    <version>1.0.42</version>
 </dependency>
 `
 
 #### Gradle
 
 ``` groovy
-compile 'in.srain.cube:cube-sdk:1.0.34'
+compile 'in.srain.cube:cube-sdk:1.0.42@aar'
 `````
 
 All of the `readme` content and document are moved to Github Pages, please visit the Github Pages for more imformation:

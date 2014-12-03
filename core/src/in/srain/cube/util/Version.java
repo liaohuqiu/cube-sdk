@@ -30,7 +30,7 @@ public class Version {
 
     }
 
-    @TargetApi(VERSION_CODES.HONEYCOMB)
+    @TargetApi(11) // @TargetApi(VERSION_CODES.HONEYCOMB)
     public static void enableStrictMode() {
         if (Version.hasGingerbread()) {
             StrictMode.ThreadPolicy.Builder threadPolicyBuilder = new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog();
@@ -51,14 +51,14 @@ public class Version {
     public static boolean hasFroyo() {
         // Can use static final constants like FROYO, declared in later versions
         // of the OS since they are inlined at compile time. This is guaranteed behavior.
-        return Build.VERSION.SDK_INT >= VERSION_CODES.FROYO;
+        return Build.VERSION.SDK_INT >= 8; // VERSION_CODES.FROYO;
     }
 
     /**
      * API level is or higher than 9
      */
     public static boolean hasGingerbread() {
-        return Build.VERSION.SDK_INT >= VERSION_CODES.GINGERBREAD;
+        return Build.VERSION.SDK_INT >= 9; // VERSION_CODES.GINGERBREAD;
     }
 
     /**
@@ -86,6 +86,6 @@ public class Version {
      * API level is higher than 19
      */
     public static boolean hasKitKat() {
-        return Build.VERSION.SDK_INT >= 19; //VERSION_CODES.KITKAT;
+        return Build.VERSION.SDK_INT >= 19; // VERSION_CODES.KITKAT;
     }
 }

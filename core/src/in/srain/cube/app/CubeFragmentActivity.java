@@ -1,6 +1,5 @@
 package in.srain.cube.app;
 
-import android.app.ActivityManager;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -12,8 +11,6 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 import in.srain.cube.util.CLog;
-
-import java.util.List;
 
 public abstract class CubeFragmentActivity extends FragmentActivity {
 
@@ -117,23 +114,6 @@ public abstract class CubeFragmentActivity extends FragmentActivity {
             fm.popBackStackImmediate();
         }
         popTopFragment(data);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        debugTaskInfo();
-    }
-
-    protected void debugTaskInfo() {
-        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-        List<ActivityManager.RunningTaskInfo> taskList = manager.getRunningTasks(10);
-        CLog.d("test", "debugTaskInfo: %s %s", this.getClass().getName(), taskList.size());
-
-        for (int i = 0; i < taskList.size(); i++) {
-            ActivityManager.RunningTaskInfo info = taskList.get(i);
-            CLog.d("test", "RunningTaskInfo: %d %s, %s", info.numActivities, info.topActivity.getClassName(), info.baseActivity.getClassName());
-        }
     }
 
     /**

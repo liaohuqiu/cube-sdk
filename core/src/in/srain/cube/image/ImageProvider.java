@@ -337,7 +337,7 @@ public class ImageProvider {
      * @param value
      * @return size in bytes
      */
-    @TargetApi(VERSION_CODES.KITKAT)
+    @TargetApi(19) // @TargetApi(VERSION_CODES.KITKAT)
     public static int getBitmapSize(BitmapDrawable value) {
         if (null == value) {
             return 0;

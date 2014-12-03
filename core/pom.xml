@@ -13,7 +13,7 @@
     <artifactId>cube-sdk</artifactId>
     <packaging>aar</packaging>
     <name>Cube SDK</name>
-    <version>1.0.41-aar-SNAPSHOT</version>
+    <version>1.0.41-aar-oss-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
@@ -32,7 +32,7 @@
         <dependency>
             <groupId>in.srain.cube</groupId>
             <artifactId>clog</artifactId>
-            <version>1.0.1</version>
+            <version>1.0.2</version>
         </dependency>
     </dependencies>
 

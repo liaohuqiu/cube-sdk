@@ -8,6 +8,9 @@ import in.srain.cube.image.iface.*;
 import in.srain.cube.image.impl.*;
 
 /**
+ * Create an {@link ImageLoader}.
+ * If Context is {@link in.srain.cube.app.lifecycle.IComponentContainer}, add {@link ImageLoader} into it.
+ *
  * @author http://www.liaohuqiu.net
  */
 public class ImageLoaderFactory {
@@ -91,7 +94,7 @@ public class ImageLoaderFactory {
         }
         ImageLoader imageLoader = new ImageLoader(context, imageProvider, imageTaskExecutor, imageResizer, imageLoadHandler);
         if (context instanceof IComponentContainer) {
-            LifeCycleComponentManager.tryAddComponentToContainer(imageLoader, context);
+            LifeCycleComponentManager.tryAddComponentToContainer(imageLoader, context, false);
         }
         return imageLoader;
     }
