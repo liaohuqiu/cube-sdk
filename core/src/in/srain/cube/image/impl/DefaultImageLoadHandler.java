@@ -27,7 +27,7 @@ import in.srain.cube.util.Version;
 public class DefaultImageLoadHandler implements ImageLoadHandler {
 
     private final static boolean DEBUG = Debug.DEBUG_IMAGE;
-    private final static String Log_TAG = "cube_image";
+    private final static String LOG_TAG = Debug.DEBUG_IMAGE_LOG_TAG;
     private final static String MSG_LOADING = "%s onLoading";
     private final static String MSG_LOAD_ERROR = "%s load error";
     private final static String MSG_LOAD_FINISH = "%s onLoadFinish %s %s %s %s";
@@ -135,8 +135,11 @@ public class DefaultImageLoadHandler implements ImageLoadHandler {
 
     @Override
     public void onLoading(ImageTask imageTask, CubeImageView imageView) {
+        if (imageView == null) {
+            return;
+        }
         if (DEBUG) {
-            Log.d(Log_TAG, String.format(MSG_LOADING, imageTask));
+            Log.d(LOG_TAG, String.format(MSG_LOADING, imageTask));
         }
         if (Version.hasHoneycomb()) {
             if (mLoadingDrawable != null && imageView != null && imageView.getDrawable() != mLoadingDrawable) {
@@ -148,9 +151,9 @@ public class DefaultImageLoadHandler implements ImageLoadHandler {
     }
 
     @Override
-    public void onLoadError(CubeImageView imageView, ImageTask imageTask) {
+    public void onLoadError(ImageTask imageTask, CubeImageView imageView, int errorCode) {
         if (DEBUG) {
-            Log.d(Log_TAG, String.format(MSG_LOAD_ERROR, imageTask));
+            Log.d(LOG_TAG, String.format(MSG_LOAD_ERROR, imageTask));
         }
         if (Version.hasHoneycomb()) {
             if (mErrorDrawable != null && imageView != null && imageView.getDrawable() != mErrorDrawable) {
@@ -163,6 +166,10 @@ public class DefaultImageLoadHandler implements ImageLoadHandler {
 
     @Override
     public void onLoadFinish(ImageTask imageTask, CubeImageView imageView, BitmapDrawable drawable) {
+
+        if (imageView == null) {
+            return;
+        }
 
         Drawable d = drawable;
         if (drawable != null) {
@@ -203,7 +210,7 @@ public class DefaultImageLoadHandler implements ImageLoadHandler {
                         w = oldDrawable.getIntrinsicWidth();
                         h = oldDrawable.getIntrinsicHeight();
                     }
-                    Log.d(Log_TAG, String.format(MSG_LOAD_FINISH, imageTask, w, h, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight()));
+                    Log.d(LOG_TAG, String.format(MSG_LOAD_FINISH, imageTask, w, h, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight()));
                 }
                 imageView.setImageDrawable(drawable);
             }

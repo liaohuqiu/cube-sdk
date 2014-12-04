@@ -34,7 +34,7 @@ public class ImageProvider {
 
     protected static final boolean DEBUG = Debug.DEBUG_IMAGE;
 
-    protected static final String TAG = "image_provider";
+    protected static final String TAG = Debug.DEBUG_IMAGE_LOG_TAG_PROVIDER;
 
     private static final String MSG_FETCH_BEGIN = "%s fetchBitmapData";
     private static final String MSG_FETCH_BEGIN_IDENTITY_KEY = "%s identityKey: %s";
@@ -122,7 +122,7 @@ public class ImageProvider {
      * <p/>
      * If no file cache can be used, download then save to file.
      */
-    public Bitmap fetchBitmapData(ImageTask imageTask, ImageResizer imageResizer) {
+    public Bitmap fetchBitmapData(ImageLoader imageLoader, ImageTask imageTask, ImageResizer imageResizer) {
         Bitmap bitmap = null;
         if (mImageFileProvider != null) {
             FileInputStream inputStream = null;
@@ -187,6 +187,7 @@ public class ImageProvider {
                     imageTask.getStatistics().afterDownload();
                 }
                 if (inputStream == null) {
+                    imageTask.onLoadError(ImageTask.ERROR_NETWORK, imageLoader.getImageLoadHandler());
                     Log.e(TAG, imageTask + " download fail: " + fileCacheKey);
                 }
             }

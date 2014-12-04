@@ -29,9 +29,6 @@ public interface ImageLoadHandler {
 
     /**
      * Some errors has occurred
-     *
-     * @param imageView
-     * @param imageTask
      */
-    void onLoadError(CubeImageView imageView, ImageTask imageTask);
+    void onLoadError(ImageTask imageTask, CubeImageView imageView, int errorCode);
 }

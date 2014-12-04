@@ -11,7 +11,7 @@ import in.srain.cube.util.Debug;
 public class DefaultMemoryCache implements ImageMemoryCache {
 
     protected static final boolean DEBUG = Debug.DEBUG_IMAGE;
-    protected static final String TAG = "image_provider";
+    protected static final String LOG_TAG = Debug.DEBUG_IMAGE_LOG_TAG_PROVIDER;
     private LruCache<String, BitmapDrawable> mMemoryCache;
 
     private static DefaultMemoryCache sDefault;
@@ -28,7 +28,7 @@ public class DefaultMemoryCache implements ImageMemoryCache {
 
         // Set up memory cache
         if (DEBUG) {
-            Log.d(TAG, "Memory cache created (size = " + cacheSizeInKB + " KB)");
+            Log.d(LOG_TAG, "Memory cache created (size = " + cacheSizeInKB + " KB)");
         }
 
         mMemoryCache = new LruCache<String, BitmapDrawable>(cacheSizeInKB) {
@@ -96,7 +96,7 @@ public class DefaultMemoryCache implements ImageMemoryCache {
         if (mMemoryCache != null) {
             mMemoryCache.evictAll();
             if (DEBUG) {
-                Log.d(TAG, "Memory cache cleared");
+                Log.d(LOG_TAG, "Memory cache cleared");
             }
         }
     }

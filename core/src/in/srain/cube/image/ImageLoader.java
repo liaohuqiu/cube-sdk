@@ -10,6 +10,7 @@ import in.srain.cube.app.lifecycle.LifeCycleComponent;
 import in.srain.cube.app.lifecycle.LifeCycleComponentManager;
 import in.srain.cube.concurrent.SimpleTask;
 import in.srain.cube.image.iface.ImageLoadHandler;
+import in.srain.cube.image.iface.ImageLoadProgressHandler;
 import in.srain.cube.image.iface.ImageResizer;
 import in.srain.cube.image.iface.ImageTaskExecutor;
 import in.srain.cube.util.Debug;
@@ -31,12 +32,13 @@ public class ImageLoader implements LifeCycleComponent {
     private static final String MSG_TASK_HIT_CACHE = "%s hit cache %s %s";
 
     protected static final boolean DEBUG = Debug.DEBUG_IMAGE;
-    protected static final String Log_TAG = "cube_image";
+    protected static final String LOG_TAG = Debug.DEBUG_IMAGE_LOG_TAG;
 
     protected ImageTaskExecutor mImageTaskExecutor;
     protected ImageResizer mImageResizer;
     protected ImageProvider mImageProvider;
     protected ImageLoadHandler mImageLoadHandler;
+    protected ImageLoadProgressHandler mLoadProgressHandler;
 
     protected boolean mPauseWork = false;
     protected boolean mExitTasksEarly = false;
@@ -90,6 +92,7 @@ public class ImageLoader implements LifeCycleComponent {
         int len = urls.length;
         for (int i = 0; i < len; i++) {
             final ImageTask imageTask = createImageTask(urls[i], 0, 0, null);
+            imageTask.setIsPreLoad();
             addImageTask(imageTask, null);
         }
     }
@@ -129,7 +132,7 @@ public class ImageLoader implements LifeCycleComponent {
                     task.cancel(true);
                 }
                 if (DEBUG) {
-                    Log.d(Log_TAG, String.format("%s previous work is cancelled.", imageTask));
+                    Log.d(LOG_TAG, String.format("%s previous work is cancelled.", imageTask));
                 }
             }
         }
@@ -149,7 +152,7 @@ public class ImageLoader implements LifeCycleComponent {
         if (runningTask != null) {
             if (imageView != null) {
                 if (DEBUG) {
-                    Log.d(Log_TAG, String.format(MSG_ATTACK_TO_RUNNING_TASK, imageTask, runningTask.getImageTask()));
+                    Log.d(LOG_TAG, String.format(MSG_ATTACK_TO_RUNNING_TASK, imageTask, runningTask.getImageTask()));
                 }
                 runningTask.getImageTask().addImageView(imageView);
             }
@@ -182,9 +185,9 @@ public class ImageLoader implements LifeCycleComponent {
         }
 
         if (DEBUG) {
-            Log.d(Log_TAG, String.format(MSG_TASK_HIT_CACHE, imageTask, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight()));
+            Log.d(LOG_TAG, String.format(MSG_TASK_HIT_CACHE, imageTask, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight()));
             if (drawable.getIntrinsicWidth() == 270) {
-                Log.d(Log_TAG, String.format(MSG_TASK_HIT_CACHE, imageTask, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight()));
+                Log.d(LOG_TAG, String.format(MSG_TASK_HIT_CACHE, imageTask, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight()));
             }
         }
         imageTask.addImageView(imageView);
@@ -228,7 +231,7 @@ public class ImageLoader implements LifeCycleComponent {
         @Override
         public void doInBackground() {
             if (DEBUG) {
-                Log.d(Log_TAG, String.format(MSG_TASK_DO_IN_BACKGROUND, mImageTask));
+                Log.d(LOG_TAG, String.format(MSG_TASK_DO_IN_BACKGROUND, mImageTask));
             }
 
             if (mImageTask.getStatistics() != null) {
@@ -240,7 +243,7 @@ public class ImageLoader implements LifeCycleComponent {
                 while (mPauseWork && !isCancelled()) {
                     try {
                         if (DEBUG) {
-                            Log.d(Log_TAG, String.format("%s wait to begin", mImageTask));
+                            Log.d(LOG_TAG, String.format("%s wait to begin", mImageTask));
                         }
                         mPauseWorkLock.wait();
                     } catch (InterruptedException e) {
@@ -254,7 +257,7 @@ public class ImageLoader implements LifeCycleComponent {
             // the cache
             if (!isCancelled() && !mExitTasksEarly && (mImageTask.isPreLoad() || mImageTask.stillHasRelatedImageView())) {
                 try {
-                    bitmap = mImageProvider.fetchBitmapData(mImageTask, mImageResizer);
+                    bitmap = mImageProvider.fetchBitmapData(ImageLoader.this, mImageTask, mImageResizer);
                     if (mImageTask.getStatistics() != null) {
                         mImageTask.getStatistics().afterDecode();
                     }
@@ -274,7 +277,7 @@ public class ImageLoader implements LifeCycleComponent {
         @Override
         public void onFinish() {
             if (DEBUG) {
-                Log.d(Log_TAG, String.format(MSG_TASK_FINISH, mImageTask));
+                Log.d(LOG_TAG, String.format(MSG_TASK_FINISH, mImageTask));
             }
             if (mExitTasksEarly) {
                 return;
@@ -290,7 +293,7 @@ public class ImageLoader implements LifeCycleComponent {
         @Override
         public void onCancel() {
             if (DEBUG) {
-                Log.d(Log_TAG, String.format(MSG_TASK_CANCEL, mImageTask));
+                Log.d(LOG_TAG, String.format(MSG_TASK_CANCEL, mImageTask));
             }
             mLoadWorkList.remove(mImageTask.getIdentityKey());
             mImageTask.onCancel();
@@ -314,7 +317,7 @@ public class ImageLoader implements LifeCycleComponent {
         mExitTasksEarly = false;
         setPause(true);
         if (DEBUG) {
-            Log.d(Log_TAG, String.format("work_status: pauseWork %s", this));
+            Log.d(LOG_TAG, String.format("work_status: pauseWork %s", this));
         }
     }
 
@@ -325,7 +328,7 @@ public class ImageLoader implements LifeCycleComponent {
         mExitTasksEarly = false;
         setPause(false);
         if (DEBUG) {
-            Log.d(Log_TAG, String.format("work_status: resumeWork %s", this));
+            Log.d(LOG_TAG, String.format("work_status: resumeWork %s", this));
         }
     }
 
@@ -334,7 +337,7 @@ public class ImageLoader implements LifeCycleComponent {
      */
     public void recoverWork() {
         if (DEBUG) {
-            Log.d(Log_TAG, String.format("work_status: recoverWork %s", this));
+            Log.d(LOG_TAG, String.format("work_status: recoverWork %s", this));
         }
         mExitTasksEarly = false;
         setPause(false);
@@ -352,7 +355,7 @@ public class ImageLoader implements LifeCycleComponent {
      */
     public void stopWork() {
         if (DEBUG) {
-            Log.d(Log_TAG, String.format("work_status: stopWork %s", this));
+            Log.d(LOG_TAG, String.format("work_status: stopWork %s", this));
         }
         mExitTasksEarly = true;
         setPause(false);
@@ -423,18 +426,26 @@ public class ImageLoader implements LifeCycleComponent {
         destroy();
     }
 
-    public void tryToAttachToContainer(Object object) {
+    public ImageLoader tryToAttachToContainer(Object object) {
         tryToAttachToContainer(object, true);
+        return this;
     }
 
-    public void tryToAttachToContainer(Object object, boolean throwEx) {
+    public ImageLoader tryToAttachToContainer(Object object, boolean throwEx) {
         LifeCycleComponentManager.tryAddComponentToContainer(this, object, throwEx);
+        return this;
     }
 
-    public void attachToCubeFragment(CubeFragment fragment) {
-        if (fragment == null) {
-            return;
+    /**
+     * Process LifeCycle
+     *
+     * @param fragment
+     * @return
+     */
+    public ImageLoader attachToCubeFragment(CubeFragment fragment) {
+        if (fragment != null) {
+            LifeCycleComponentManager.tryAddComponentToContainer(this, fragment);
         }
-        LifeCycleComponentManager.tryAddComponentToContainer(this, fragment);
+        return this;
     }
 }

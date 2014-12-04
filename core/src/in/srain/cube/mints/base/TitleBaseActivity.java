@@ -18,14 +18,13 @@ public abstract class TitleBaseActivity extends DemoBaseActivity {
         initViews();
     }
 
-    protected int getLayoutId() {
+    protected int getFrameLayoutId() {
         return R.layout.cube_mints_base_content_frame_with_title_header;
     }
 
     protected void initViews() {
-        super.setContentView(getLayoutId());
+        super.setContentView(getFrameLayoutId());
 
-        // 页头逻辑处理
         mTitleHeaderBar = (TitleHeaderBar) findViewById(R.id.cube_mints_content_frame_title_header);
         mContentContainer = (LinearLayout) findViewById(R.id.cube_mints_content_frame_content);
 

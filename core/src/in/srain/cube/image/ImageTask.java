@@ -16,7 +16,7 @@ import java.lang.ref.WeakReference;
  */
 public class ImageTask {
 
-    protected static final String Log_TAG = "cube_image_task";
+    protected static final String LOG_TAG = Debug.DEBUG_IMAGE_LOG_TAG_TASK;
     private static final Object sPoolSync = new Object();
     private static ImageTask sTop;
     private static int sPoolSize = 0;
@@ -30,6 +30,9 @@ public class ImageTask {
     private final static int STATUS_LOADING = 0x02;
     private final static int STATUS_DONE = 0x04;
     private final static int STATUS_CANCELED = 0x08;
+    private final static int STATUS_FAIL = 0x10;
+
+    public final static int ERROR_NETWORK = 0x01;
 
     private int mFlag = 0;
     protected int mId = 0;
@@ -84,7 +87,7 @@ public class ImageTask {
                 return m;
             }
             if (Debug.DEBUG_IMAGE) {
-                CLog.d(Log_TAG, "obtain, pool remain: %d", sPoolSize);
+                CLog.d(LOG_TAG, "obtain, pool remain: %d", sPoolSize);
             }
         }
         return null;
@@ -104,7 +107,7 @@ public class ImageTask {
                 sPoolSize++;
             }
             if (Debug.DEBUG_IMAGE) {
-                CLog.d(Log_TAG, "recycle, pool remain: %d", sPoolSize);
+                CLog.d(LOG_TAG, "recycle, pool remain: %d", sPoolSize);
             }
         }
     }
@@ -325,6 +328,24 @@ public class ImageTask {
     public void onCancel() {
         mFlag &= ~STATUS_LOADING;
         mFlag |= STATUS_CANCELED;
+    }
+
+    public void onLoadError(int reason, ImageLoadHandler handler) {
+        mFlag &= ~STATUS_LOADING;
+        mFlag |= STATUS_FAIL;
+        if (mFirstImageViewHolder == null) {
+            handler.onLoadError(this, null, reason);
+        } else {
+            ImageViewHolder holder = mFirstImageViewHolder;
+            do {
+                final CubeImageView imageView = holder.getImageView();
+                if (null != imageView) {
+                    imageView.onLoadFinish();
+                    handler.onLoadError(this, imageView, reason);
+                }
+            } while ((holder = holder.mNext) != null);
+
+        }
     }
 
     /**

@@ -22,7 +22,7 @@ public abstract class TitleBaseFragment extends CubeFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        ViewGroup view = (ViewGroup) inflater.inflate(R.layout.cube_mints_base_content_frame_with_title_header, null);
+        ViewGroup view = (ViewGroup) inflater.inflate(getFrameLayoutId(), null);
         LinearLayout contentContainer = (LinearLayout) view.findViewById(R.id.cube_mints_content_frame_content);
 
         mTitleHeaderBar = (TitleHeaderBar) view.findViewById(R.id.cube_mints_content_frame_title_header);
@@ -43,6 +43,10 @@ public abstract class TitleBaseFragment extends CubeFragment {
         contentView.setLayoutParams(new LinearLayout.LayoutParams(-1, -1));
         contentContainer.addView(contentView);
         return view;
+    }
+
+    protected int getFrameLayoutId() {
+        return R.layout.cube_mints_base_content_frame_with_title_header;
     }
 
     /**
