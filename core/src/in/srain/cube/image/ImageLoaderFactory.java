@@ -1,8 +1,6 @@
 package in.srain.cube.image;
 
 import android.content.Context;
-import in.srain.cube.app.lifecycle.IComponentContainer;
-import in.srain.cube.app.lifecycle.LifeCycleComponentManager;
 import in.srain.cube.file.FileUtil;
 import in.srain.cube.image.iface.*;
 import in.srain.cube.image.impl.*;
@@ -93,9 +91,6 @@ public class ImageLoaderFactory {
             imageLoadHandler = new DefaultImageLoadHandler(context);
         }
         ImageLoader imageLoader = new ImageLoader(context, imageProvider, imageTaskExecutor, imageResizer, imageLoadHandler);
-        if (context instanceof IComponentContainer) {
-            LifeCycleComponentManager.tryAddComponentToContainer(imageLoader, context, false);
-        }
         return imageLoader;
     }
 
