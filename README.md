@@ -1,4 +1,4 @@
-[中文版文档]()
+[中文说明](https://github.com/etao-open-source/cube-sdk/blob/dev/README-cn.md)
 
 ---
 

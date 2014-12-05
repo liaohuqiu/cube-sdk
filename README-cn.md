@@ -2,7 +2,7 @@ Cube-SDK 是一个开发框架。这个框架致力于快速实现需求，解�
 
 ![Screen Shot](https://raw.githubusercontent.com/etao-open-source/cube-sdk/dev/screen-shot.png)
 
-**参考**文档: http://cube-sdk.liaohuqiu.net/cn
+文档: http://cube-sdk.liaohuqiu.net/cn
 
 Demo 项目移到了这里: https://github.com/liaohuqiu/android-cube-app
 

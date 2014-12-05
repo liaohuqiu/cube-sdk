@@ -34,8 +34,8 @@ replace_file('core/gradle.properties', 'VERSION_NAME=', '\n', version_name, 1, 2
 # update version for reade me
 replace_file('README.md', '<version>', '</version>', version_name, 21, 28)
 replace_file('README.md', '<version>', '</version>', version_name, 31, 38)
-replace_file('README.md', 'cube-sdk', '@aar', version_name, 41, 45)
+replace_file('README.md', 'in.srain.cube:cube-sdk:', '@aar', version_name, 41, 45)
 
 replace_file('README-cn.md', '<version>', '</version>', version_name, 18, 25)
 replace_file('README-cn.md', '<version>', '</version>', version_name, 29, 35)
-replace_file('README-cn.md', 'cube-sdk', '@aar', version_name, 41, 41)
+replace_file('README-cn.md', 'in.srain.cube:cube-sdk:', '@aar', version_name, 41, 41)
