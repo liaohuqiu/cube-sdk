@@ -1,14 +1,112 @@
 package in.srain.cube.request;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 public class RequestData {
 
+    private static final String CHAR_QM = "?";
+    private static final String CHAR_AND = "&";
+    private static final String CHAR_EQ = "=";
+    private static final String CHAR_SET = "UTF-8";
+
     public String mUrl;
+
+    private HashMap<String, Object> mQueryData;
+    private HashMap<String, Object> mPostData;
+    private boolean mUsePost = false;
+
+    public static String buildQueryString(Map<String, ?> data, String url) {
+
+        StringBuilder sb = new StringBuilder();
+        boolean append = false;
+        if (url != null) {
+            sb.append(url);
+            if (url.contains(CHAR_QM)) {
+                append = true;
+            } else {
+                sb.append(CHAR_QM);
+            }
+        }
+        Iterator<? extends Map.Entry<String, ?>> it = data.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<String, ?> item = it.next();
+            if (append) {
+                sb.append(CHAR_AND);
+            } else {
+                append = true;
+            }
+
+            try {
+                sb.append(URLEncoder.encode(item.getKey(), CHAR_SET));
+                sb.append(CHAR_EQ);
+                sb.append(URLEncoder.encode(item.getValue().toString(), CHAR_SET));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
+        return sb.toString();
+    }
+
+    public void addPostData(String key, Object data) {
+        if (mPostData == null) {
+            mPostData = new HashMap<String, Object>();
+        }
+        mPostData.put(key, data);
+    }
+
+    public void addPostData(Map<String, ?> data) {
+        if (mPostData == null) {
+            mPostData = new HashMap<String, Object>();
+        }
+        mPostData.putAll(data);
+    }
+
+    public void addQueryData(String key, Object data) {
+        if (mQueryData == null) {
+            mQueryData = new HashMap<String, Object>();
+        }
+        mQueryData.put(key, data);
+    }
+
+    public void addQueryData(Map<String, ?> data) {
+        if (mQueryData == null) {
+            mQueryData = new HashMap<String, Object>();
+        }
+        mQueryData.putAll(data);
+    }
+
+    public String getRequestUrl() {
+        if (mQueryData != null) {
+            return buildQueryString(mQueryData, mUrl);
+        }
+        return mUrl;
+    }
 
     public void setRequestUrl(String url) {
         mUrl = url;
     }
 
-    public String getRequestUrl() {
-        return mUrl;
+    public HashMap<String, Object> getQueryData() {
+        return mQueryData;
+    }
+
+    public HashMap<String, Object> getPostData() {
+        return mPostData;
+    }
+
+    public void usePost(boolean use) {
+        mUsePost = use;
+    }
+
+    public String getPostString() {
+        return buildQueryString(mPostData, null);
+    }
+
+    public boolean shouldPost() {
+        return mUsePost || (mPostData != null && mPostData.size() > 0);
     }
 }

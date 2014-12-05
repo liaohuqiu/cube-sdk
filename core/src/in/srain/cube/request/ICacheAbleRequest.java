@@ -1,38 +1,11 @@
 package in.srain.cube.request;
 
-/**
- * A CacheAble Request wrap
- */
-public interface ICacheAbleRequest<T> extends IRequest<T> {
+import in.srain.cube.cache.ICacheAble;
 
-    public int getCacheTime();
-
-    public String getCacheKey();
-
-    public String getAssertInitDataPath();
+public interface ICacheAbleRequest<T> extends ICacheAble<T>, IRequest<T> {
 
     /**
-     * We need to process the data from data source, do some filter of convert the structure.
-     * <p/>
-     * As the "Assert Data" is a special data source, we also need to do the same work.
-     */
-    public T processRawDataFromCache(JsonData rawData);
-
-    /**
-     * when data loaded from cache
-     *
-     * @param cacheData
-     * @param outOfDate
-     */
-    public void onCacheData(T cacheData, boolean outOfDate);
-
-    /**
-     * process query data from server
-     */
-    public void queryFromServer();
-
-    /**
-     * disable cache
+     * check cache is disabled
      * <p/>
      * 1. will not load cache
      * <p/>
@@ -40,7 +13,7 @@ public interface ICacheAbleRequest<T> extends IRequest<T> {
      *
      * @return
      */
-    public boolean disableCache();
+    public boolean cacheIsDisabled();
 
     /**
      * set a timeout, when request time over this value, cache data will be used.

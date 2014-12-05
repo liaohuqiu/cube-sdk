@@ -2,6 +2,7 @@ package in.srain.cube.image.impl;
 
 import android.os.Build;
 import android.util.Log;
+import in.srain.cube.util.Debug;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -12,7 +13,7 @@ import java.net.URL;
  */
 public class SimpleDownloader {
 
-    private static final String TAG = "image_provider";
+    protected static final String LOG_TAG = Debug.DEBUG_IMAGE_LOG_TAG_PROVIDER;
 
     private static final int IO_BUFFER_SIZE = 8 * 1024;
 
@@ -39,7 +40,7 @@ public class SimpleDownloader {
             }
             return true;
         } catch (final IOException e) {
-            Log.e(TAG, "Error in downloadBitmap - " + e);
+            Log.e(LOG_TAG, "Error in downloadBitmap - " + e);
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();

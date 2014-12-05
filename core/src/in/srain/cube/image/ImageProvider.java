@@ -15,7 +15,7 @@ import in.srain.cube.image.iface.ImageMemoryCache;
 import in.srain.cube.image.iface.ImageResizer;
 import in.srain.cube.image.impl.DefaultMemoryCache;
 import in.srain.cube.image.impl.LruImageFileProvider;
-import in.srain.cube.util.CLog;
+import in.srain.cube.util.Debug;
 import in.srain.cube.util.Version;
 
 import java.io.FileDescriptor;
@@ -32,9 +32,9 @@ import java.io.InputStream;
  */
 public class ImageProvider {
 
-    protected static final boolean DEBUG = CLog.DEBUG_IMAGE;
+    protected static final boolean DEBUG = Debug.DEBUG_IMAGE;
 
-    protected static final String TAG = "image_provider";
+    protected static final String TAG = Debug.DEBUG_IMAGE_LOG_TAG_PROVIDER;
 
     private static final String MSG_FETCH_BEGIN = "%s fetchBitmapData";
     private static final String MSG_FETCH_BEGIN_IDENTITY_KEY = "%s identityKey: %s";
@@ -122,7 +122,7 @@ public class ImageProvider {
      * <p/>
      * If no file cache can be used, download then save to file.
      */
-    public Bitmap fetchBitmapData(ImageTask imageTask, ImageResizer imageResizer) {
+    public Bitmap fetchBitmapData(ImageLoader imageLoader, ImageTask imageTask, ImageResizer imageResizer) {
         Bitmap bitmap = null;
         if (mImageFileProvider != null) {
             FileInputStream inputStream = null;
@@ -187,6 +187,7 @@ public class ImageProvider {
                     imageTask.getStatistics().afterDownload();
                 }
                 if (inputStream == null) {
+                    imageTask.onLoadError(ImageTask.ERROR_NETWORK, imageLoader.getImageLoadHandler());
                     Log.e(TAG, imageTask + " download fail: " + fileCacheKey);
                 }
             }
@@ -276,11 +277,11 @@ public class ImageProvider {
         }
     }
 
-    public int getMemoryCacheMaxSpace() {
+    public long getMemoryCacheMaxSpace() {
         return mMemoryCache.getMaxSize();
     }
 
-    public int getMemoryCacheUsedSpace() {
+    public long getMemoryCacheUsedSpace() {
         return mMemoryCache.getUsedSpace();
     }
 
@@ -337,7 +338,7 @@ public class ImageProvider {
      * @param value
      * @return size in bytes
      */
-    @TargetApi(VERSION_CODES.KITKAT)
+    @TargetApi(19) // @TargetApi(VERSION_CODES.KITKAT)
     public static int getBitmapSize(BitmapDrawable value) {
         if (null == value) {
             return 0;

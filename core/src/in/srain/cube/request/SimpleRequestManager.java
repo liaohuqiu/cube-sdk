@@ -3,12 +3,9 @@ package in.srain.cube.request;
 import android.os.Handler;
 import android.os.Message;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 
 /**
  * @author http://www.liaohuqiu.net
@@ -45,21 +42,27 @@ public class SimpleRequestManager {
             public void run() {
                 T data = null;
                 try {
+
+                    RequestData requestData = request.getRequestData();
                     StringBuilder sb = new StringBuilder();
                     URL url = new URL(request.getRequestData().getRequestUrl());
-                    URLConnection urlConnection = url.openConnection();
-                    InputStream ips = new BufferedInputStream(urlConnection.getInputStream());
-                    BufferedReader buf = new BufferedReader(new InputStreamReader(ips, "UTF-8"));
+                    HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
-                    String s;
-                    while (true) {
-                        s = buf.readLine();
-                        if (s == null || s.length() == 0)
-                            break;
-                        sb.append(s);
-
+                    if (requestData.shouldPost()) {
+                        urlConnection.setRequestMethod("POST");
+                        OutputStreamWriter writer = new OutputStreamWriter(urlConnection.getOutputStream());
+                        writer.write(requestData.getPostString());
+                        writer.flush();
                     }
-                    buf.close();
+                    InputStream ips = new BufferedInputStream(urlConnection.getInputStream());
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(ips, "UTF-8"));
+
+                    char[] buffer = new char[1024];
+                    int bufferLength;
+                    while ((bufferLength = reader.read(buffer, 0, buffer.length)) > 0) {
+                        sb.append(buffer, 0, bufferLength);
+                    }
+                    reader.close();
                     ips.close();
                     data = request.onDataFromServer(sb.toString());
                 } catch (Exception e) {

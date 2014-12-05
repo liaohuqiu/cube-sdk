@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="cube_mints_white">#ffffff</color>
+    <color name="cube_mints_333333">#333333</color>
+    <color name="cube_mints_666666">#666666</color>
+    <color name="cube_mints_999999">#999999</color>
+    <color name="cube_mints_f1f1f1">#f1f1f1</color>
+    <color name="cube_mints_black">#000000</color>
+    <color name="cube_mints_app_base_background">#373737</color>
+    <color name="cube_mints_base_font_color">#007edf</color>
+    <color name="cube_mints_main_color">#007edf</color>
+    <color name="cube_mints_4d90fe">#4d90fe</color>
+
+</resources>

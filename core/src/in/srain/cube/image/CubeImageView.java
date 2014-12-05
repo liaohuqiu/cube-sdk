@@ -33,6 +33,7 @@ public class CubeImageView extends ImageView {
 
     private ImageReuseInfo mImageReuseInfo;
     private ImageTask mImageTask;
+    private boolean mClearWhenDetached = true;
 
     public CubeImageView(Context context) {
         super(context);
@@ -42,26 +43,38 @@ public class CubeImageView extends ImageView {
         super(context, attrs);
     }
 
-    /**
-     * @see android.widget.ImageView#onDetachedFromWindow()
-     */
-    @Override
-    protected void onDetachedFromWindow() {
-        // This has been detached from Window, so clear the drawable
+    public void setClearDrawableWhenDetached(boolean clearWhenDetached) {
+        mClearWhenDetached = clearWhenDetached;
+    }
+
+    public void clearDrawable() {
         setImageDrawable(null);
 
         if (null != mImageTask && null != mImageLoader) {
             mImageLoader.detachImageViewFromImageTask(mImageTask, this);
             clearLoadTask();
         }
+    }
 
+    /**
+     * @see android.widget.ImageView#onDetachedFromWindow()
+     */
+    @Override
+    protected void onDetachedFromWindow() {
+        // This has been detached from Window, so clear the drawable
+        // If this view is recycled ???
+        if (mClearWhenDetached) {
+            clearDrawable();
+        }
         super.onDetachedFromWindow();
     }
 
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        tryLoadImage();
+        if (mClearWhenDetached) {
+            tryLoadImage();
+        }
     }
 
     /**

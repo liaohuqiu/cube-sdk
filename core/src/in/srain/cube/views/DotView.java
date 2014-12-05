@@ -7,11 +7,11 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.LinearLayout;
 import in.srain.cube.R;
+import in.srain.cube.views.banner.PagerIndicator;
 
-public class DotView extends LinearLayout implements OnClickListener {
+public class DotView extends LinearLayout implements PagerIndicator {
 
     public interface OnDotClickHandler {
         public void onDotClick(int index);
@@ -55,6 +55,7 @@ public class DotView extends LinearLayout implements OnClickListener {
         mLittleDotSize = (int) (mDotSpan / 2 + mDotRadius * 2);
     }
 
+    @Override
     public final void setNum(int num) {
         if (num < 0)
             return;
@@ -72,15 +73,17 @@ public class DotView extends LinearLayout implements OnClickListener {
             }
             dot.setLayoutParams(new LayoutParams((int) mLittleDotSize, (int) mDotRadius * 2, 1));
             dot.setClickable(true);
-            dot.setOnClickListener(this);
+            dot.setOnClickListener(mDotClickHandler);
             addView(dot);
         }
     }
 
+    @Override
     public int getTotal() {
         return mTotal;
     }
 
+    @Override
     public int getCurrentIndex() {
         return mCurrent;
     }
@@ -89,13 +92,14 @@ public class DotView extends LinearLayout implements OnClickListener {
         mOnDotClickHandler = handler;
     }
 
-    @Override
-    public void onClick(View v) {
-
-        if (v instanceof LittleDot && null != mOnDotClickHandler) {
-            mOnDotClickHandler.onDotClick(((LittleDot) v).getIndex());
+    private OnClickListener mDotClickHandler = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (v instanceof LittleDot && null != mOnDotClickHandler) {
+                mOnDotClickHandler.onDotClick(((LittleDot) v).getIndex());
+            }
         }
-    }
+    };
 
     public final void setSelected(int index) {
         if (index >= getChildCount() || index < 0 || mCurrent == index)

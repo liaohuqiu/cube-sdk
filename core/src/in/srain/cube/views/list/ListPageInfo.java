@@ -7,7 +7,7 @@ public class ListPageInfo<T> {
 
     private int mNumPerPage = 0;
     private int mStart = 0;
-    private int mTotal;
+    private boolean mHasMore;
     private boolean mIsBusy = false;
 
     private List<T> mDataList;
@@ -17,11 +17,21 @@ public class ListPageInfo<T> {
     }
 
     public void updateListInfo(List<T> dataList, int total) {
+        addMore(dataList);
+        mHasMore = mDataList.size() < total;
+        mIsBusy = false;
+    }
+
+    private void addMore(List<T> dataList) {
         if (mStart == 0 || mDataList == null) {
             mDataList = new ArrayList<T>();
         }
         mDataList.addAll(dataList);
-        mTotal = total;
+    }
+
+    public void updateListInfo(List<T> dataList, boolean hasMore) {
+        addMore(dataList);
+        mHasMore = hasMore;
         mIsBusy = false;
     }
 
@@ -39,10 +49,6 @@ public class ListPageInfo<T> {
 
     public int getStart() {
         return mStart;
-    }
-
-    public int getTotal() {
-        return mTotal;
     }
 
     public int getNumPerPage() {
@@ -84,7 +90,7 @@ public class ListPageInfo<T> {
     }
 
     public boolean hasMore() {
-        return mDataList == null || mDataList.size() < mTotal;
+        return mDataList == null || mHasMore;
     }
 
     public boolean isFirstPage() {

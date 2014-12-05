@@ -6,24 +6,27 @@ package in.srain.cube.request;
 public class SimpleRequest<T> extends RequestBase<T> implements IRequest<T> {
 
     private RequestHandler<T> mRequestHandler;
-    private RequestPreHandler mRequestPreHandler;
 
-    public SimpleRequest(RequestPreHandler requestPreHandler, RequestHandler<T> handler) {
-        mRequestPreHandler = requestPreHandler;
+    public SimpleRequest() {
+
+    }
+
+    public SimpleRequest(RequestHandler<T> handler) {
+        setRequestHandler(handler);
+    }
+
+    public SimpleRequest setRequestHandler(RequestHandler<T> handler) {
         mRequestHandler = handler;
+        return this;
     }
 
     @Override
     protected void doSendRequest() {
-        this.prepareRequest();
         SimpleRequestManager.sendRequest(this);
     }
 
     @Override
-    public void prepareRequest() {
-        if (null != mRequestPreHandler) {
-            mRequestPreHandler.prepareRequest(this);
-        }
+    protected void prepareRequest() {
     }
 
     @Override

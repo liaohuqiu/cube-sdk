@@ -12,6 +12,10 @@ public class ListViewDataAdapter<ItemDataType> extends ListViewDataAdapterBase<I
 
     protected ArrayList<ItemDataType> mItemDataList = new ArrayList<ItemDataType>();
 
+    public ListViewDataAdapter() {
+
+    }
+
     /**
      * @param viewHolderCreator The view holder creator will create a View Holder that extends {@link ViewHolderBase}
      */

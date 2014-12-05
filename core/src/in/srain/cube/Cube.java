@@ -2,6 +2,7 @@ package in.srain.cube;
 
 import android.app.Application;
 import android.content.Context;
+import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 import in.srain.cube.util.LocalDisplay;
@@ -17,18 +18,11 @@ public class Cube {
         instance = new Cube(app);
     }
 
-    public static void onTerminate() {
-
-    }
-
     private Cube(Application application) {
         mApplication = application;
 
         // local display
-        DisplayMetrics dm = new DisplayMetrics();
-        WindowManager wm = (WindowManager) application.getSystemService(Context.WINDOW_SERVICE);
-        wm.getDefaultDisplay().getMetrics(dm);
-        LocalDisplay.init(dm);
+        LocalDisplay.init(application);
 
         // network status
         NetworkStatusManager.init(application);
@@ -42,8 +36,8 @@ public class Cube {
         return mApplication;
     }
 
-    public String getRootDirNameInSDCard() {
-        return "cube_sdk";
+    public String getAndroidId() {
+        String id = Settings.Secure.getString(mApplication.getContentResolver(), Settings.Secure.ANDROID_ID);
+        return id;
     }
-
 }

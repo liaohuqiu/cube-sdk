@@ -430,13 +430,6 @@ public final class DiskLruCache implements Closeable {
     }
 
     private static void deleteIfExists(File file) throws IOException {
-//        try {
-//            Libcore.os.remove(file.getPath());
-//        } catch (ErrnoException errnoException) {
-//            if (errnoException.errno != OsConstants.ENOENT) {
-//                throw errnoException.rethrowAsIOException();
-//            }
-//        }
         if (file.exists() && !file.delete()) {
             throw new IOException();
         }
@@ -722,6 +715,10 @@ public final class DiskLruCache implements Closeable {
          */
         public Editor edit() throws IOException {
             return DiskLruCache.this.edit(key, sequenceNumber);
+        }
+
+        public boolean has(int index) {
+            return index < ins.length;
         }
 
         /**

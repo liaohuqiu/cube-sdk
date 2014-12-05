@@ -4,6 +4,7 @@ import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import in.srain.cube.image.iface.ImageLoadHandler;
 import in.srain.cube.util.CLog;
+import in.srain.cube.util.Debug;
 import in.srain.cube.util.Encrypt;
 
 import java.lang.ref.WeakReference;
@@ -15,7 +16,7 @@ import java.lang.ref.WeakReference;
  */
 public class ImageTask {
 
-    protected static final String Log_TAG = "cube_image_task";
+    protected static final String LOG_TAG = Debug.DEBUG_IMAGE_LOG_TAG_TASK;
     private static final Object sPoolSync = new Object();
     private static ImageTask sTop;
     private static int sPoolSize = 0;
@@ -29,6 +30,9 @@ public class ImageTask {
     private final static int STATUS_LOADING = 0x02;
     private final static int STATUS_DONE = 0x04;
     private final static int STATUS_CANCELED = 0x08;
+    private final static int STATUS_FAIL = 0x10;
+
+    public final static int ERROR_NETWORK = 0x01;
 
     private int mFlag = 0;
     protected int mId = 0;
@@ -82,8 +86,8 @@ public class ImageTask {
                 sPoolSize--;
                 return m;
             }
-            if (CLog.DEBUG_IMAGE) {
-                CLog.d(Log_TAG, "obtain, pool remain: %d", sPoolSize);
+            if (Debug.DEBUG_IMAGE) {
+                CLog.d(LOG_TAG, "obtain, pool remain: %d", sPoolSize);
             }
         }
         return null;
@@ -102,8 +106,8 @@ public class ImageTask {
                 sTop = this;
                 sPoolSize++;
             }
-            if (CLog.DEBUG_IMAGE) {
-                CLog.d(Log_TAG, "recycle, pool remain: %d", sPoolSize);
+            if (Debug.DEBUG_IMAGE) {
+                CLog.d(LOG_TAG, "recycle, pool remain: %d", sPoolSize);
             }
         }
     }
@@ -270,17 +274,21 @@ public class ImageTask {
     public void onLoading(ImageLoadHandler handler) {
         mFlag = mFlag | STATUS_LOADING;
 
-        if (null == handler || null == mFirstImageViewHolder) {
+        if (null == handler) {
             return;
         }
 
-        ImageViewHolder holder = mFirstImageViewHolder;
-        do {
-            final CubeImageView imageView = holder.getImageView();
-            if (null != imageView) {
-                handler.onLoading(this, imageView);
-            }
-        } while ((holder = holder.mNext) != null);
+        if (mFirstImageViewHolder == null) {
+            handler.onLoading(this, null);
+        } else {
+            ImageViewHolder holder = mFirstImageViewHolder;
+            do {
+                final CubeImageView imageView = holder.getImageView();
+                if (null != imageView) {
+                    handler.onLoading(this, imageView);
+                }
+            } while ((holder = holder.mNext) != null);
+        }
     }
 
     /**
@@ -293,23 +301,25 @@ public class ImageTask {
         mFlag &= ~STATUS_LOADING;
         mFlag |= STATUS_DONE;
 
-        if (null == handler || null == mFirstImageViewHolder) {
+        if (null == handler) {
             return;
         }
 
         if (null != mImageTaskStatistics) {
             mImageTaskStatistics.showBegin();
         }
-
-        ImageViewHolder holder = mFirstImageViewHolder;
-        do {
-            final CubeImageView imageView = holder.getImageView();
-            if (null != imageView) {
-                imageView.onLoadFinish();
-                handler.onLoadFinish(this, imageView, drawable);
-            }
-        } while ((holder = holder.mNext) != null);
-
+        if (mFirstImageViewHolder == null) {
+            handler.onLoadFinish(this, null, drawable);
+        } else {
+            ImageViewHolder holder = mFirstImageViewHolder;
+            do {
+                final CubeImageView imageView = holder.getImageView();
+                if (null != imageView) {
+                    imageView.onLoadFinish();
+                    handler.onLoadFinish(this, imageView, drawable);
+                }
+            } while ((holder = holder.mNext) != null);
+        }
         if (null != mImageTaskStatistics) {
             mImageTaskStatistics.showComplete(ImageProvider.getBitmapSize(drawable));
         }
@@ -318,6 +328,24 @@ public class ImageTask {
     public void onCancel() {
         mFlag &= ~STATUS_LOADING;
         mFlag |= STATUS_CANCELED;
+    }
+
+    public void onLoadError(int reason, ImageLoadHandler handler) {
+        mFlag &= ~STATUS_LOADING;
+        mFlag |= STATUS_FAIL;
+        if (mFirstImageViewHolder == null) {
+            handler.onLoadError(this, null, reason);
+        } else {
+            ImageViewHolder holder = mFirstImageViewHolder;
+            do {
+                final CubeImageView imageView = holder.getImageView();
+                if (null != imageView) {
+                    imageView.onLoadFinish();
+                    handler.onLoadError(this, imageView, reason);
+                }
+            } while ((holder = holder.mNext) != null);
+
+        }
     }
 
     /**

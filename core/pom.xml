@@ -5,34 +5,40 @@
 
     <parent>
         <groupId>in.srain</groupId>
-        <artifactId>cube-parent</artifactId>
-        <version>1.1.1</version>
+        <artifactId>cube-parent-for-oss</artifactId>
+        <version>1.0.1-SNAPSHOT</version>
     </parent>
 
     <groupId>in.srain.cube</groupId>
     <artifactId>cube-sdk</artifactId>
-    <packaging>apklib</packaging>
+    <packaging>aar</packaging>
     <name>Cube SDK</name>
-    <version>1.0.34</version>
+    <version>1.0.42</version>
 
     <dependencies>
         <dependency>
             <groupId>com.google.android</groupId>
             <artifactId>android</artifactId>
-            <version>4.4.0</version>
+            <version>4.1.1.4</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>com.google.android</groupId>
             <artifactId>support-v4</artifactId>
-            <version>r18</version>
+            <version>r7</version>
+        </dependency>
+
+        <dependency>
+            <groupId>in.srain.cube</groupId>
+            <artifactId>clog</artifactId>
+            <version>1.0.2</version>
         </dependency>
     </dependencies>
 
     <properties>
-        <android.maven.plugin.version>3.7.0</android.maven.plugin.version>
-        <android.compile.apilevel>16</android.compile.apilevel>
+        <android.maven.plugin.version>3.8.2</android.maven.plugin.version>
+        <android.compile.api_level>19</android.compile.api_level>
     </properties>
 
     <build>
@@ -46,8 +52,7 @@
                 <version>${android.maven.plugin.version}</version>
                 <configuration>
                     <sdk>
-                        <path>${env.ANDROID_HOME}</path>
-                        <platform>${android.compile.apilevel}</platform>
+                        <platform>${android.compile.api_level}</platform>
                     </sdk>
                     <sign>
                         <debug>false</debug>

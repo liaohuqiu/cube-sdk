@@ -1,0 +1,91 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.12.+'
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+        mavenCentral();
+    }
+}
+
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
+    buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
+
+    defaultConfig {
+        applicationId "in.srain.cube"
+        minSdkVersion 8
+        targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
+    }
+
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDirs = ['src']
+            resources.srcDirs = ['resources']
+            res.srcDirs = ['res']
+            assets.srcDirs = ['assets']
+            // aidl.srcDirs = ['src']
+            // renderscript.srcDirs = ['src']
+        }
+
+        androidTest.setRoot('tests')
+    }
+}
+
+task copyLibs << {
+
+    // copy jars
+    copy {
+        from configurations.compile
+        into "libs"
+
+        // exclude: apkilib, aar, support-v*
+        eachFile { file ->
+            if (file.name.contains("apklib") || file.name.contains("aar")) {
+                file.exclude()
+            }
+        }
+    }
+
+    // copy source
+    copy {
+
+        def sourceList = configurations.compile.incoming.dependencies.collect { dependency ->
+            dependency.artifact { artifact ->
+                artifact.name = dependency.name
+                artifact.type = 'source'
+                artifact.extension = 'jar'
+                artifact.classifier = 'sources'
+            }
+            dependency
+        }
+        from(configurations.detachedConfiguration(sourceList as Dependency[]).resolvedConfiguration.
+                resolvedConfiguration.lenientConfiguration.getFiles(Specs.SATISFIES_ALL)) {
+        }
+
+        into("libs")
+
+        // exclude: apkilib, aar, support-v*
+        eachFile { file ->
+            if (file.name.contains("apklib") || file.name.contains("aar") || file.name.contains("support-v4")) {
+                file.exclude()
+            }
+        }
+    }
+}
+
+dependencies {
+    compile 'in.srain.cube:clog:1.0.2'
+    // compile 'com.android.support:support-v4:20.0.0'
+    compile 'com.google.android:support-v4:r7'
+}
+apply from: './gradle-mvn-push.gradle'

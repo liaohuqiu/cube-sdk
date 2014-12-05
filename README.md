@@ -1,28 +1,48 @@
-`Cube` is a light package for Android development. 
+##[中文说明](https://github.com/etao-open-source/cube-sdk/blob/master/README-cn.md)
+
+
+`Cube` is a light package for Android development.
+
+![Screen Shot](https://raw.githubusercontent.com/etao-open-source/cube-sdk/dev/screen-shot.png)
+
+DEMO project has been moved to [HERE](https://github.com/liaohuqiu/android-cube-app).
 
 All of the `readme` content and document are moved to Github Pages, please visit the Github Pages for more imformation:
 
-### Usage
+http://cube-sdk.liaohuqiu.net
 
-It's in Maven Central:
+### Import to your project
+
+Cube-SDK has been pushed to Maven Central, both in `aar` and `apklib` format.
+
+##### Using in pom.xml
 
 ```xml
 <dependency>
     <groupId>in.srain.cube</groupId>
     <artifactId>cube-sdk</artifactId>
     <type>apklib</type>
-    <version>1.0.34</version>
+    <version>1.0.42</version>
 </dependency>
 ```
 
-###[`Github Pages`](http://cube-sdk.liaohuqiu.net)
+or:
 
-###[`中文版文档`](http://cube-sdk.liaohuqiu.net/cn)
+```
+<dependency>
+    <groupId>in.srain.cube</groupId>
+    <artifactId>cube-sdk</artifactId>
+    <type>aar</type>
+    <version>1.0.42</version>
+</dependency>
+```
 
----
+###### Gradle / Android Studio
 
-* srain@php.net
-* twitter: https://twitter.com/liaohuqiu
-* weibo: http://weibo.com/liaohuqiu
-* QQ交流群: 271918140
+``` gradle 
+compile 'in.srain.cube:cube-sdk:1.0.42@aar'
+`````
 
+###### Eclipse
+
+Load the content into you eclipse, it's library project. Then use it in your application project.

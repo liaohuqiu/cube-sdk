@@ -7,7 +7,8 @@ import in.srain.cube.concurrent.SimpleExecutor;
 import in.srain.cube.concurrent.SimpleTask;
 import in.srain.cube.file.DiskLruCache.Editor;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 
 public class LruFileCache implements IFileCache {
 
@@ -27,17 +28,22 @@ public class LruFileCache implements IFileCache {
     private boolean mDiskCacheStarting = true;
     private boolean mDiskCacheReady = false;
     private File mDiskCacheDir;
-    private int mDiskCacheSize;
+    private long mDiskCacheSize;
 
-    private long mLastFlushTime = 0;
+    private boolean mIsDelayFlushing = false;
 
     protected enum FileCacheTaskType {
         init_cache, close_cache, flush_cache
     }
 
-    public LruFileCache(Context context, String path, int size) {
+    public LruFileCache(Context context, String path, long size) {
         mDiskCacheSize = size;
-        mDiskCacheDir = FileUtil.getDiskCacheDir(context, path, size);
+        FileUtil.CacheDirInfo cacheDirInfo = FileUtil.getDiskCacheDir(context, path, size);
+        mDiskCacheDir = cacheDirInfo.path;
+        mDiskCacheSize = cacheDirInfo.realSize;
+        if (cacheDirInfo.isNotEnough) {
+            Log.e(TAG, String.format("no enough space for initDiskCache %s %s", cacheDirInfo.requireSize, cacheDirInfo.realSize));
+        }
     }
 
     public static LruFileCache getDefault(Context context) {
@@ -62,17 +68,13 @@ public class LruFileCache implements IFileCache {
                     if (!mDiskCacheDir.exists()) {
                         mDiskCacheDir.mkdirs();
                     }
-                    if (FileUtil.getUsableSpace(mDiskCacheDir) > mDiskCacheSize) {
-                        try {
-                            mDiskLruCache = DiskLruCache.open(mDiskCacheDir, 1, 1, mDiskCacheSize);
-                            if (DEBUG) {
-                                Log.d(TAG, "Disk cache initialized " + this);
-                            }
-                        } catch (final IOException e) {
-                            Log.e(TAG, "initDiskCache - " + e);
+                    try {
+                        mDiskLruCache = DiskLruCache.open(mDiskCacheDir, 1, 1, mDiskCacheSize);
+                        if (DEBUG) {
+                            Log.d(TAG, "Disk cache initialized " + this);
                         }
-                    } else {
-                        Log.e(TAG, String.format("no enough space for initDiskCache %s %s", FileUtil.getUsableSpace(mDiskCacheDir), mDiskCacheSize));
+                    } catch (final IOException e) {
+                        Log.e(TAG, "initDiskCache - " + e);
                     }
                 }
             }
@@ -90,13 +92,10 @@ public class LruFileCache implements IFileCache {
         synchronized (mDiskCacheLock) {
             if (mDiskLruCache != null) {
                 try {
-                    DiskLruCache.Snapshot snapshot = mDiskLruCache.get(key);
-                    if (snapshot == null) {
-                        final Editor editor = mDiskLruCache.edit(key);
-                        if (editor != null) {
-                            editor.set(DISK_CACHE_INDEX, str);
-                            editor.commit();
-                        }
+                    final Editor editor = mDiskLruCache.edit(key);
+                    if (editor != null) {
+                        editor.set(DISK_CACHE_INDEX, str);
+                        editor.commit();
                     }
                 } catch (final IOException e) {
                     e.printStackTrace();
@@ -147,22 +146,47 @@ public class LruFileCache implements IFileCache {
     }
 
     public boolean has(String key) {
-        try {
-            Editor editor = mDiskLruCache.edit(key);
-            if (editor != null) {
-                return editor.has(DISK_CACHE_INDEX);
+        synchronized (mDiskCacheLock) {
+            while (mDiskCacheStarting) {
+                try {
+                    if (DEBUG) {
+                        Log.d(TAG, "check has wait " + this);
+                    }
+                    mDiskCacheLock.wait();
+                } catch (InterruptedException e) {
+                }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+            if (mDiskLruCache != null) {
+                try {
+                    DiskLruCache.Snapshot snapshot = mDiskLruCache.get(key);
+                    if (snapshot == null) {
+                        return false;
+                    }
+                    return snapshot.has(DISK_CACHE_INDEX);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return false;
     }
 
     public void delete(String key) {
-        try {
-            mDiskLruCache.remove(key);
-        } catch (IOException e) {
-            e.printStackTrace();
+        synchronized (mDiskCacheLock) {
+            while (mDiskCacheStarting) {
+                try {
+                    if (DEBUG) {
+                        Log.d(TAG, "delete wait " + this);
+                    }
+                    mDiskCacheLock.wait();
+                } catch (InterruptedException e) {
+                }
+            }
+            try {
+                mDiskLruCache.remove(key);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -206,11 +230,7 @@ public class LruFileCache implements IFileCache {
      */
     public void flushDiskCache() {
         synchronized (mDiskCacheLock) {
-            long now = System.currentTimeMillis();
-            if (now - 1000 < mLastFlushTime) {
-                return;
-            }
-            mLastFlushTime = now;
+            mIsDelayFlushing = false;
             if (mDiskLruCache != null) {
                 try {
                     mDiskLruCache.flush();
@@ -281,6 +301,15 @@ public class LruFileCache implements IFileCache {
         void execute() {
             SimpleExecutor.getInstance().execute(this);
         }
+
+        void execute(int delay) {
+            SimpleTask.postDelay(new Runnable() {
+                @Override
+                public void run() {
+                    execute();
+                }
+            }, delay);
+        }
     }
 
     /**
@@ -313,6 +342,20 @@ public class LruFileCache implements IFileCache {
         new FileCacheTask(FileCacheTaskType.flush_cache).execute();
     }
 
+    /**
+     * flush the data to disk cache
+     */
+    public void flushDiskCacheAsyncWithDelay(int delay) {
+        if (DEBUG) {
+            Log.d(TAG, "flushDishCacheAsync");
+        }
+        if (mIsDelayFlushing) {
+            return;
+        }
+        mIsDelayFlushing = true;
+        new FileCacheTask(FileCacheTaskType.flush_cache).execute(delay);
+    }
+
     @Override
     public String getCachePath() {
         return mDiskCacheDir.getPath();
@@ -327,7 +370,7 @@ public class LruFileCache implements IFileCache {
     }
 
     @Override
-    public int getMaxSize() {
+    public long getMaxSize() {
         return mDiskCacheSize;
     }
 }

@@ -15,7 +15,7 @@ public class BlockListView extends RelativeLayout {
 
     private static final int INDEX_TAG = 0x04 << 24;
 
-    private BlockListAdapter<?> mBlockListAdpater;
+    private BlockListAdapter<?> mBlockListAdapter;
 
     private LayoutInflater mLayoutInflater;
 
@@ -38,23 +38,23 @@ public class BlockListView extends RelativeLayout {
         if (adapter == null) {
             throw new IllegalArgumentException("adapter should not be null");
         }
-        mBlockListAdpater = adapter;
+        mBlockListAdapter = adapter;
         adapter.registerView(this);
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        if (null != mBlockListAdpater) {
-            mBlockListAdpater.registerView(null);
+        if (null != mBlockListAdapter) {
+            mBlockListAdapter.registerView(null);
         }
     }
 
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        if (null != mBlockListAdpater) {
-            mBlockListAdpater.registerView(this);
+        if (null != mBlockListAdapter) {
+            mBlockListAdapter.registerView(this);
         }
     }
 
@@ -73,25 +73,35 @@ public class BlockListView extends RelativeLayout {
         }
     };
 
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        super.onLayout(changed, l, t, r, b);
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    }
+
     public void onDataListChange() {
 
         removeAllViews();
 
-        int len = mBlockListAdpater.getCount();
-        int w = mBlockListAdpater.getBlockWidth();
-        int h = mBlockListAdpater.getBlockHeight();
-        int cloumnNum = mBlockListAdpater.getCloumnNum();
+        int len = mBlockListAdapter.getCount();
+        int w = mBlockListAdapter.getBlockWidth();
+        int h = mBlockListAdapter.getBlockHeight();
+        int columnNum = mBlockListAdapter.getCloumnNum();
 
-        int horizontalSpacing = mBlockListAdpater.getHorizontalSpacing();
-        int verticalSpacing = mBlockListAdpater.getVerticalSpacing();
+        int horizontalSpacing = mBlockListAdapter.getHorizontalSpacing();
+        int verticalSpacing = mBlockListAdapter.getVerticalSpacing();
 
         boolean blockDescendant = getDescendantFocusability() == ViewGroup.FOCUS_BLOCK_DESCENDANTS;
 
         for (int i = 0; i < len; i++) {
 
             RelativeLayout.LayoutParams lyp = new RelativeLayout.LayoutParams(w, h);
-            int row = i / cloumnNum;
-            int clo = i % cloumnNum;
+            int row = i / columnNum;
+            int clo = i % columnNum;
             int left = 0;
             int top = 0;
 
@@ -102,12 +112,13 @@ public class BlockListView extends RelativeLayout {
                 top = (verticalSpacing + h) * row;
             }
             lyp.setMargins(left, top, 0, 0);
-            View view = mBlockListAdpater.getView(mLayoutInflater, i);
+            View view = mBlockListAdapter.getView(mLayoutInflater, i);
             if (!blockDescendant) {
                 view.setOnClickListener(mOnClickListener);
             }
             view.setTag(INDEX_TAG, i);
             addView(view, lyp);
         }
+        requestLayout();
     }
 }

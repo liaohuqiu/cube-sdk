@@ -11,54 +11,10 @@
 
     <groupId>in.srain</groupId>
     <artifactId>cube-parent</artifactId>
-    <version>1.1.1-SNAPSHOT</version>
+    <version>1.1.1</version>
     <packaging>pom</packaging>
 
     <name>Cube SDK Parent</name>
-    <description>Cube SDK, library for Android development</description>
-    <url>http://cube-sdk.liaohuqiu.net</url>
-    <inceptionYear>2014</inceptionYear>
-
-    <modules>
-        <module>core</module>
-    </modules>
-
-    <scm>
-        <url>https://github.com/etao-open-source/cube-sdk</url>
-        <connection>scm:git:git:@github.com:etao-open-source/cube-sdk.git</connection>
-        <developerConnection>scm:git:git@github.com:etao-open-source/cube-sdk.git</developerConnection>
-    </scm>
-
-    <developers>
-        <developer>
-            <name>Huqiu Liao</name>
-            <email>liaohuqiu@gmail.com</email>
-            <id>liaohuqiu</id>
-            <url>http://www.liaohuqiu.net</url>
-            <timezone>+8</timezone>
-            <roles>
-                <role>developer</role>
-            </roles>
-        </developer>
-    </developers>
-
-    <licenses>
-        <license>
-            <name>Apache License Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-
-    <organization>
-        <name>Huqiu Liao</name>
-        <url>http://www.liaohuqiu.net</url>
-    </organization>
-
-    <issueManagement>
-        <system>GitHub Issues</system>
-        <url>https://github.com/etao-open-source/cube-sdk/issues</url>
-    </issueManagement>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

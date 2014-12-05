@@ -11,13 +11,14 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import in.srain.cube.R;
 import in.srain.cube.util.CLog;
+import in.srain.cube.util.Debug;
 
 /**
  * @author http://www.liaohuqiu.net
  */
 public class ScrollHeaderFrame extends RelativeLayout {
 
-    private static final boolean DEBUG = CLog.DEBUG_SCROLL_HEADER_FRAME;
+    private static final boolean DEBUG = Debug.DEBUG_SCROLL_HEADER_FRAME;
     private static final String LOG_TAG = ScrollHeaderFrame.class.getName();
 
     private int mHeaderHeight;
@@ -70,6 +71,7 @@ public class ScrollHeaderFrame extends RelativeLayout {
 
     public void setHandler(IScrollHeaderFrameHandler handler) {
         mIScrollHeaderFrameHandler = handler;
+        CLog.d(LOG_TAG, "setHandler: %s", this);
     }
 
     @Override
@@ -86,7 +88,7 @@ public class ScrollHeaderFrame extends RelativeLayout {
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
         if (DEBUG) {
-            Log.d(LOG_TAG, String.format("onLayout: %s, %s %s %s", l, t, r, b));
+            Log.d(LOG_TAG, String.format("onLayout: current %s, %s %s %s %s", mCurrentPos, l, t, r, b));
         }
 
         int headerHeight = mHeaderContainer.getMeasuredHeight();
@@ -96,22 +98,23 @@ public class ScrollHeaderFrame extends RelativeLayout {
 
         int w = getMeasuredWidth();
         int h = getMeasuredHeight();
+        int pos = 0;
 
-        // mHeaderContainer.layout(0, mCurrentPos, w, mCurrentPos + headerHeight);
-        mContentViewContainer.layout(0, mCurrentPos + headerHeight, w, h);
+        mHeaderContainer.layout(0, pos, w, pos + headerHeight);
+        mContentViewContainer.layout(0, pos + headerHeight, w, h + headerHeight);
     }
 
     /**
      * if deltaY > 0, tryToMove the content down
      */
-    private void tryToMove(float deltaY) {
+    private boolean tryToMove(float deltaY) {
 
         // has reached the bottom
         if ((deltaY > 0 && mCurrentPos == 0)) {
             if (DEBUG) {
                 Log.d(LOG_TAG, String.format("has reached the bottom"));
             }
-            return;
+            return false;
         }
 
         // has reached the top
@@ -119,7 +122,7 @@ public class ScrollHeaderFrame extends RelativeLayout {
             if (DEBUG) {
                 Log.d(LOG_TAG, String.format("has reached the top"));
             }
-            return;
+            return false;
         }
 
         int to = mCurrentPos + (int) deltaY;
@@ -139,27 +142,28 @@ public class ScrollHeaderFrame extends RelativeLayout {
             }
             to = 0;
         }
-        moveTo(to);
+        return moveTo(to);
     }
 
-    private void moveTo(int to) {
+    private boolean moveTo(int to) {
         if (DEBUG) {
             Log.d(LOG_TAG, String.format("moveTo: %s %s, %s", to, mCurrentPos, mHeaderHeight));
         }
         if (mCurrentPos == to) {
-            return;
+            return false;
         }
+        int y = mCurrentPos - to;
         mCurrentPos = to;
-        invalidate();
-        requestLayout();
         updatePos();
+        return true;
     }
 
     private void updatePos() {
         int change = mCurrentPos - mLastPos;
-        mHeaderContainer.offsetTopAndBottom(change);
-        mContentViewContainer.offsetTopAndBottom(change);
 
+        // mHeaderContainer.scrollTo(0, -change);
+        // mContentViewContainer.scrollTo(0, -change);
+        scrollTo(0, -change);
     }
 
     @Override
@@ -169,18 +173,16 @@ public class ScrollHeaderFrame extends RelativeLayout {
         int h = getMeasuredHeight();
         mHeaderHeight = mHeaderContainer.getMeasuredHeight();
 
-        h = h - (mHeaderHeight + mCurrentPos);
-
         if (DEBUG) {
             Log.d(LOG_TAG, String.format("onMeasure %s getMeasuredHeight: %s", h, mHeaderContainer.getMeasuredHeight()));
         }
 
-        mContentViewContainer.measure(MeasureSpec.makeMeasureSpec(w, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(h, MeasureSpec.EXACTLY));
+        mContentViewContainer.measure(MeasureSpec.makeMeasureSpec(w, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(h, MeasureSpec.AT_MOST));
     }
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent e) {
-        if (mDisabled) {
+        if (!isEnabled() || mDisabled) {
             return super.dispatchTouchEvent(e);
         }
         boolean handled = super.dispatchTouchEvent(e);
@@ -213,18 +215,21 @@ public class ScrollHeaderFrame extends RelativeLayout {
                     Log.d(LOG_TAG, String.format("ACTION_MOVE: %s, speed: %s, moveUp: %s, canMoveUp: %s, moveDown: %s, canMoveDown: %s", speed, deltaY, moveUp, canMoveUp, moveDown, canMoveDown));
                 }
 
-                if (speed >= 10 && moveDown && mIScrollHeaderFrameHandler != null) {
-                    moveTo(0);
-                }
                 // disable move when header not reach top
                 if (moveDown && mIScrollHeaderFrameHandler != null && !mIScrollHeaderFrameHandler.hasReachTop()) {
                     return handled;
                 }
 
+                if (speed >= 5 && moveDown && mIScrollHeaderFrameHandler != null) {
+                    moveTo(0);
+                    return handled;
+                }
+                if (speed >= 5 && moveUp && mIScrollHeaderFrameHandler != null) {
+                    moveTo(-mHeaderHeight);
+                    return handled;
+                }
+
                 if ((moveUp && canMoveUp) || (moveDown && canMoveDown)) {
-                    if (moveDown && mIScrollHeaderFrameHandler == null) {
-                        deltaY = deltaY * 0.3f;
-                    }
                     tryToMove(deltaY);
                 }
                 break;

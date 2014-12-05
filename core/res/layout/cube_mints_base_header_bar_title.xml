@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/cube_mints_header_height"
+    android:background="@color/cube_mints_main_color">
+
+    <RelativeLayout
+        android:id="@+id/ly_title_bar_left"
+        android:layout_width="100dp"
+        android:layout_height="@dimen/cube_mints_header_height"
+        android:layout_alignParentLeft="true"
+        android:gravity="center_vertical"
+        android:paddingLeft="12dp">
+
+        <ImageView
+            android:id="@+id/iv_title_bar_left"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:focusable="false"
+            android:src="@drawable/cube_mints_icon_top_back" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/ly_title_bar_center"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/tv_title_bar_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:singleLine="true"
+            android:textColor="#fff"
+            android:textSize="17sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/ly_title_bar_right"
+        android:layout_width="100dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:paddingRight="12dp">
+
+    </RelativeLayout>
+
+</RelativeLayout>

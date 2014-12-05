@@ -51,6 +51,13 @@ public abstract class PagedListDataModel<T> {
         }
     }
 
+    protected void setRequestResult(List<T> list, boolean hasMore) {
+        mListPageInfo.updateListInfo(list, hasMore);
+        if (null != mPagedListDataHandler) {
+            mPagedListDataHandler.onPageDataLoaded(mListPageInfo);
+        }
+    }
+
     public ListPageInfo<T> getListPageInfo() {
         return mListPageInfo;
     }

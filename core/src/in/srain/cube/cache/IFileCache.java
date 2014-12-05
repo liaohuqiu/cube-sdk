@@ -1,7 +1,5 @@
 package in.srain.cube.cache;
 
-import java.io.InputStream;
-
 public interface IFileCache {
 
     public String getCachePath();
@@ -10,7 +8,7 @@ public interface IFileCache {
 
     public void clearCache();
 
-    public int getMaxSize();
+    public long getMaxSize();
 
     public boolean has(String key);
 }

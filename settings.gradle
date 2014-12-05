@@ -1,0 +1,2 @@
+rootProject.name = 'cube-sdk'
+include ':core'

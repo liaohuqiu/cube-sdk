@@ -8,10 +8,8 @@ public interface IRequest<T> {
 
     public void onRequestFail(FailData failData);
 
-    public void prepareRequest();
-
     /**
-     * send request, {@link IRequest#prepareRequest} should be called.
+     * send request
      */
     public void send();
 

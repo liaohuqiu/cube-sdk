@@ -17,41 +17,63 @@ public class FileUtil {
 
     /**
      * Get a usable cache directory (external if available, internal otherwise).
+     * .
+     * Check if media is mounted or storage is built-in, if so, try and use external cache folder
+     * otherwise use internal cache folder
+     * .
+     * If both of them can not meet the requirement, use the bigger one.
      *
      * @param context    The context to use
      * @param uniqueName A unique folder name to append to the cache folder
      * @return The cache folder
      */
-    public static File getDiskCacheDir(Context context, String uniqueName, int requireSpace) {
-        // Check if media is mounted or storage is built-in, if so, try and use external cache folder
-        // otherwise use internal cache folder
+    public static CacheDirInfo getDiskCacheDir(Context context, String uniqueName, long requireSpace) {
         File sdPath = null;
         File internalPath = null;
-        File cacheFile = null;
         Long sdCardFree = 0L;
-        Long internalFree = 0L;
+
+        boolean usingInternal = false;
+
         if (hasSDCardMounted()) {
             sdPath = getExternalCacheDir(context);
             sdCardFree = getUsableSpace(sdPath);
         }
+
+        CacheDirInfo cacheDirInfo = new CacheDirInfo();
+        cacheDirInfo.requireSize = requireSpace;
+
+        // sd card can not meet the requirement
+        // try to use the build-in storage
         if (sdPath == null || sdCardFree < requireSpace) {
             internalPath = context.getCacheDir();
-            internalFree = getUsableSpace(internalPath);
+            long internalFree = getUsableSpace(internalPath);
 
+            // both lower then requirement, choose the bigger one
             if (internalFree < requireSpace) {
-
-                cacheFile = internalFree > sdCardFree ? internalPath : sdPath;
-
+                if (internalFree > sdCardFree) {
+                    usingInternal = true;
+                    cacheDirInfo.realSize = internalFree;
+                } else {
+                    usingInternal = false;
+                    cacheDirInfo.realSize = sdCardFree;
+                }
+                cacheDirInfo.isNotEnough = true;
             } else {
-                cacheFile = internalPath;
+                usingInternal = true;
+                cacheDirInfo.realSize = requireSpace;
             }
-
         } else {
-            cacheFile = sdPath;
+            usingInternal = false;
+            cacheDirInfo.realSize = requireSpace;
         }
 
-        String cachePath = cacheFile.getPath();
-        return new File(cachePath + File.separator + uniqueName);
+        cacheDirInfo.isInternal = usingInternal;
+        if (usingInternal) {
+            cacheDirInfo.path = new File(internalPath.getPath() + File.separator + uniqueName);
+        } else {
+            cacheDirInfo.path = new File(sdPath.getPath() + File.separator + uniqueName);
+        }
+        return cacheDirInfo;
     }
 
     /**
@@ -150,15 +172,14 @@ public class FileUtil {
         }
     }
 
-    public static String wantFilesPath(Context context, boolean externalStorageFirst, String specifiedPathForExtenalStoage) {
-
+    /**
+     * external: "/storage/emulated/0/Android/data/in.srain.sample/files"
+     * internal: "/data/data/in.srain.sample/files"
+     */
+    public static String wantFilesPath(Context context, boolean externalStorageFirst) {
         String path = null;
         if (externalStorageFirst && hasSDCardMounted()) {
-            if (specifiedPathForExtenalStoage != null && specifiedPathForExtenalStoage.length() != 0)
-                path = Environment.getExternalStorageDirectory() + "/" + specifiedPathForExtenalStoage + "/files";
-            else {
-                path = Environment.getExternalStorageDirectory() + "/" + context.getPackageName() + "/files";
-            }
+            path = context.getExternalFilesDir("").getAbsolutePath();
         } else {
             path = context.getFilesDir().getAbsolutePath();
         }
@@ -259,5 +280,13 @@ public class FileUtil {
             }
         }
         return null;
+    }
+
+    public static class CacheDirInfo {
+        public File path;
+        public boolean isInternal = false;
+        public boolean isNotEnough = false;
+        public long realSize;
+        public long requireSize;
     }
 }

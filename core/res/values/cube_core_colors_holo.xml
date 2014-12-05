@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+/* //device/apps/common/assets/res/any/colors.xml
+**
+** Copyright 2006, The Android Open Source Project
+**
+** Licensed under the Apache License, Version 2.0 (the "License");
+** you may not use this file except in compliance with the License.
+** You may obtain a copy of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
+**
+** Unless required by applicable law or agreed to in writing, software
+** distributed under the License is distributed on an "AS IS" BASIS,
+** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+** See the License for the specific language governing permissions and
+** limitations under the License.
+*/
+-->
+<resources>
+    <!-- A light Holo shade of blue -->
+    <color name="cube_holo_blue_light">#ff33b5e5</color>
+    <!-- A light Holo shade of green -->
+    <color name="cube_holo_green_light">#ff99cc00</color>
+    <!-- A light Holo shade of red -->
+    <color name="cube_holo_red_light">#ffff4444</color>
+    <!-- A dark Holo shade of blue -->
+    <color name="cube_holo_blue_dark">#ff0099cc</color>
+    <!-- A dark Holo shade of green -->
+    <color name="cube_holo_green_dark">#ff669900</color>
+    <!-- A dark Holo shade of red -->
+    <color name="cube_holo_red_dark">#ffcc0000</color>
+    <!-- A Holo shade of purple -->
+    <color name="cube_holo_purple">#ffaa66cc</color>
+    <!-- A light Holo shade of orange -->
+    <color name="cube_holo_orange_light">#ffffbb33</color>
+    <!-- A dark Holo shade of orange -->
+    <color name="cube_holo_orange_dark">#ffff8800</color>
+    <!-- A really bright Holo shade of blue -->
+    <color name="cube_holo_blue_bright">#ff00ddff</color>
+
+</resources>
+
