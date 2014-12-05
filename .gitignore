@@ -15,6 +15,7 @@ libs/
 # generated files
 bin/
 .idea/
+.gradle/
 gen/
 target/
 build/
