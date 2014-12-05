@@ -1,6 +1,5 @@
-[中文说明](https://github.com/etao-open-source/cube-sdk/blob/dev/README-cn.md)
+##[中文说明](https://github.com/etao-open-source/cube-sdk/blob/master/README-cn.md)
 
----
 
 `Cube` is a light package for Android development.
 
