@@ -10,7 +10,6 @@
 *.class
 
 # libs
-libs/
 
 # generated files
 bin/
