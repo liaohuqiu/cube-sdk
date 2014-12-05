@@ -1,20 +1,19 @@
-
+Cube-SDK 是一个开发框架。这个框架致力于快速实现需求，解放生产力。
 
 ![Screen Shot](https://raw.githubusercontent.com/etao-open-source/cube-sdk/dev/screen-shot.png)
 
-###[`中文版文档`](http://cube-sdk.liaohuqiu.net/cn)
+**参考**文档: http://cube-sdk.liaohuqiu.net/cn
 
-DEMO project has been moved to [HERE](https://github.com/liaohuqiu/android-cube-app).
+Demo 项目移到了这里: https://github.com/liaohuqiu/android-cube-app
 
-All of the `readme` content and document are moved to Github Pages, please visit the Github Pages for more imformation:
+### 在项目中引入
 
-###[`Github Pages`](http://cube-sdk.liaohuqiu.net)
 
-##### Import to your project
+项目现在已经发布到了maven中央库，有 `aar` and `apklib` 和两种格式
 
-It has been pushed to Maven Central, both in `aar` and `apklib`.
+##### 在 pom.xml 中
 
-Using in pom.xml
+引用apklib:
 
 ```xml
 <dependency>
@@ -25,7 +24,7 @@ Using in pom.xml
 </dependency>
 ```
 
-or:
+或者引入aar:
 
 ```
 <dependency>
@@ -36,8 +35,12 @@ or:
 </dependency>
 ```
 
-###### Gradle / Android Studio
+##### 在 Gradle / Android Studio
 
 ``` gradle 
 compile 'in.srain.cube:cube-sdk:1.0.42@aar'
 `````
+
+##### eclipse
+
+直接将core文件夹下的内容作为一个类库加载，然后在项目中引用

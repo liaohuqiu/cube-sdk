@@ -1,10 +1,3 @@
-# replace version for pom
-# replace version for gradle
-# update version for reade me
-# run gradle task to publish
-
-import re
-
 def replace_file(fname, start, end, replace, line_from = 1, line_to = 0):
 
     with open(fname) as f:
@@ -29,5 +22,20 @@ def replace_between(str, start, end, replace):
     pos2 = str.find(end);
     return str[0:pos1 + len(start)] + replace + str[pos2:]
 
-replace_file('README.md', '<version>', '</version>', 'xxxxxx', 22, 27)
-replace_file('core/gradle.properties', 'VERSION_NAME=', ' // VERSION_NAME', 'xxxxxx', 1, 2)
+
+version_name = '1.0.42'
+
+# replace version for pom
+replace_file('core/pom.xml', '<version>', '</version>', version_name, 12, 17)
+
+# replace version for gradle
+replace_file('core/gradle.properties', 'VERSION_NAME=', '\n', version_name, 1, 2)
+
+# update version for reade me
+replace_file('README.md', '<version>', '</version>', version_name, 21, 28)
+replace_file('README.md', '<version>', '</version>', version_name, 31, 38)
+replace_file('README.md', 'cube-sdk', '@aar', version_name, 41, 45)
+
+replace_file('README-cn.md', '<version>', '</version>', version_name, 18, 25)
+replace_file('README-cn.md', '<version>', '</version>', version_name, 29, 35)
+replace_file('README-cn.md', 'cube-sdk', '@aar', version_name, 41, 41)
