@@ -186,10 +186,10 @@ public class FileUtil {
         return path;
     }
 
-    public static File wantFile(String dir, String fileName) {
-        File wallpaperDirectory = new File(dir);
-        wallpaperDirectory.mkdirs();
-        File outputFile = new File(wallpaperDirectory, fileName);
+    public static File wantFile(String dirPath, String fileName) {
+        File dir = new File(dirPath);
+        dir.mkdirs();
+        File outputFile = new File(dir, fileName);
         return outputFile;
     }
 

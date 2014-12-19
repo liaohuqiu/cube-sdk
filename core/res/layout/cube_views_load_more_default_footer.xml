@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/cube_views_load_more_default_footer_text_view"
+        android:layout_width="fill_parent"
+        android:layout_height="80dp"
+        android:textColor="@color/cube_mints_black"
+        android:layout_centerInParent="true"
+        android:gravity="center" />
+
+</RelativeLayout>

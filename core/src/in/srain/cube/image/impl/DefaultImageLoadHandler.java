@@ -30,7 +30,7 @@ public class DefaultImageLoadHandler implements ImageLoadHandler {
     private final static String LOG_TAG = Debug.DEBUG_IMAGE_LOG_TAG;
     private final static String MSG_LOADING = "%s onLoading";
     private final static String MSG_LOAD_ERROR = "%s load error";
-    private final static String MSG_LOAD_FINISH = "%s onLoadFinish %s %s %s %s";
+    private final static String MSG_LOAD_FINISH = "%s onLoadTaskFinish %s %s %s %s";
 
     private Context mContext;
     private final static int DISPLAY_FADE_IN = 0x01;

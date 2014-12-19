@@ -8,21 +8,49 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
 import in.srain.cube.R;
+import in.srain.cube.util.CLog;
 import in.srain.cube.views.DotView;
 import in.srain.cube.views.mix.AutoPlayer;
 
 public class SliderBanner extends RelativeLayout {
 
-    private ViewPager mViewPager;
-    private BannerAdapter mBannerAdapter;
-    private ViewPager.OnPageChangeListener mOnPageChangeListener;
-
-    private PagerIndicator mPagerIndicator;
-    private AutoPlayer mAutoPlayer;
 
     protected int mIdForViewPager;
     protected int mIdForIndicator;
     protected int mTimeInterval = 2000;
+    private ViewPager mViewPager;
+    private BannerAdapter mBannerAdapter;
+    private ViewPager.OnPageChangeListener mOnPageChangeListener;
+    private PagerIndicator mPagerIndicator;
+    private AutoPlayer mAutoPlayer;
+    private OnTouchListener mViewPagerOnTouchListener;
+    private AutoPlayer.Playable mGalleryPlayable = new AutoPlayer.Playable() {
+
+        @Override
+        public void playTo(int to) {
+            mViewPager.setCurrentItem(to, true);
+        }
+
+        @Override
+        public void playNext() {
+            mViewPager.setCurrentItem(mViewPager.getCurrentItem() + 1, true);
+        }
+
+        @Override
+        public void playPrevious() {
+            mViewPager.setCurrentItem(mViewPager.getCurrentItem() - 1, true);
+        }
+
+        @Override
+        public int getTotal() {
+            return mBannerAdapter.getCount();
+        }
+
+        @Override
+        public int getCurrent() {
+            return mViewPager.getCurrentItem();
+        }
+    };
 
     public SliderBanner(Context context) {
         this(context, null);
@@ -44,17 +72,38 @@ public class SliderBanner extends RelativeLayout {
     }
 
     @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        int action = ev.getAction();
+        switch (action) {
+            case MotionEvent.ACTION_DOWN:
+                if (mAutoPlayer != null) {
+                    mAutoPlayer.pause();
+                }
+                break;
+            case MotionEvent.ACTION_CANCEL:
+            case MotionEvent.ACTION_UP:
+                if (mAutoPlayer != null) {
+                    mAutoPlayer.resume();
+                }
+                break;
+            default:
+                break;
+        }
+        if (mViewPagerOnTouchListener != null) {
+            mViewPagerOnTouchListener.onTouch(this, ev);
+        }
+        return super.dispatchTouchEvent(ev);
+    }
+
+    public void setViewPagerOnTouchListener(OnTouchListener onTouchListener) {
+        mViewPagerOnTouchListener = onTouchListener;
+    }
+
+    @Override
     protected void onFinishInflate() {
         mViewPager = (ViewPager) findViewById(mIdForViewPager);
         mPagerIndicator = (DotView) findViewById(mIdForIndicator);
 
-        mViewPager.setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                requestDisallowInterceptTouchEvent(true);
-                return false;
-            }
-        });
         mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int i, float v, int i2) {
@@ -110,32 +159,4 @@ public class SliderBanner extends RelativeLayout {
             mPagerIndicator.setNum(num);
         }
     }
-
-    private AutoPlayer.Playable mGalleryPlayable = new AutoPlayer.Playable() {
-
-        @Override
-        public void playTo(int to) {
-            mViewPager.setCurrentItem(to, true);
-        }
-
-        @Override
-        public void playNext() {
-            mViewPager.setCurrentItem(mViewPager.getCurrentItem() + 1, true);
-        }
-
-        @Override
-        public void playPrevious() {
-            mViewPager.setCurrentItem(mViewPager.getCurrentItem() - 1, true);
-        }
-
-        @Override
-        public int getTotal() {
-            return mBannerAdapter.getCount();
-        }
-
-        @Override
-        public int getCurrent() {
-            return mViewPager.getCurrentItem();
-        }
-    };
 }

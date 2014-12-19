@@ -36,7 +36,7 @@ public class NetworkStatusManager {
     private State mState;
     private boolean mListening;
     private String mReason;
-    private boolean mIsFailover;
+    private boolean mIsFailOver;
 
     private NetworkInfo mNetworkInfo;
 
@@ -84,7 +84,7 @@ public class NetworkStatusManager {
             mOtherNetworkInfo = (NetworkInfo) intent.getParcelableExtra(ConnectivityManager.EXTRA_OTHER_NETWORK_INFO);
 
             mReason = intent.getStringExtra(ConnectivityManager.EXTRA_REASON);
-            mIsFailover = intent.getBooleanExtra(ConnectivityManager.EXTRA_IS_FAILOVER, false);
+            mIsFailOver = intent.getBooleanExtra(ConnectivityManager.EXTRA_IS_FAILOVER, false);
             if (DBG) {
                 Log.d(TAG, "onReceive(): mNetworkInfo=" + mNetworkInfo + " mOtherNetworkInfo = " + (mOtherNetworkInfo == null ? "[none]" : mOtherNetworkInfo + " noConn=" + noConnectivity)
                         + " mState=" + mState.toString());
@@ -153,7 +153,7 @@ public class NetworkStatusManager {
             mContext = null;
             mNetworkInfo = null;
             mOtherNetworkInfo = null;
-            mIsFailover = false;
+            mIsFailOver = false;
             mReason = null;
             mListening = false;
         }
@@ -183,7 +183,7 @@ public class NetworkStatusManager {
      * @return {@code true} if this was a fail over attempt, {@code false} otherwise.
      */
     public boolean isFailover() {
-        return mIsFailover;
+        return mIsFailOver;
     }
 
     /**

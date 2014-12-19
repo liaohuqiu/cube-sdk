@@ -26,10 +26,18 @@ public class ImageTask {
     private static int sId = 0;
 
     private final static String SIZE_SP = "_";
+
+    // 0000 1100
+    private static final int ERROR_CODE_MASK = 0x03 << 2;
+
+    /**
+     * 1 pre-load
+     * 2 loading
+     * 3 error-code
+     * 4 error-code
+     */
     private final static int STATUS_PRE_LOAD = 0x01;
     private final static int STATUS_LOADING = 0x02;
-    private final static int STATUS_DONE = 0x04;
-    private final static int STATUS_CANCELED = 0x08;
     private final static int STATUS_FAIL = 0x10;
 
     public final static int ERROR_NETWORK = 0x01;
@@ -296,12 +304,16 @@ public class ImageTask {
      *
      * @param drawable
      */
-    public void onLoadFinish(BitmapDrawable drawable, ImageLoadHandler handler) {
+    public void onLoadTaskFinish(BitmapDrawable drawable, ImageLoadHandler handler) {
 
         mFlag &= ~STATUS_LOADING;
-        mFlag |= STATUS_DONE;
 
         if (null == handler) {
+            return;
+        }
+        int errorCode = (mFlag & ERROR_CODE_MASK) >> 3;
+        if (errorCode > 0) {
+            onLoadError(errorCode, handler);
             return;
         }
 
@@ -325,14 +337,17 @@ public class ImageTask {
         }
     }
 
-    public void onCancel() {
-        mFlag &= ~STATUS_LOADING;
-        mFlag |= STATUS_CANCELED;
+    public void onLoadTaskCancel() {
     }
 
-    public void onLoadError(int reason, ImageLoadHandler handler) {
-        mFlag &= ~STATUS_LOADING;
-        mFlag |= STATUS_FAIL;
+    public void setError(int errorCode) {
+        if (errorCode > 3) {
+            throw new IllegalArgumentException("error code undefined.");
+        }
+        mFlag |= errorCode << 2;
+    }
+
+    private void onLoadError(int reason, ImageLoadHandler handler) {
         if (mFirstImageViewHolder == null) {
             handler.onLoadError(this, null, reason);
         } else {
@@ -344,7 +359,6 @@ public class ImageTask {
                     handler.onLoadError(this, imageView, reason);
                 }
             } while ((holder = holder.mNext) != null);
-
         }
     }
 

@@ -7,7 +7,7 @@ import android.view.View.OnClickListener;
 import android.widget.LinearLayout;
 import in.srain.cube.R;
 
-public abstract class TitleBaseActivity extends DemoBaseActivity {
+public abstract class TitleBaseActivity extends MintsBaseActivity {
 
     protected TitleHeaderBar mTitleHeaderBar;
     protected LinearLayout mContentContainer;
@@ -22,11 +22,19 @@ public abstract class TitleBaseActivity extends DemoBaseActivity {
         return R.layout.cube_mints_base_content_frame_with_title_header;
     }
 
+    protected TitleHeaderBar getTitleHeaderBar() {
+        return (TitleHeaderBar) findViewById(R.id.cube_mints_content_frame_title_header);
+    }
+
+    protected LinearLayout getContentContainer() {
+        return (LinearLayout) findViewById(R.id.cube_mints_content_frame_content);
+    }
+
     protected void initViews() {
         super.setContentView(getFrameLayoutId());
 
-        mTitleHeaderBar = (TitleHeaderBar) findViewById(R.id.cube_mints_content_frame_title_header);
-        mContentContainer = (LinearLayout) findViewById(R.id.cube_mints_content_frame_content);
+        mTitleHeaderBar = getTitleHeaderBar();
+        mContentContainer = getContentContainer();
 
         if (enableDefaultBack()) {
             mTitleHeaderBar.setLeftOnClickListener(new OnClickListener() {
@@ -53,6 +61,9 @@ public abstract class TitleBaseActivity extends DemoBaseActivity {
         mContentContainer.addView(view);
     }
 
+    public void setContentViewSupper(int layoutResID) {
+        super.setContentView(layoutResID);
+    }
 
     protected void setHeaderTitle(int id) {
         mTitleHeaderBar.getTitleTextView().setText(id);

@@ -15,6 +15,7 @@ import in.srain.cube.image.iface.ImageMemoryCache;
 import in.srain.cube.image.iface.ImageResizer;
 import in.srain.cube.image.impl.DefaultMemoryCache;
 import in.srain.cube.image.impl.LruImageFileProvider;
+import in.srain.cube.util.CLog;
 import in.srain.cube.util.Debug;
 import in.srain.cube.util.Version;
 
@@ -53,13 +54,6 @@ public class ImageProvider {
     private ImageFileProvider mImageFileProvider;
 
     private static ImageProvider sDefault;
-
-    public static ImageProvider getDefault(Context context) {
-        if (null == sDefault) {
-            sDefault = new ImageProvider(context, DefaultMemoryCache.getDefault(), LruImageFileProvider.getDefault(context));
-        }
-        return sDefault;
-    }
 
     public ImageProvider(Context context, ImageMemoryCache memoryCache, ImageFileProvider fileProvider) {
         mMemoryCache = memoryCache;
@@ -187,18 +181,19 @@ public class ImageProvider {
                     imageTask.getStatistics().afterDownload();
                 }
                 if (inputStream == null) {
-                    imageTask.onLoadError(ImageTask.ERROR_NETWORK, imageLoader.getImageLoadHandler());
-                    Log.e(TAG, imageTask + " download fail: " + fileCacheKey);
+                    imageTask.setError(ImageTask.ERROR_NETWORK);
+                    CLog.e(TAG, "%s download fail: %s %s", imageTask, fileCacheKey, url);
                 }
             }
             if (inputStream != null) {
                 try {
                     bitmap = decodeSampledBitmapFromDescriptor(inputStream.getFD(), imageTask, imageResizer);
                 } catch (IOException e) {
+                    CLog.e(TAG, "%s decode bitmap fail. %s, %s", imageTask, fileCacheKey, imageResizer.getRemoteUrl(imageTask));
                     e.printStackTrace();
                 }
             } else {
-                Log.e(TAG, imageTask + " fetch bitmap fail. file cache key: " + fileCacheKey);
+                CLog.e(TAG, "%s fetch bitmap fail. %s, %s", imageTask, fileCacheKey, imageResizer.getRemoteUrl(imageTask));
             }
         }
         return bitmap;

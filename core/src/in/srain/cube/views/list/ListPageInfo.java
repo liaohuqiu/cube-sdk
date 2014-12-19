@@ -55,6 +55,15 @@ public class ListPageInfo<T> {
         return mNumPerPage;
     }
 
+    /**
+     * start from 0
+     *
+     * @return
+     */
+    public int getPage() {
+        return mStart / mNumPerPage;
+    }
+
     public void goToHead() {
         mStart = 0;
     }

@@ -1,15 +1,14 @@
 package in.srain.cube.image.impl;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
-import android.util.Log;
 import in.srain.cube.concurrent.SimpleExecutor;
 import in.srain.cube.concurrent.SimpleTask;
 import in.srain.cube.file.DiskLruCache;
 import in.srain.cube.file.DiskLruCache.Editor;
 import in.srain.cube.file.FileUtil;
 import in.srain.cube.image.iface.ImageFileProvider;
+import in.srain.cube.util.CLog;
 import in.srain.cube.util.Debug;
 
 import java.io.*;
@@ -25,10 +24,6 @@ public class LruImageFileProvider implements ImageFileProvider {
 
     protected static final boolean DEBUG = Debug.DEBUG_IMAGE;
     protected static final String LOG_TAG = Debug.DEBUG_IMAGE_LOG_TAG_PROVIDER;
-
-    private static final String DEFAULT_CACHE_DIR = "cube-image";
-    private static final int DEFAULT_CACHE_SIZE = 1024 * 1024 * 10;
-    private static LruImageFileProvider sDefault;
 
     // Compression settings when writing images to disk cache
     private static final CompressFormat DEFAULT_COMPRESS_FORMAT = CompressFormat.JPEG;
@@ -56,6 +51,7 @@ public class LruImageFileProvider implements ImageFileProvider {
             if (editor != null) {
                 OutputStream outputStream = editor.newOutputStream(0);
                 boolean ret = SimpleDownloader.downloadUrlToStream(url, outputStream);
+                CLog.i(LOG_TAG, "download: %s %s %s", ret, fileCacheKey, url);
                 if (ret) {
                     editor.commit();
                 } else {
@@ -77,21 +73,12 @@ public class LruImageFileProvider implements ImageFileProvider {
         mDiskCacheDir = path;
     }
 
-    public static LruImageFileProvider getDefault(Context context) {
-        if (null == sDefault) {
-            FileUtil.CacheDirInfo cacheDirInfo = FileUtil.getDiskCacheDir(context, DEFAULT_CACHE_DIR, DEFAULT_CACHE_SIZE);
-            sDefault = new LruImageFileProvider(cacheDirInfo.realSize, cacheDirInfo.path);
-            sDefault.initDiskCacheAsync();
-        }
-        return sDefault;
-    }
-
     /**
      * Initializes the disk cache. Note that this includes disk access so this should not be executed on the main/UI thread. By default an ImageProvider does not initialize the disk cache when it is created, instead you should call initDiskCache() to initialize it on a background thread.
      */
     public void initDiskCache() {
         if (DEBUG) {
-            Log.d(LOG_TAG, "initDiskCache " + this);
+            CLog.d(LOG_TAG, "initDiskCache " + this);
         }
         // Set up disk cache
         synchronized (mDiskCacheLock) {
@@ -103,14 +90,12 @@ public class LruImageFileProvider implements ImageFileProvider {
                     if (FileUtil.getUsableSpace(mDiskCacheDir) > mDiskCacheSize) {
                         try {
                             mDiskLruCache = DiskLruCache.open(mDiskCacheDir, 1, 1, mDiskCacheSize);
-                            if (DEBUG) {
-                                Log.d(LOG_TAG, "Disk cache initialized " + this);
-                            }
+                            CLog.i(LOG_TAG, "Disk cache initialized: " + getCachePath());
                         } catch (final IOException e) {
-                            Log.e(LOG_TAG, "initDiskCache - " + e);
+                            CLog.e(LOG_TAG, "initDiskCache - " + e);
                         }
                     } else {
-                        Log.e(LOG_TAG, String.format("no enough space for initDiskCache %s %s", FileUtil.getUsableSpace(mDiskCacheDir), mDiskCacheSize));
+                        CLog.e(LOG_TAG, "no enough space for initDiskCache %s %s", FileUtil.getUsableSpace(mDiskCacheDir), mDiskCacheSize);
                     }
                 }
             }
@@ -148,9 +133,9 @@ public class LruImageFileProvider implements ImageFileProvider {
                         }
                     }
                 } catch (final IOException e) {
-                    Log.e(LOG_TAG, "addBitmapToCache - " + e);
+                    CLog.e(LOG_TAG, "addBitmapToCache - " + e);
                 } catch (Exception e) {
-                    Log.e(LOG_TAG, "addBitmapToCache - " + e);
+                    CLog.e(LOG_TAG, "addBitmapToCache - " + e);
                 } finally {
                     try {
                         if (out != null) {
@@ -172,7 +157,7 @@ public class LruImageFileProvider implements ImageFileProvider {
             while (mDiskCacheStarting) {
                 try {
                     if (DEBUG) {
-                        Log.d(LOG_TAG, "read wait " + this);
+                        CLog.d(LOG_TAG, "read wait " + this);
                     }
                     mDiskCacheLock.wait();
                 } catch (InterruptedException e) {
@@ -185,7 +170,7 @@ public class LruImageFileProvider implements ImageFileProvider {
                     snapshot = mDiskLruCache.get(fileCacheKey);
 
                 } catch (final IOException e) {
-                    Log.e(LOG_TAG, "getBitmapFromDiskCache - " + e);
+                    CLog.e(LOG_TAG, "getBitmapFromDiskCache - " + e);
                 }
 
                 if (snapshot == null) {
@@ -203,7 +188,7 @@ public class LruImageFileProvider implements ImageFileProvider {
         if (null != mDiskLruCache) {
             return mDiskLruCache.edit(key);
         } else {
-            Log.e(LOG_TAG, "mDiskLruCache is null");
+            CLog.e(LOG_TAG, "mDiskLruCache is null");
             return null;
         }
     }
@@ -220,12 +205,10 @@ public class LruImageFileProvider implements ImageFileProvider {
             if (mDiskLruCache != null && !mDiskLruCache.isClosed()) {
                 try {
                     mDiskLruCache.delete();
-                    if (DEBUG) {
-                        Log.d(LOG_TAG, "Disk cache cleared");
-                    }
+                    CLog.i(LOG_TAG, "Disk cache cleared: ", getCachePath());
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Log.e(LOG_TAG, "clearCache - " + e);
+                    CLog.e(LOG_TAG, "clearCache - " + e);
                 }
                 mDiskLruCache = null;
 
@@ -248,10 +231,10 @@ public class LruImageFileProvider implements ImageFileProvider {
                 try {
                     mDiskLruCache.flush();
                     if (DEBUG) {
-                        Log.d(LOG_TAG, "Disk cache flushed");
+                        CLog.d(LOG_TAG, "Disk cache flushed: %s", this);
                     }
                 } catch (IOException e) {
-                    Log.e(LOG_TAG, "flush - " + e);
+                    CLog.e(LOG_TAG, "flush - " + e);
                 }
             }
         }
@@ -268,11 +251,11 @@ public class LruImageFileProvider implements ImageFileProvider {
                         mDiskLruCache.close();
                         mDiskLruCache = null;
                         if (DEBUG) {
-                            Log.d(LOG_TAG, "Disk cache closed");
+                            CLog.d(LOG_TAG, "Disk cache closed");
                         }
                     }
                 } catch (IOException e) {
-                    Log.e(LOG_TAG, "close - " + e);
+                    CLog.e(LOG_TAG, "close - " + e);
                 }
             }
         }
@@ -313,7 +296,7 @@ public class LruImageFileProvider implements ImageFileProvider {
         public void onFinish() {
         }
 
-        void excute() {
+        void execute() {
             SimpleExecutor.getInstance().execute(this);
         }
     }
@@ -323,9 +306,9 @@ public class LruImageFileProvider implements ImageFileProvider {
      */
     public void initDiskCacheAsync() {
         if (DEBUG) {
-            Log.d(LOG_TAG, "initDiskCacheAsync " + this);
+            CLog.d(LOG_TAG, "initDiskCacheAsync: " + getCachePath());
         }
-        new FileCacheTask(FileCacheTaskType.init_cache).excute();
+        new FileCacheTask(FileCacheTaskType.init_cache).execute();
     }
 
     /**
@@ -333,9 +316,9 @@ public class LruImageFileProvider implements ImageFileProvider {
      */
     public void closeDiskCacheAsync() {
         if (DEBUG) {
-            Log.d(LOG_TAG, "closeDiskCacheAsync");
+            CLog.d(LOG_TAG, "closeDiskCacheAsync");
         }
-        new FileCacheTask(FileCacheTaskType.close_cache).excute();
+        new FileCacheTask(FileCacheTaskType.close_cache).execute();
     }
 
     /**
@@ -344,9 +327,9 @@ public class LruImageFileProvider implements ImageFileProvider {
     @Override
     public void flushDiskCacheAsync() {
         if (DEBUG) {
-            Log.d(LOG_TAG, "flushDishCacheAsync");
+            CLog.d(LOG_TAG, "flushDishCacheAsync");
         }
-        new FileCacheTask(FileCacheTaskType.flush_cache).excute();
+        new FileCacheTask(FileCacheTaskType.flush_cache).execute();
     }
 
     @Override

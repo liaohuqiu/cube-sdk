@@ -2,6 +2,8 @@ package in.srain.cube.request;
 
 import android.os.Handler;
 import android.os.Message;
+import in.srain.cube.util.CLog;
+import in.srain.cube.util.Debug;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -11,6 +13,9 @@ import java.net.URL;
  * @author http://www.liaohuqiu.net
  */
 public class SimpleRequestManager {
+
+    private static final boolean DEBUG = Debug.DEBUG_REQUEST;
+    private static final String LOG_TAG = Debug.DEBUG_REQUEST_LOG_TAG;
 
     private final static int REQUEST_SUCCESS = 0x01;
 
@@ -44,6 +49,10 @@ public class SimpleRequestManager {
                 try {
 
                     RequestData requestData = request.getRequestData();
+
+                    if (DEBUG) {
+                        CLog.d(LOG_TAG, "url: %s", requestData.getRequestUrl());
+                    }
                     StringBuilder sb = new StringBuilder();
                     URL url = new URL(request.getRequestData().getRequestUrl());
                     HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();

@@ -3,6 +3,7 @@
 
     <color name="cube_mints_white">#ffffff</color>
     <color name="cube_mints_333333">#333333</color>
+    <color name="cube_mints_cccccc">#cccccc</color>
     <color name="cube_mints_666666">#666666</color>
     <color name="cube_mints_999999">#999999</color>
     <color name="cube_mints_f1f1f1">#f1f1f1</color>

@@ -27,8 +27,8 @@ public class ImageLoader implements LifeCycleComponent {
     private static final String MSG_ATTACK_TO_RUNNING_TASK = "%s attach to running: %s";
 
     private static final String MSG_TASK_DO_IN_BACKGROUND = "%s doInBackground";
-    private static final String MSG_TASK_FINISH = "%s onFinish";
-    private static final String MSG_TASK_CANCEL = "%s onCancel";
+    private static final String MSG_TASK_FINISH = "%s onLoadTaskFinish";
+    private static final String MSG_TASK_CANCEL = "%s onLoadTaskCancel";
     private static final String MSG_TASK_HIT_CACHE = "%s hit cache %s %s";
 
     protected static final boolean DEBUG = Debug.DEBUG_IMAGE;
@@ -38,7 +38,7 @@ public class ImageLoader implements LifeCycleComponent {
     protected ImageResizer mImageResizer;
     protected ImageProvider mImageProvider;
     protected ImageLoadHandler mImageLoadHandler;
-    protected ImageLoadProgressHandler mLoadProgressHandler;
+    protected ImageLoadProgressHandler mLoadImageLoadProgressHandler;
 
     protected boolean mPauseWork = false;
     protected boolean mExitTasksEarly = false;
@@ -191,7 +191,7 @@ public class ImageLoader implements LifeCycleComponent {
             }
         }
         imageTask.addImageView(imageView);
-        imageTask.onLoadFinish(drawable, mImageLoadHandler);
+        imageTask.onLoadTaskFinish(drawable, mImageLoadHandler);
         return true;
     }
 
@@ -285,7 +285,7 @@ public class ImageLoader implements LifeCycleComponent {
             mLoadWorkList.remove(mImageTask.getIdentityKey());
 
             if (!isCancelled() && !mExitTasksEarly) {
-                mImageTask.onLoadFinish(mDrawable, mImageLoadHandler);
+                mImageTask.onLoadTaskFinish(mDrawable, mImageLoadHandler);
             }
             mImageTask.tryToRecycle();
         }
@@ -296,7 +296,7 @@ public class ImageLoader implements LifeCycleComponent {
                 CLog.d(LOG_TAG, MSG_TASK_CANCEL, mImageTask);
             }
             mLoadWorkList.remove(mImageTask.getIdentityKey());
-            mImageTask.onCancel();
+            mImageTask.onLoadTaskCancel();
             mImageTask.tryToRecycle();
         }
     }
@@ -446,7 +446,7 @@ public class ImageLoader implements LifeCycleComponent {
     }
 
     /**
-     * Process LifeCycle
+     * LiefCycle phase will be same to CubeFragment, an will be processed automatically.
      *
      * @param fragment
      * @return

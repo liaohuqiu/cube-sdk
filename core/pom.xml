@@ -6,7 +6,7 @@
     <parent>
         <groupId>in.srain</groupId>
         <artifactId>cube-parent-for-oss</artifactId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>1.0.1</version>
     </parent>
 
     <groupId>in.srain.cube</groupId>
@@ -19,7 +19,7 @@
         <dependency>
             <groupId>com.google.android</groupId>
             <artifactId>android</artifactId>
-            <version>4.1.1.4</version>
+            <version>4.4.0</version>
             <scope>provided</scope>
         </dependency>
 

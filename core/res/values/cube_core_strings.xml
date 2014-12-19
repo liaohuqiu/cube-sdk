@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="cube_views_load_more_loading">loading...</string>
+    <string name="cube_views_load_more_click_to_load_more">Click to oad more</string>
+    <string name="cube_views_load_more_loaded_no_more">All the data has been loaded</string>
+    <string name="cube_views_load_more_loaded_empty">It is empty. :(</string>
+
 </resources>

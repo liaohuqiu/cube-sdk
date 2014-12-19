@@ -59,7 +59,7 @@ public class LruFileCache implements IFileCache {
      */
     public void initDiskCache() {
         if (DEBUG) {
-            Log.d(TAG, "initDiskCache " + this);
+            Log.d(TAG, "initDiskCache " + getCachePath());
         }
         // Set up disk cache
         synchronized (mDiskCacheLock) {
@@ -115,7 +115,7 @@ public class LruFileCache implements IFileCache {
             while (mDiskCacheStarting) {
                 try {
                     if (DEBUG) {
-                        Log.d(TAG, "read wait " + this);
+                        Log.d(TAG, "read wait " + getCachePath());
                     }
                     mDiskCacheLock.wait();
                 } catch (InterruptedException e) {
@@ -150,7 +150,7 @@ public class LruFileCache implements IFileCache {
             while (mDiskCacheStarting) {
                 try {
                     if (DEBUG) {
-                        Log.d(TAG, "check has wait " + this);
+                        Log.d(TAG, "check has wait " + getCachePath());
                     }
                     mDiskCacheLock.wait();
                 } catch (InterruptedException e) {
@@ -176,7 +176,7 @@ public class LruFileCache implements IFileCache {
             while (mDiskCacheStarting) {
                 try {
                     if (DEBUG) {
-                        Log.d(TAG, "delete wait " + this);
+                        Log.d(TAG, "delete wait " + getCachePath());
                     }
                     mDiskCacheLock.wait();
                 } catch (InterruptedException e) {
