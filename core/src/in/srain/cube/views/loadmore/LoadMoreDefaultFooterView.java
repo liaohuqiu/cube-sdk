@@ -46,7 +46,7 @@ public class LoadMoreDefaultFooterView extends RelativeLayout implements LoadMor
                 mTextView.setText(R.string.cube_views_load_more_loaded_no_more);
             }
         } else {
-            setVisibility(GONE);
+            setVisibility(INVISIBLE);
         }
     }
 
