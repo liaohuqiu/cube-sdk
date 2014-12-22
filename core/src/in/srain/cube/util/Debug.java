@@ -1,9 +1,11 @@
 package in.srain.cube.util;
 
 public class Debug {
+
     public static boolean DEBUG_CACHE = false;
     public static boolean DEBUG_IMAGE = false;
     public static boolean DEBUG_REQUEST = false;
+
     public static String DEBUG_REQUEST_LOG_TAG = "cube_request";
 
     public static String DEBUG_IMAGE_LOG_TAG = "cube_image";
