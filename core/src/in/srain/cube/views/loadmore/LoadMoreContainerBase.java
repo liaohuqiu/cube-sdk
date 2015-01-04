@@ -102,7 +102,9 @@ public abstract class LoadMoreContainerBase extends LinearLayout implements Load
         if (mAutoLoadMore) {
             performLoadMore();
         } else {
-            mLoadMoreUIHandler.onWaitToLoadMore(this);
+            if (mHasMore) {
+                mLoadMoreUIHandler.onWaitToLoadMore(this);
+            }
         }
     }
 

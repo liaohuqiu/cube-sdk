@@ -10,6 +10,8 @@ import java.io.File;
 
 /**
  * Create an {@link ImageLoader}.
+ * Here defines two {@link ImageLoader}, one is the default, the other one is the stable.
+ * You can use the stable one to load the images which will not change frequently.
  *
  * @author http://www.liaohuqiu.net
  */
@@ -33,14 +35,39 @@ public class ImageLoaderFactory {
         return memoryCacheSizeInKB;
     }
 
+    /**
+     * customize cache
+     *
+     * @param context
+     * @param memoryCacheSizeInKB      How many memory should use. Will not be greater than 50% of free memory
+     * @param defaultDiskCacheSizeInKB Default disk cache size.
+     */
     public static void customizeCache(Context context, int memoryCacheSizeInKB, int defaultDiskCacheSizeInKB) {
         customizeCache(context, memoryCacheSizeInKB, defaultDiskCacheSizeInKB, 0);
     }
 
+    /**
+     * customize cache
+     *
+     * @param context
+     * @param memoryCacheSizeInKB      How many memory should use. Will not be greater than 50% of free memory
+     * @param defaultDiskCachePath     Default image cache path.
+     *                                 Absolute path or a relative path under cache directory. External cache first.
+     *                                 If not specified, using {@link #DEFAULT_FILE_CACHE_DIR} under cache directory.
+     * @param defaultDiskCacheSizeInKB Default disk cache size.
+     */
     public static void customizeCache(Context context, int memoryCacheSizeInKB, String defaultDiskCachePath, int defaultDiskCacheSizeInKB) {
         customizeCache(context, memoryCacheSizeInKB, defaultDiskCachePath, defaultDiskCacheSizeInKB, null, 0);
     }
 
+    /**
+     * customize cache
+     *
+     * @param context
+     * @param memoryCacheSizeInKB      How many memory should use. Will not be greater than 50% of free memory
+     * @param defaultDiskCacheSizeInKB Default disk cache size.
+     * @param stableDiskCacheSizeInKB  Stable disk cache size.
+     */
     public static void customizeCache(Context context, int memoryCacheSizeInKB, int defaultDiskCacheSizeInKB, int stableDiskCacheSizeInKB) {
         customizeCache(context, memoryCacheSizeInKB, null, defaultDiskCacheSizeInKB, null, stableDiskCacheSizeInKB);
     }
@@ -51,10 +78,11 @@ public class ImageLoaderFactory {
      * @param context
      * @param memoryCacheSizeInKB      How many memory should use. Will not be greater than 50% of free memory
      * @param defaultDiskCachePath     Default image cache path.
-     *                                 If not specified, in {@link #DEFAULT_FILE_CACHE_DIR} under cache directory. External first.
-     * @param defaultDiskCacheSizeInKB
-     * @param stableDiskCachePath
-     * @param stableDiskCacheSizeInKB
+     *                                 Absolute path or a relative path under cache directory. External cache first.
+     *                                 If not specified, using {@link #DEFAULT_FILE_CACHE_DIR} under cache directory.
+     * @param defaultDiskCacheSizeInKB Default disk cache size.
+     * @param stableDiskCachePath      Path for stable cache directory. Default is {@link #STABLE_FILE_CACHE_DIR}
+     * @param stableDiskCacheSizeInKB  Stable disk cache size.
      */
     public static void customizeCache(Context context, int memoryCacheSizeInKB,
                                       String defaultDiskCachePath, int defaultDiskCacheSizeInKB,
@@ -63,7 +91,7 @@ public class ImageLoaderFactory {
         // init memory cache first
         if (memoryCacheSizeInKB > 0) {
             int maxCacheSizeInKB = Math.round(0.5f * Runtime.getRuntime().maxMemory() / 1024);
-            memoryCacheSizeInKB = Math.max(memoryCacheSizeInKB, maxCacheSizeInKB);
+            memoryCacheSizeInKB = Math.min(memoryCacheSizeInKB, maxCacheSizeInKB);
             sDefaultImageMemoryCache = new DefaultMemoryCache(memoryCacheSizeInKB);
         }
 

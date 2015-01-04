@@ -27,20 +27,22 @@ public class ImageTask {
 
     private final static String SIZE_SP = "_";
 
-    // 0000 1100
-    private static final int ERROR_CODE_MASK = 0x03 << 2;
+    // 0000 0111
+    private static final int ERROR_CODE_MASK = 0x07;
+
+    // error code
+    public final static int ERROR_NETWORK = 0x01;
 
     /**
-     * 1 pre-load
-     * 2 loading
+     * bits:
+     * 1 error-code
+     * 2 error-code
      * 3 error-code
-     * 4 error-code
+     * 4 loading
+     * 5 pre-load
      */
-    private final static int STATUS_PRE_LOAD = 0x01;
-    private final static int STATUS_LOADING = 0x02;
-    private final static int STATUS_FAIL = 0x10;
-
-    public final static int ERROR_NETWORK = 0x01;
+    private final static int STATUS_LOADING = 0x01 << 3;
+    private final static int STATUS_PRE_LOAD = 0x02 << 3;
 
     private int mFlag = 0;
     protected int mId = 0;
@@ -311,7 +313,7 @@ public class ImageTask {
         if (null == handler) {
             return;
         }
-        int errorCode = (mFlag & ERROR_CODE_MASK) >> 3;
+        int errorCode = mFlag & ERROR_CODE_MASK;
         if (errorCode > 0) {
             onLoadError(errorCode, handler);
             return;
@@ -341,10 +343,15 @@ public class ImageTask {
     }
 
     public void setError(int errorCode) {
-        if (errorCode > 3) {
+        if (errorCode > ERROR_CODE_MASK) {
             throw new IllegalArgumentException("error code undefined.");
         }
-        mFlag |= errorCode << 2;
+
+        // clear old error flag
+        mFlag = (mFlag & ~ERROR_CODE_MASK);
+
+        // set current error flag
+        mFlag |= errorCode;
     }
 
     private void onLoadError(int reason, ImageLoadHandler handler) {
