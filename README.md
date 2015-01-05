@@ -46,3 +46,10 @@ compile 'in.srain.cube:cube-sdk:1.0.42@aar'
 ###### Eclipse
 
 Load the content into you eclipse, it's library project. Then use it in your application project.
+
+
+##### Components
+
+cube-sdk contains:
+
+* CLog

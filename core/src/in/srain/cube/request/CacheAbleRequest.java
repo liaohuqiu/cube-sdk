@@ -21,7 +21,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
     }
 
     protected static final boolean DEBUG = Debug.DEBUG_CACHE;
-    protected static final String LOG_TAG = "cube_cache_request";
+    protected static final String LOG_TAG = "cube-cache-request";
 
     private CacheAbleRequestHandler<T> mHandler;
 

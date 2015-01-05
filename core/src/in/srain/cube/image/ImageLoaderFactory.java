@@ -2,11 +2,9 @@ package in.srain.cube.image;
 
 import android.content.Context;
 import android.text.TextUtils;
-import in.srain.cube.file.FileUtil;
+import in.srain.cube.cache.DiskFileUtils;
 import in.srain.cube.image.iface.*;
 import in.srain.cube.image.impl.*;
-
-import java.io.File;
 
 /**
  * Create an {@link ImageLoader}.
@@ -96,43 +94,31 @@ public class ImageLoaderFactory {
         }
 
         if (defaultDiskCacheSizeInKB > 0 && !TextUtils.isEmpty(defaultDiskCachePath)) {
-            ImageFileProvider imageFileProvider = getImageFileProvider(context, defaultDiskCachePath, defaultDiskCacheSizeInKB, DEFAULT_FILE_CACHE_DIR);
+            ImageDiskCacheProvider imageFileProvider = getImageFileProvider(context, defaultDiskCachePath, defaultDiskCacheSizeInKB, DEFAULT_FILE_CACHE_DIR);
             if (imageFileProvider != null) {
                 sDefaultImageProvider = new ImageProvider(context, getDefaultImageMemoryCache(), imageFileProvider);
             }
         }
 
         if (stableDiskCacheSizeInKB > 0 && !TextUtils.isEmpty(stableDiskCachePath)) {
-            ImageFileProvider imageFileProvider = getImageFileProvider(context, stableDiskCachePath, stableDiskCacheSizeInKB, STABLE_FILE_CACHE_DIR);
+            ImageDiskCacheProvider imageFileProvider = getImageFileProvider(context, stableDiskCachePath, stableDiskCacheSizeInKB, STABLE_FILE_CACHE_DIR);
             if (imageFileProvider != null) {
                 sStableImageProvider = new ImageProvider(context, getDefaultImageMemoryCache(), imageFileProvider);
             }
         }
     }
 
-    private static ImageFileProvider getImageFileProvider(Context context, String path, int sizeInKB, String fallbackCachePath) {
-
-        long size = (long) sizeInKB * 1024;
-
-        ImageFileProvider imageFileProvider = null;
-        if (!TextUtils.isEmpty(path)) {
-            File cachePath = new File(path);
-            // is not exist, try to make parent directory
-            if (cachePath.exists() || cachePath.mkdirs()) {
-                long free = FileUtil.getUsableSpace(cachePath);
-                size = Math.min(size, free);
-                imageFileProvider = new LruImageFileProvider(size, cachePath);
-            }
+    private static ImageDiskCacheProvider getImageFileProvider(Context context, String path, int sizeInKB, String fallbackCachePath) {
+        if (sizeInKB <= 0) {
+            sizeInKB = DEFAULT_FILE_CACHE_SIZE_IN_KB;
         }
 
-        if (imageFileProvider == null) {
-            size = DEFAULT_FILE_CACHE_SIZE_IN_KB * 1024;
-            FileUtil.CacheDirInfo dirInfo = FileUtil.getDiskCacheDir(context, fallbackCachePath, size);
-            imageFileProvider = new LruImageFileProvider(dirInfo.realSize, dirInfo.path);
-        }
+        DiskFileUtils.CacheDirInfo dirInfo = DiskFileUtils.getDiskCacheDir(context, path, sizeInKB, fallbackCachePath);
+
+        ImageDiskCacheProvider imageFileProvider = ImageDiskCacheProvider.createLru(dirInfo.realSize, dirInfo.path);
 
         if (imageFileProvider != null) {
-            imageFileProvider.initDiskCacheAsync();
+            imageFileProvider.openDiskCacheAsync();
         }
         return imageFileProvider;
     }
@@ -200,7 +186,7 @@ public class ImageLoaderFactory {
 
     private static ImageProvider getDefaultImageProvider(Context context) {
         if (null == sDefaultImageProvider) {
-            ImageFileProvider imageFileProvider = getImageFileProvider(context, null, 0, DEFAULT_FILE_CACHE_DIR);
+            ImageDiskCacheProvider imageFileProvider = getImageFileProvider(context, null, 0, DEFAULT_FILE_CACHE_DIR);
             sDefaultImageProvider = new ImageProvider(context, getDefaultImageMemoryCache(), imageFileProvider);
         }
         return sDefaultImageProvider;
@@ -208,7 +194,7 @@ public class ImageLoaderFactory {
 
     private static ImageProvider getStableImageProvider(Context context) {
         if (null == sStableImageProvider) {
-            ImageFileProvider imageFileProvider = getImageFileProvider(context, null, 0, STABLE_FILE_CACHE_DIR);
+            ImageDiskCacheProvider imageFileProvider = getImageFileProvider(context, null, 0, STABLE_FILE_CACHE_DIR);
             sStableImageProvider = new ImageProvider(context, getDefaultImageMemoryCache(), imageFileProvider);
         }
         return sStableImageProvider;

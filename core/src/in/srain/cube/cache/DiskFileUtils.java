@@ -1,19 +1,50 @@
-package in.srain.cube.file;
+package in.srain.cube.cache;
 
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.Build;
-import android.os.Build.VERSION_CODES;
 import android.os.Environment;
 import android.os.StatFs;
+import android.text.TextUtils;
 import in.srain.cube.util.Version;
 
-import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.InputStream;
 
-public class FileUtil {
+public class DiskFileUtils {
+
+    public static CacheDirInfo getDiskCacheDir(
+            Context context, String absolutePath, int sizeInKB,
+            String fallbackRelativePath) {
+
+        long size = (long) sizeInKB * 1024;
+        boolean done = false;
+
+        CacheDirInfo dirInfo = new CacheDirInfo();
+        dirInfo.requireSize = size;
+
+        // treat as absolute path
+        if (!TextUtils.isEmpty(absolutePath)) {
+            File cachePath = new File(absolutePath);
+            // is not exist, try to make parent directory
+            if (cachePath.exists() || cachePath.mkdirs()) {
+                long free = getUsableSpace(cachePath);
+                size = Math.min(size, free);
+                dirInfo.realSize = size;
+                dirInfo.path = cachePath;
+                done = true;
+            }
+        }
+
+        // it's relative path
+        if (!done) {
+            dirInfo = getDiskCacheDir(context, fallbackRelativePath, size);
+        }
+        return dirInfo;
+    }
 
     /**
      * Get a usable cache directory (external if available, internal otherwise).
@@ -82,7 +113,7 @@ public class FileUtil {
      * @param context The context to use
      * @return The external cache folder : /storage/sdcard0/Android/data/com.srain.sdk/cache
      */
-    @TargetApi(VERSION_CODES.FROYO)
+    @TargetApi(Build.VERSION_CODES.FROYO)
     public static File getExternalCacheDir(Context context) {
         if (Version.hasFroyo()) {
             File path = context.getExternalCacheDir();
@@ -105,7 +136,7 @@ public class FileUtil {
      * @return The space available in bytes by user, not by root, -1 means path is null, 0 means path is not exist.
      */
     @SuppressWarnings("deprecation")
-    @TargetApi(VERSION_CODES.GINGERBREAD)
+    @TargetApi(Build.VERSION_CODES.GINGERBREAD)
     public static long getUsableSpace(File path) {
         if (path == null) {
             return -1;
@@ -123,7 +154,7 @@ public class FileUtil {
     }
 
     @SuppressWarnings("deprecation")
-    @TargetApi(VERSION_CODES.GINGERBREAD)
+    @TargetApi(Build.VERSION_CODES.GINGERBREAD)
     public static long getUsedSpace(File path) {
         if (path == null) {
             return -1;
@@ -178,44 +209,12 @@ public class FileUtil {
      */
     public static String wantFilesPath(Context context, boolean externalStorageFirst) {
         String path = null;
-        if (externalStorageFirst && hasSDCardMounted()) {
+        if (externalStorageFirst && DiskFileUtils.hasSDCardMounted()) {
             path = context.getExternalFilesDir("").getAbsolutePath();
         } else {
             path = context.getFilesDir().getAbsolutePath();
         }
         return path;
-    }
-
-    public static File wantFile(String dirPath, String fileName) {
-        File dir = new File(dirPath);
-        dir.mkdirs();
-        File outputFile = new File(dir, fileName);
-        return outputFile;
-    }
-
-    public static boolean write(String filePath, String content) {
-        File file = new File(filePath);
-        if (!file.getParentFile().exists())
-            file.getParentFile().mkdirs();
-
-        FileWriter writer = null;
-        try {
-
-            writer = new FileWriter(file);
-            writer.write(content);
-
-        } catch (IOException e) {
-        } finally {
-            try {
-                if (writer != null) {
-
-                    writer.close();
-                    return true;
-                }
-            } catch (IOException e) {
-            }
-        }
-        return false;
     }
 
     /**
@@ -240,44 +239,6 @@ public class FileUtil {
             return byteArrayOutputStream.toString();
         } catch (Exception e) {
             e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static String read(String filePath) {
-        File file = new File(filePath);
-        if (!file.exists())
-            return null;
-
-        FileInputStream fileInput = null;
-        FileChannel channel = null;
-        try {
-            fileInput = new FileInputStream(filePath);
-            channel = fileInput.getChannel();
-            ByteBuffer buffer = ByteBuffer.allocate((int) channel.size());
-            channel.read(buffer);
-
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            byteArrayOutputStream.write(buffer.array());
-            return byteArrayOutputStream.toString();
-        } catch (Exception e) {
-        } finally {
-
-            if (fileInput != null) {
-                try {
-                    fileInput.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (channel != null) {
-                try {
-                    channel.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
         }
         return null;
     }

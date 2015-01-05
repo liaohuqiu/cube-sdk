@@ -11,6 +11,9 @@ allprojects {
     repositories {
         jcenter()
         mavenCentral();
+        maven {
+            url 'https://oss.sonatype.org/content/repositories/snapshots'
+        }
     }
 }
 
@@ -84,8 +87,8 @@ task copyLibs << {
 }
 
 dependencies {
+    compile 'in.srain.cube:diskcache:1.0.1-SNAPSHOT'
     compile 'in.srain.cube:clog:1.0.2'
-    // compile 'com.android.support:support-v4:20.0.0'
     compile 'com.google.android:support-v4:r7'
 }
 apply from: './gradle-mvn-push.gradle'

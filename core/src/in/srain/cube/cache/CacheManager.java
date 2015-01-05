@@ -5,11 +5,11 @@ import android.support.v4.util.LruCache;
 import android.text.TextUtils;
 import in.srain.cube.concurrent.SimpleExecutor;
 import in.srain.cube.concurrent.SimpleTask;
-import in.srain.cube.file.FileUtil;
-import in.srain.cube.file.LruFileCache;
 import in.srain.cube.request.JsonData;
 import in.srain.cube.util.CLog;
 import in.srain.cube.util.Debug;
+
+import java.io.IOException;
 
 /**
  * @author http://www.liaohuqiu.net
@@ -17,10 +17,11 @@ import in.srain.cube.util.Debug;
 public class CacheManager {
 
     private static final boolean DEBUG = Debug.DEBUG_CACHE;
-    private static final String LOG_TAG = "cube_cache";
+    private static final String LOG_TAG = "cube-cache";
 
-    private LruCache<String, CacheInfo> mMemoryCache;
-    private LruFileCache mFileCache;
+    private static final String DEFAULT_CACHE_DIR = "cube-cache";
+
+    private static final int DEFAULT_CACHE_SIZE_IN_KB = 1024 * 10;
 
     private static final byte AFTER_READ_FROM_FILE = 0x01;
     private static final byte AFTER_READ_FROM_ASSERT = 0x02;
@@ -34,7 +35,8 @@ public class CacheManager {
     private static final byte CONVERT_FOR_FILE = 0x01;
     private static final byte CONVERT_FOR_ASSERT = 0x02;
     private static final byte CONVERT_FOR_CREATE = 0x04;
-
+    private LruCache<String, CacheInfo> mMemoryCache;
+    private DiskCacheProvider mFileCache;
     private Context mContext;
 
     public CacheManager(Context content, String cacheDir, int memoryCacheSizeInKB, int fileCacheSizeInKB) {
@@ -46,10 +48,19 @@ public class CacheManager {
                 return (value.getSize() + key.getBytes().length);
             }
         };
-        mFileCache = new LruFileCache(content, cacheDir, fileCacheSizeInKB * 1024);
-        mFileCache.initDiskCacheAsync();
+
+        if (fileCacheSizeInKB < 0) {
+            fileCacheSizeInKB = DEFAULT_CACHE_SIZE_IN_KB;
+        }
+
+        DiskFileUtils.CacheDirInfo cacheDirInfo = DiskFileUtils.getDiskCacheDir(content, cacheDir, fileCacheSizeInKB, DEFAULT_CACHE_DIR);
+        mFileCache = DiskCacheProvider.createLru(content, cacheDirInfo.path, cacheDirInfo.realSize);
+        mFileCache.openDiskCacheAsync();
+
         if (DEBUG) {
-            CLog.d(LOG_TAG, "init file cache. dir: %s => %s, size: %s, used: %s", cacheDir, mFileCache.getCachePath(), mFileCache.getMaxSize(), mFileCache.getUsedSpace());
+            CLog.d(LOG_TAG,
+                    "init file cache. dir: %s => %s, size: %s => %s",
+                    cacheDir, cacheDirInfo.path, cacheDirInfo.requireSize, cacheDirInfo.realSize);
         }
     }
 
@@ -83,6 +94,106 @@ public class CacheManager {
                     }
                 }
         );
+    }
+
+    private void putDataToMemoryCache(String key, CacheInfo data) {
+        if (TextUtils.isEmpty(key)) {
+            return;
+        }
+        if (DEBUG) {
+            CLog.d(LOG_TAG, "%s, set cache to runtime cache list", key);
+        }
+        mMemoryCache.put(key, data);
+    }
+
+    /**
+     * delete cache by key
+     *
+     * @param key
+     */
+    public void invalidateCache(String key) {
+        if (DEBUG) {
+            CLog.d(LOG_TAG, "%s, invalidateCache", key);
+        }
+        try {
+            mFileCache.getDiskCache().delete(key);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        mMemoryCache.remove(key);
+    }
+
+    /**
+     * clear the memory cache
+     */
+    public void clearMemoryCache() {
+        if (mMemoryCache != null) {
+            mMemoryCache.evictAll();
+        }
+    }
+
+    /**
+     * get the spaced has been used
+     *
+     * @return
+     */
+    public int getMemoryCacheUsedSpace() {
+        return mMemoryCache.size();
+    }
+
+    /**
+     * get the spaced max space in config
+     *
+     * @return
+     */
+    public int getMemoryCacheMaxSpace() {
+        return mMemoryCache.maxSize();
+    }
+
+    /**
+     * clear the disk cache
+     */
+    public void clearDiskCache() {
+        if (null != mFileCache) {
+            try {
+                mFileCache.getDiskCache().clear();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * return the file cache path
+     *
+     * @return
+     */
+    public String getFileCachePath() {
+        if (null != mFileCache) {
+            return mFileCache.getDiskCache().getDirectory().getAbsolutePath();
+        }
+        return null;
+    }
+
+    /**
+     * get the used space in file cache
+     *
+     * @return
+     */
+    public long getFileCacheUsedSpace() {
+        return null != mFileCache ? mFileCache.getDiskCache().getSize() : 0;
+    }
+
+    /**
+     * get the max space for file cache
+     *
+     * @return
+     */
+    public long getFileCacheMaxSpace() {
+        if (null != mFileCache) {
+            return mFileCache.getDiskCache().getCapacity();
+        }
+        return 0;
     }
 
     private class InnerCacheTask<T1> extends SimpleTask {
@@ -122,7 +233,7 @@ public class CacheManager {
             }
 
             // try read from cache data
-            boolean hasFileCache = mFileCache.has(mCacheAble.getCacheKey());
+            boolean hasFileCache = mFileCache.getDiskCache().has(mCacheAble.getCacheKey());
             if (hasFileCache) {
                 beginQueryFromCacheFileAsync();
                 return;
@@ -231,7 +342,7 @@ public class CacheManager {
                 CLog.d(LOG_TAG, "%s, try read cache data from assert file", mCacheAble.getCacheKey());
             }
 
-            String cacheContent = FileUtil.readAssert(mContext, mCacheAble.getAssertInitDataPath());
+            String cacheContent = DiskFileUtils.readAssert(mContext, mCacheAble.getAssertInitDataPath());
             mRawData = CacheInfo.createInvalidated(cacheContent);
             putDataToMemoryCache(mCacheAble.getCacheKey(), mRawData);
         }
@@ -275,97 +386,5 @@ public class CacheManager {
                 mCacheAble.createDataForCache(CacheManager.this);
             }
         }
-    }
-
-    private void putDataToMemoryCache(String key, CacheInfo data) {
-        if (TextUtils.isEmpty(key)) {
-            return;
-        }
-        if (DEBUG) {
-            CLog.d(LOG_TAG, "%s, set cache to runtime cache list", key);
-        }
-        mMemoryCache.put(key, data);
-    }
-
-    /**
-     * delete cache by key
-     *
-     * @param key
-     */
-    public void invalidateCache(String key) {
-        if (DEBUG) {
-            CLog.d(LOG_TAG, "%s, invalidateCache", key);
-        }
-        mFileCache.delete(key);
-        mMemoryCache.remove(key);
-    }
-
-    /**
-     * clear the memory cache
-     */
-    public void clearMemoryCache() {
-        if (mMemoryCache != null) {
-            mMemoryCache.evictAll();
-        }
-    }
-
-    /**
-     * get the spaced has been used
-     *
-     * @return
-     */
-    public int getMemoryCacheUsedSpace() {
-        return mMemoryCache.size();
-    }
-
-    /**
-     * get the spaced max space in config
-     *
-     * @return
-     */
-    public int getMemoryCacheMaxSpace() {
-        return mMemoryCache.maxSize();
-    }
-
-    /**
-     * clear the disk cache
-     */
-    public void clearDiskCache() {
-        if (null != mFileCache) {
-            mFileCache.clearCache();
-        }
-    }
-
-    /**
-     * return the file cache path
-     *
-     * @return
-     */
-    public String getFileCachePath() {
-        if (null != mFileCache) {
-            return mFileCache.getCachePath();
-        }
-        return null;
-    }
-
-    /**
-     * get the used space in file cache
-     *
-     * @return
-     */
-    public long getFileCacheUsedSpace() {
-        return null != mFileCache ? mFileCache.getUsedSpace() : 0;
-    }
-
-    /**
-     * get the max space for file cache
-     *
-     * @return
-     */
-    public long getFileCacheMaxSpace() {
-        if (null != mFileCache) {
-            return mFileCache.getMaxSize();
-        }
-        return 0;
     }
 }
