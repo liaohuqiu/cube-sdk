@@ -280,7 +280,7 @@ public class CacheManager {
         }
 
         @Override
-        public void onFinish() {
+        public void onFinish(boolean canceled) {
             switch (mCurrentStatus) {
                 case AFTER_READ_FROM_FILE:
                     beginConvertDataAsync(CONVERT_FOR_FILE);

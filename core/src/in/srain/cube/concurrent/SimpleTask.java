@@ -2,11 +2,17 @@ package in.srain.cube.concurrent;
 
 import android.os.Handler;
 import android.os.Message;
+import in.srain.cube.util.CLog;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A class which encapsulate a task that can execute in background thread and can be cancelled.
+ * memory require:
+ * <p/>
+ * Shadow heap size of AtomicInteger: 12 + 4  = 16 bytes;
+ * Shadow heap size of SimpleTask: 12 + 4 + 4 = 20. After aligned: 24 bytes;
+ * Retained heap size of SimpleTask: 16 + 24 = 40 bytes.
  *
  * @author http://www.liaohuqiu.net
  */
@@ -14,11 +20,12 @@ public abstract class SimpleTask implements Runnable {
 
     private static final int STATE_NEW = 0x01;
     private static final int STATE_RUNNING = 0x02;
-    private static final int STATE_COMPLETING = 0x04;
+    private static final int STATE_FINISH = 0x04;
     private static final int STATE_CANCELLED = 0x08;
 
     private static final int MSG_TASK_DONE = 0x01;
     private static InternalHandler sHandler = new InternalHandler();
+
     private Thread mCurrentThread;
     private AtomicInteger mState = new AtomicInteger(STATE_NEW);
 
@@ -30,7 +37,7 @@ public abstract class SimpleTask implements Runnable {
     /**
      * will be called after doInBackground();
      */
-    public abstract void onFinish();
+    public abstract void onFinish(boolean canceled);
 
     /**
      * When the Task is Cancelled.
@@ -67,18 +74,22 @@ public abstract class SimpleTask implements Runnable {
      *
      * @return
      */
+    @SuppressWarnings({"unused"})
     public boolean isDone() {
-        return mState.get() == STATE_COMPLETING;
+        return mState.get() == STATE_FINISH;
     }
 
-    public void cancel(boolean mayInterruptIfRunning) {
-        if (mState.get() >= STATE_COMPLETING) {
+    public void cancel() {
+        CLog.d("cube-simple-task", "cancel: %s", this);
+        if (mState.get() >= STATE_FINISH) {
             return;
         } else {
-            if (mState.get() == STATE_RUNNING && mayInterruptIfRunning && null != mCurrentThread) {
+            if (mState.get() == STATE_RUNNING && null != mCurrentThread) {
                 try {
                     mCurrentThread.interrupt();
+                    CLog.d("cube-simple-task", "cancel: %s", this);
                 } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
             mState.set(STATE_CANCELLED);
@@ -92,8 +103,8 @@ public abstract class SimpleTask implements Runnable {
             SimpleTask work = (SimpleTask) msg.obj;
             switch (msg.what) {
                 case MSG_TASK_DONE:
-                    work.mState.set(STATE_COMPLETING);
-                    work.onFinish();
+                    work.mState.set(STATE_FINISH);
+                    work.onFinish(work.isCancelled());
                     break;
                 default:
                     break;

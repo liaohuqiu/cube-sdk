@@ -26,7 +26,7 @@ import java.io.IOException;
 public final class SimpleDiskLruCache implements DiskCache {
 
     private static final String LOG_TAG = "simple-lru";
-    private static final boolean DEBUG = true;
+    public static boolean DEBUG = false;
 
     private LruActionTracer mActionTracer;
 
@@ -86,6 +86,10 @@ public final class SimpleDiskLruCache implements DiskCache {
     @Override
     public void abortEdit(CacheEntry cacheEntry) {
         mActionTracer.abortEdit(cacheEntry);
+    }
+
+    public void abortEdit(String key) {
+
     }
 
     @Override

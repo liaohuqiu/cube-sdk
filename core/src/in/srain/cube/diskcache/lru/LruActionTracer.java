@@ -37,7 +37,6 @@ public final class LruActionTracer implements Runnable {
     static final String MAGIC = "lru-tracer";
     static final String VERSION_1 = "1";
     private static final String LOG_TAG = "simple-lru";
-    private static final boolean DEBUG = true;
 
     private static final byte ACTION_CLEAN = 1;
     private static final byte ACTION_DIRTY = 2;
@@ -107,19 +106,19 @@ public final class LruActionTracer implements Runnable {
                 processJournal();
                 mJournalWriter = new BufferedWriter(new FileWriter(mJournalFile, true),
                         IO_BUFFER_SIZE);
-                if (DEBUG) {
+                if (SimpleDiskLruCache.DEBUG) {
                     CLog.d(LOG_TAG, "open success");
                 }
             } catch (IOException journalIsCorrupt) {
                 journalIsCorrupt.printStackTrace();
-                if (DEBUG) {
+                if (SimpleDiskLruCache.DEBUG) {
                     CLog.d(LOG_TAG, "clear old cache");
                 }
                 clear();
             }
         } else {
 
-            if (DEBUG) {
+            if (SimpleDiskLruCache.DEBUG) {
                 CLog.d(LOG_TAG, "create new cache");
             }
 
@@ -144,7 +143,7 @@ public final class LruActionTracer implements Runnable {
         mSize = 0;
 
         // delete current directory then rebuild
-        if (DEBUG) {
+        if (SimpleDiskLruCache.DEBUG) {
             CLog.d(LOG_TAG, "delete directory");
         }
 
@@ -177,7 +176,7 @@ public final class LruActionTracer implements Runnable {
         checkNotClosed();
         validateKey(key);
 
-        if (DEBUG) {
+        if (SimpleDiskLruCache.DEBUG) {
             CLog.d(LOG_TAG, "beginEdit: %s", key);
         }
         CacheEntry cacheEntry = mLruEntries.get(key);
@@ -193,7 +192,7 @@ public final class LruActionTracer implements Runnable {
 
     public void abortEdit(CacheEntry cacheEntry) {
         final String cacheKey = cacheEntry.getKey();
-        if (DEBUG) {
+        if (SimpleDiskLruCache.DEBUG) {
             CLog.d(LOG_TAG, "abortEdit: %s", cacheKey);
         }
         if (mNewCreateList.contains(cacheKey)) {
@@ -203,7 +202,7 @@ public final class LruActionTracer implements Runnable {
     }
 
     public void commitEdit(CacheEntry cacheEntry) throws IOException {
-        if (DEBUG) {
+        if (SimpleDiskLruCache.DEBUG) {
             CLog.d(LOG_TAG, "commitEdit: %s", cacheEntry.getKey());
         }
         mNewCreateList.remove(cacheEntry.getKey());
@@ -354,7 +353,10 @@ public final class LruActionTracer implements Runnable {
                 final byte action = message.mAction;
                 message.recycle();
 
-                CLog.d(LOG_TAG, "doAction: %s,\tkey: %s", sACTION_LIST[action], cacheEntry != null ? cacheEntry.getKey() : null);
+                if (SimpleDiskLruCache.DEBUG) {
+                    CLog.d(LOG_TAG, "doAction: %s,\tkey: %s",
+                            sACTION_LIST[action], cacheEntry != null ? cacheEntry.getKey() : null);
+                }
 
                 switch (action) {
                     case ACTION_READ:
@@ -390,7 +392,7 @@ public final class LruActionTracer implements Runnable {
     }
 
     private void waitJobDone() {
-        if (DEBUG) {
+        if (SimpleDiskLruCache.DEBUG) {
             CLog.d(LOG_TAG, "waitJobDone");
         }
         synchronized (mLock) {
@@ -404,7 +406,7 @@ public final class LruActionTracer implements Runnable {
                 }
             }
         }
-        if (DEBUG) {
+        if (SimpleDiskLruCache.DEBUG) {
             CLog.d(LOG_TAG, "job is done");
         }
     }
@@ -455,7 +457,7 @@ public final class LruActionTracer implements Runnable {
     private void trimToSize() throws IOException {
         synchronized (this) {
             if (mSize > mCapacity) {
-                if (DEBUG) {
+                if (SimpleDiskLruCache.DEBUG) {
                     CLog.d(LOG_TAG, "should trim, current is: %s", mSize);
                 }
             }
@@ -467,7 +469,7 @@ public final class LruActionTracer implements Runnable {
 
                 mSize -= cacheEntry.getSize();
                 addActionLog(ACTION_PENDING_DELETE, cacheEntry);
-                if (DEBUG) {
+                if (SimpleDiskLruCache.DEBUG) {
                     CLog.d(LOG_TAG, "pending remove: %s, size: %s, after remove total: %s", key, cacheEntry.getSize(), mSize);
                 }
             }
@@ -475,7 +477,7 @@ public final class LruActionTracer implements Runnable {
     }
 
     public synchronized boolean delete(String key) throws IOException {
-        if (DEBUG) {
+        if (SimpleDiskLruCache.DEBUG) {
             CLog.d(LOG_TAG, "delete: %s", key);
         }
         checkNotClosed();

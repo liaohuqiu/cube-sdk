@@ -3,7 +3,7 @@ package in.srain.cube.image.impl;
 import android.annotation.TargetApi;
 import android.os.Build;
 import in.srain.cube.concurrent.LinkedBlockingDeque;
-import in.srain.cube.image.ImageLoader.ImageTaskOrder;
+import in.srain.cube.image.ImageLoader;
 import in.srain.cube.image.iface.ImageTaskExecutor;
 import in.srain.cube.util.Version;
 
@@ -40,15 +40,15 @@ public class DefaultImageTaskExecutor implements ImageTaskExecutor {
     public static class LinkedBlockingStack<T> extends LinkedBlockingDeque<T> {
 
         private static final long serialVersionUID = -4114786347960826192L;
-        private ImageTaskOrder mImageTaskOrder = ImageTaskOrder.FIRST_IN_FIRST_OUT;
+        private int mImageTaskOrder = ImageLoader.TASK_ORDER_FIRST_IN_FIRST_OUT;
 
-        public void setTaskOrder(ImageTaskOrder order) {
+        public void setTaskOrder(int order) {
             mImageTaskOrder = order;
         }
 
         @Override
         public boolean offer(T e) {
-            if (mImageTaskOrder == ImageTaskOrder.LAST_IN_FIRST_OUT) {
+            if (mImageTaskOrder == ImageLoader.TASK_ORDER_FIRST_IN_FIRST_OUT) {
                 return super.offerFirst(e);
             } else {
                 return super.offer(e);
@@ -57,7 +57,7 @@ public class DefaultImageTaskExecutor implements ImageTaskExecutor {
 
         @Override
         public T remove() {
-            if (mImageTaskOrder == ImageTaskOrder.LAST_IN_FIRST_OUT) {
+            if (mImageTaskOrder == ImageLoader.TASK_ORDER_LAST_IN_FIRST_OUT) {
                 return super.removeFirst();
             } else {
                 return super.remove();
@@ -110,7 +110,7 @@ public class DefaultImageTaskExecutor implements ImageTaskExecutor {
     }
 
     @Override
-    public void setTaskOrder(ImageTaskOrder order) {
+    public void setTaskOrder(int order) {
         mTaskWorkQueue.setTaskOrder(order);
     }
 }

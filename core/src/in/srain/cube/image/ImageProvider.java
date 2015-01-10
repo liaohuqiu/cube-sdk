@@ -152,6 +152,9 @@ public class ImageProvider {
         }
     }
 
+    public void cancelTask(ImageTask task) {
+    }
+
     /**
      * Get Bitmap. If not exist in file cache, will try to re-use the file cache of the other sizes.
      * <p/>
@@ -229,8 +232,12 @@ public class ImageProvider {
             if (inputStream != null) {
                 try {
                     bitmap = decodeSampledBitmapFromDescriptor(inputStream.getFD(), imageTask, imageResizer);
+                    if (bitmap == null) {
+                        imageTask.setError(ImageTask.ERROR_BAD_FORMAT);
+                        CLog.e(TAG, "%s decode bitmap fail, bad format. %s, %s", imageTask, fileCacheKey, imageResizer.getRemoteUrl(imageTask));
+                    }
                 } catch (IOException e) {
-                    CLog.e(TAG, "%s decode bitmap fail. %s, %s", imageTask, fileCacheKey, imageResizer.getRemoteUrl(imageTask));
+                    CLog.e(TAG, "%s decode bitmap fail, may be out of memory. %s, %s", imageTask, fileCacheKey, imageResizer.getRemoteUrl(imageTask));
                     e.printStackTrace();
                 }
             } else {

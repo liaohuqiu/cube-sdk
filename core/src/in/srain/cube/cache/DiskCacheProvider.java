@@ -143,7 +143,7 @@ public class DiskCacheProvider {
         }
 
         @Override
-        public void onFinish() {
+        public void onFinish(boolean canceled) {
         }
 
         void executeNow() {

@@ -28,6 +28,12 @@
             <artifactId>support-v4</artifactId>
             <version>r7</version>
         </dependency>
+        <dependency>
+            <groupId>in.srain.cube</groupId>
+            <artifactId>clog</artifactId>
+            <version>1.0.2</version>
+            <scope>compile</scope>
+        </dependency>
 
     </dependencies>
 

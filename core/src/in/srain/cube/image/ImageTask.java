@@ -7,6 +7,7 @@ import in.srain.cube.util.CLog;
 import in.srain.cube.util.Debug;
 import in.srain.cube.util.Encrypt;
 
+import java.awt.*;
 import java.lang.ref.WeakReference;
 
 /**
@@ -30,8 +31,9 @@ public class ImageTask {
     // 0000 0111
     private static final int ERROR_CODE_MASK = 0x07;
 
-    // error code
+    // error code, max 0x07
     public final static int ERROR_NETWORK = 0x01;
+    public final static int ERROR_BAD_FORMAT = 0x02;
 
     /**
      * bits:
@@ -68,7 +70,10 @@ public class ImageTask {
 
     ImageTask next;
 
+    private boolean mHasRecycled = false;
+
     protected void clearForRecycle() {
+        mHasRecycled = true;
         mFlag = 0;
 
         mOriginUrl = null;
@@ -94,10 +99,11 @@ public class ImageTask {
                 sTop = m.next;
                 m.next = null;
                 sPoolSize--;
+                m.mHasRecycled = false;
+                if (Debug.DEBUG_IMAGE) {
+                    CLog.d(LOG_TAG, "%s, obtain reused, pool remain: %d", m, sPoolSize);
+                }
                 return m;
-            }
-            if (Debug.DEBUG_IMAGE) {
-                CLog.d(LOG_TAG, "obtain, pool remain: %d", sPoolSize);
             }
         }
         return null;
@@ -115,15 +121,26 @@ public class ImageTask {
                 next = sTop;
                 sTop = this;
                 sPoolSize++;
-            }
-            if (Debug.DEBUG_IMAGE) {
-                CLog.d(LOG_TAG, "recycle, pool remain: %d", sPoolSize);
+                if (Debug.DEBUG_IMAGE) {
+                    CLog.d(LOG_TAG, "%s is put to recycle poll, pool size: %d", this, sPoolSize);
+                } else {
+                    if (Debug.DEBUG_IMAGE) {
+                        CLog.d(LOG_TAG, "%s is not recycled, the poll is full: %d", this, sPoolSize);
+                    }
+                }
             }
         }
     }
 
     public ImageTask renew() {
-        mId = ++sId;
+        if (Debug.DEBUG_IMAGE) {
+            int lastId = mId;
+            mId = ++sId;
+            CLog.d(LOG_TAG, "%s, renew: %s => %s", this, lastId, mId);
+        } else {
+            mId = ++sId;
+        }
+        mStr = null;
         if (ImagePerformanceStatistics.sample(mId)) {
             mImageTaskStatistics = new ImageTaskStatistics();
         }
@@ -281,6 +298,11 @@ public class ImageTask {
         }
     }
 
+    /**
+     * When loading from network
+     *
+     * @param handler
+     */
     public void onLoading(ImageLoadHandler handler) {
         mFlag = mFlag | STATUS_LOADING;
 
@@ -469,7 +491,7 @@ public class ImageTask {
     @Override
     public String toString() {
         if (mStr == null) {
-            mStr = String.format("%s %sx%s", mId, mRequestSize.x, mRequestSize.y);
+            mStr = String.format("[ImageTask@%s %s %sx%s %s]", Integer.toHexString(hashCode()), mId, mRequestSize.x, mRequestSize.y, mHasRecycled);
         }
         return mStr;
     }
