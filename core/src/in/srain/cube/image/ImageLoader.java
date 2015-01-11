@@ -328,7 +328,7 @@ public class ImageLoader implements LifeCycleComponent {
                 mImageTask.onLoadTaskFinish(mDrawable, mImageLoader.mImageLoadHandler);
             }
 
-            removeAndRecycle();
+            mImageLoader.mLoadWorkList.remove(mImageTask.getIdentityKey());
         }
 
         @Override
@@ -338,13 +338,13 @@ public class ImageLoader implements LifeCycleComponent {
             }
             mImageLoader.getImageProvider().cancelTask(mImageTask);
             mImageTask.onLoadTaskCancel();
+            mImageLoader.mLoadWorkList.remove(mImageTask.getIdentityKey());
         }
 
         private void removeAndRecycle() {
             if (DEBUG) {
                 CLog.d(LOG_TAG, MSG_TASK_RECYCLE, this, mImageTask);
             }
-            mImageLoader.mLoadWorkList.remove(mImageTask.getIdentityKey());
             // unlink
             mImageLoader = null;
             mImageTask = null;
