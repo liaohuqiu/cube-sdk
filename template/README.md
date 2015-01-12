@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/etao-open-source/cube-sdk.svg?branch=dev)](https://travis-ci.org/etao-open-source/cube-sdk)
+
 ##[中文说明](https://github.com/etao-open-source/cube-sdk/blob/master/README-cn.md)
 
 

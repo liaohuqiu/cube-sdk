@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/etao-open-source/cube-sdk.svg?branch=dev)](https://travis-ci.org/etao-open-source/cube-sdk)
+
 Cube-SDK 是一个开发框架。这个框架致力于快速实现需求，解放生产力。
 
 ![Screen Shot](https://raw.githubusercontent.com/etao-open-source/cube-sdk/dev/screen-shot.png)

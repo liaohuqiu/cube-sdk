@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/etao-open-source/cube-sdk.svg?branch=dev)](https://travis-ci.org/etao-open-source/cube-sdk)
+
 Cube-SDK 是一个开发框架。这个框架致力于快速实现需求，解放生产力。
 
 ![Screen Shot](https://raw.githubusercontent.com/etao-open-source/cube-sdk/dev/screen-shot.png)
@@ -20,7 +22,7 @@ Demo 项目移到了这里: https://github.com/liaohuqiu/android-cube-app
     <groupId>in.srain.cube</groupId>
     <artifactId>cube-sdk</artifactId>
     <type>apklib</type>
-    <version>1.0.42</version>
+    <version>1.0.43-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -31,14 +33,14 @@ Demo 项目移到了这里: https://github.com/liaohuqiu/android-cube-app
     <groupId>in.srain.cube</groupId>
     <artifactId>cube-sdk</artifactId>
     <type>aar</type>
-    <version>1.0.42</version>
+    <version>1.0.43-SNAPSHOT</version>
 </dependency>
 ```
 
 ##### 在 Gradle / Android Studio
 
 ``` gradle 
-compile 'in.srain.cube:cube-sdk:1.0.42@aar'
+compile 'in.srain.cube:cube-sdk:1.0.43-SNAPSHOT@aar'
 `````
 
 ##### eclipse
