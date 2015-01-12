@@ -22,7 +22,7 @@ public abstract class LoadMoreContainerBase extends LinearLayout implements Load
     private View mFooterView;
 
     private AbsListView mAbsListView;
-    private int mPage = 0;
+    private boolean mListEmpty = true;
 
     public LoadMoreContainerBase(Context context) {
         super(context);
@@ -90,7 +90,7 @@ public abstract class LoadMoreContainerBase extends LinearLayout implements Load
 
         mIsLoading = true;
 
-        if (mLoadMoreUIHandler != null && (mPage != 0 || mShowLoadingForFirstPage)) {
+        if (mLoadMoreUIHandler != null && (!mListEmpty || mShowLoadingForFirstPage)) {
             mLoadMoreUIHandler.onLoading(this);
         }
         if (null != mLoadMoreHandler) {
@@ -160,17 +160,17 @@ public abstract class LoadMoreContainerBase extends LinearLayout implements Load
     /**
      * page has loaded
      *
-     * @param page    start from 0
+     * @param emptyResult
      * @param hasMore
      */
     @Override
-    public void loadMoreFinish(int page, boolean hasMore) {
-        mPage = page;
+    public void loadMoreFinish(boolean emptyResult, boolean hasMore) {
+        mListEmpty = emptyResult;
         mIsLoading = false;
         mHasMore = hasMore;
 
         if (mLoadMoreUIHandler != null) {
-            mLoadMoreUIHandler.onLoadFinish(this, page, hasMore);
+            mLoadMoreUIHandler.onLoadFinish(this, emptyResult, hasMore);
         }
     }
 

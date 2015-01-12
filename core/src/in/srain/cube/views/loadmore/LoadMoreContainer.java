@@ -20,8 +20,8 @@ public interface LoadMoreContainer {
     /**
      * page has loaded
      *
-     * @param page    start from 0
+     * @param emptyResult
      * @param hasMore
      */
-    public void loadMoreFinish(int page, boolean hasMore);
+    public void loadMoreFinish(boolean emptyResult, boolean hasMore);
 }

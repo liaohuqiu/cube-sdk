@@ -37,10 +37,10 @@ public class LoadMoreDefaultFooterView extends RelativeLayout implements LoadMor
     }
 
     @Override
-    public void onLoadFinish(LoadMoreContainer container, int page, boolean hasMore) {
+    public void onLoadFinish(LoadMoreContainer container, boolean empty, boolean hasMore) {
         if (!hasMore) {
             setVisibility(VISIBLE);
-            if (page == 0) {
+            if (empty) {
                 mTextView.setText(R.string.cube_views_load_more_loaded_empty);
             } else {
                 mTextView.setText(R.string.cube_views_load_more_loaded_no_more);

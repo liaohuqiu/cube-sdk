@@ -368,21 +368,23 @@ public class CacheManager {
             long timeInterval = System.currentTimeMillis() / 1000 - lastTime;
             boolean outOfDate = timeInterval > mCacheAble.getCacheTime() || timeInterval < 0;
 
-            switch (mConvertFor) {
-                case CONVERT_FOR_ASSERT:
-                    mCacheAble.onCacheData(CacheResultType.FROM_INIT_FILE, mResult, outOfDate);
-                    break;
-                case CONVERT_FOR_CREATE:
-                    mCacheAble.onCacheData(CacheResultType.FROM_CREATED, mResult, outOfDate);
-                    break;
-                case CONVERT_FOR_FILE:
-                    mCacheAble.onCacheData(CacheResultType.FROM_INIT_FILE, mResult, outOfDate);
-                    break;
-                case CONVERT_FOR_MEMORY:
-                    mCacheAble.onCacheData(CacheResultType.FROM_CACHE_FILE, mResult, outOfDate);
-                    break;
+            if (mResult != null) {
+                switch (mConvertFor) {
+                    case CONVERT_FOR_ASSERT:
+                        mCacheAble.onCacheData(CacheResultType.FROM_INIT_FILE, mResult, outOfDate);
+                        break;
+                    case CONVERT_FOR_CREATE:
+                        mCacheAble.onCacheData(CacheResultType.FROM_CREATED, mResult, outOfDate);
+                        break;
+                    case CONVERT_FOR_FILE:
+                        mCacheAble.onCacheData(CacheResultType.FROM_INIT_FILE, mResult, outOfDate);
+                        break;
+                    case CONVERT_FOR_MEMORY:
+                        mCacheAble.onCacheData(CacheResultType.FROM_CACHE_FILE, mResult, outOfDate);
+                        break;
+                }
             }
-            if (outOfDate) {
+            if (mResult == null || outOfDate) {
                 mCacheAble.createDataForCache(CacheManager.this);
             }
         }

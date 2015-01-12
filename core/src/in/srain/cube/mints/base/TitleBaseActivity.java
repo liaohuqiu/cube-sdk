@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import in.srain.cube.R;
 
@@ -58,6 +59,7 @@ public abstract class TitleBaseActivity extends MintsBaseActivity {
     @Override
     public void setContentView(int layoutResID) {
         View view = LayoutInflater.from(this).inflate(layoutResID, null);
+        view.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         mContentContainer.addView(view);
     }
 

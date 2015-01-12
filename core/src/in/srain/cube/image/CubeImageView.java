@@ -44,6 +44,10 @@ public class CubeImageView extends ImageView {
         super(context, attrs);
     }
 
+    public CubeImageView(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+    }
+
     /**
      * Notifies the drawable that it's displayed state has changed.
      *

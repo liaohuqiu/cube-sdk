@@ -184,7 +184,7 @@ public class ImageLoaderFactory {
         sStableImageProvider = imageProvider;
     }
 
-    private static ImageProvider getDefaultImageProvider(Context context) {
+    public static ImageProvider getDefaultImageProvider(Context context) {
         if (null == sDefaultImageProvider) {
             ImageDiskCacheProvider imageFileProvider = getImageFileProvider(context, null, 0, DEFAULT_FILE_CACHE_DIR);
             sDefaultImageProvider = new ImageProvider(context, getDefaultImageMemoryCache(), imageFileProvider);
@@ -192,7 +192,7 @@ public class ImageLoaderFactory {
         return sDefaultImageProvider;
     }
 
-    private static ImageProvider getStableImageProvider(Context context) {
+    public static ImageProvider getStableImageProvider(Context context) {
         if (null == sStableImageProvider) {
             ImageDiskCacheProvider imageFileProvider = getImageFileProvider(context, null, 0, STABLE_FILE_CACHE_DIR);
             sStableImageProvider = new ImageProvider(context, getDefaultImageMemoryCache(), imageFileProvider);
