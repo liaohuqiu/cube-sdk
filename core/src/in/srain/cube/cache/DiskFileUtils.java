@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
 import android.text.TextUtils;
+import in.srain.cube.util.CLog;
 import in.srain.cube.util.Version;
 
 import java.io.ByteArrayOutputStream;
@@ -16,6 +17,13 @@ import java.io.InputStream;
 
 public class DiskFileUtils {
 
+    /**
+     * @param context
+     * @param absolutePath         if it's not absolutePath, will be path under cache dir
+     * @param sizeInKB
+     * @param fallbackRelativePath
+     * @return
+     */
     public static CacheDirInfo getDiskCacheDir(
             Context context, String absolutePath, int sizeInKB,
             String fallbackRelativePath) {
@@ -41,6 +49,9 @@ public class DiskFileUtils {
 
         // it's relative path
         if (!done) {
+            if (TextUtils.isEmpty(fallbackRelativePath)) {
+                fallbackRelativePath = absolutePath;
+            }
             dirInfo = getDiskCacheDir(context, fallbackRelativePath, size);
         }
         return dirInfo;
@@ -103,6 +114,9 @@ public class DiskFileUtils {
             cacheDirInfo.path = new File(internalPath.getPath() + File.separator + uniqueName);
         } else {
             cacheDirInfo.path = new File(sdPath.getPath() + File.separator + uniqueName);
+        }
+        if (!cacheDirInfo.path.exists() && !cacheDirInfo.path.mkdirs()) {
+            CLog.e("cube-cache", "can not create directory for: %s", cacheDirInfo.path);
         }
         return cacheDirInfo;
     }

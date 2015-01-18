@@ -13,14 +13,24 @@ import java.io.IOException;
 
 public class DiskCacheProvider {
 
+    public interface AsyncTaskEventHandler {
+        public void onEvent(int type);
+    }
+
     protected static final boolean DEBUG = true;
     protected static final String TAG = "cube-file-cache";
 
-    protected static final byte TASK_INIT_CACHE = 1;
-    protected static final byte TASK_CLOSE_CACHE = 2;
-    protected static final byte TASK_FLUSH_CACHE = 3;
+    public static final byte TASK_INIT_CACHE = 1;
+    public static final byte TASK_CLOSE_CACHE = 2;
+    public static final byte TASK_FLUSH_CACHE = 3;
+
     protected DiskCache mDiskCache;
     private boolean mIsDelayFlushing = false;
+    private AsyncTaskEventHandler mAsyncTaskEventHandler;
+
+    public void setAsyncTaskEventHandler(AsyncTaskEventHandler handler) {
+        mAsyncTaskEventHandler = handler;
+    }
 
     public DiskCacheProvider(DiskCache diskCache) {
         mDiskCache = diskCache;
@@ -144,6 +154,9 @@ public class DiskCacheProvider {
 
         @Override
         public void onFinish(boolean canceled) {
+            if (mAsyncTaskEventHandler != null) {
+                mAsyncTaskEventHandler.onEvent(mTaskType);
+            }
         }
 
         void executeNow() {

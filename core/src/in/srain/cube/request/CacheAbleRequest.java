@@ -3,6 +3,7 @@ package in.srain.cube.request;
 import android.text.TextUtils;
 import in.srain.cube.cache.CacheManager;
 import in.srain.cube.cache.CacheResultType;
+import in.srain.cube.cache.ICacheAble;
 import in.srain.cube.concurrent.SimpleTask;
 import in.srain.cube.util.CLog;
 import in.srain.cube.util.Debug;
@@ -79,8 +80,9 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
     }
 
     @Override
-    public void useCacheAnyway(boolean use) {
+    public CacheAbleRequest<T> useCacheAnyway(boolean use) {
         mUseCacheAnyway = use;
+        return this;
     }
 
     @Override
@@ -91,11 +93,13 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
         if (hasBeenCanceled()) {
             return;
         }
-        mCacheData = data;
         if (null != mHandler) {
             mHandler.onRequestFinish(data);
-            if (!mHasTimeout && !mUseCacheAnyway) {
-                notifyRequestFinish(ResultType.USE_DATA_FROM_SERVER, false);
+
+            // cache data is not available or
+            // cache is available and time duration not reach timeout or not always use the cache
+            if (mCacheData == null || (!mHasTimeout && !mUseCacheAnyway)) {
+                notifyRequestFinish(ResultType.USE_DATA_FROM_SERVER, data, false);
             } else {
                 if (DEBUG) {
                     CLog.d(LOG_TAG, "%s, will not notifyRequestFinish", getCacheKey());
@@ -115,7 +119,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
         if (null != mHandler) {
             mHandler.onRequestFail(failData);
             if (mCacheData != null && !cacheIsDisabled() && !mUseCacheAnyway) {
-                notifyRequestFinish(ResultType.USE_CACHE_ON_FAIL, true);
+                notifyRequestFinish(ResultType.USE_CACHE_ON_FAIL, mCacheData, true);
             } else {
                 mHandler.onRequestFail(null);
             }
@@ -167,10 +171,10 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
             mHandler.onCacheData(data, outOfDate);
 
             if (mUseCacheAnyway) {
-                notifyRequestFinish(ResultType.USE_CACHE_ANYWAY, mOutOfDate);
+                notifyRequestFinish(ResultType.USE_CACHE_ANYWAY, data, mOutOfDate);
             } else {
                 if (!outOfDate) {
-                    notifyRequestFinish(ResultType.USE_CACHE_NOT_EXPIRED, false);
+                    notifyRequestFinish(ResultType.USE_CACHE_NOT_EXPIRED, data, false);
                 }
             }
         }
@@ -238,7 +242,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
      * @param type
      * @param outOfDate
      */
-    private void notifyRequestFinish(ResultType type, boolean outOfDate) {
+    private void notifyRequestFinish(ResultType type, T cacheData, boolean outOfDate) {
         if (DEBUG) {
             CLog.d(LOG_TAG, "%s, notifyRequestFinish: %s, %s", getCacheKey(), type, outOfDate);
         }
@@ -246,13 +250,13 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
             return;
         }
         mHasNotified = true;
-        mHandler.onCacheAbleRequestFinish(mCacheData, type, outOfDate);
+        mHandler.onCacheAbleRequestFinish(cacheData, type, outOfDate);
     }
 
     private void timeout() {
         mHasTimeout = true;
         if (mCacheData != null && mHandler != null) {
-            notifyRequestFinish(ResultType.USE_CACHE_ON_TIMEOUT, true);
+            notifyRequestFinish(ResultType.USE_CACHE_ON_TIMEOUT, mCacheData, true);
         }
     }
 
@@ -267,23 +271,27 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
         }
     }
 
-    public CacheAbleRequest setCacheKey(String cacheKey) {
+    @Override
+    public CacheAbleRequest<T> setCacheKey(String cacheKey) {
         mCacheKey = cacheKey;
         return this;
     }
 
-    public CacheAbleRequest setDisableCache(boolean disable) {
+    @Override
+    public CacheAbleRequest<T> setDisableCache(boolean disable) {
         mDisableCache = disable;
         return this;
     }
 
-    public CacheAbleRequest setInitDataPath(String path) {
+    @Override
+    public CacheAbleRequest<T> setAssertInitDataPath(String path) {
         mInitDataPath = path;
         return this;
     }
 
-    public CacheAbleRequest setCacheTime(long cacheTime) {
-        mCacheTime = cacheTime;
+    @Override
+    public CacheAbleRequest<T> setCacheTime(long time) {
+        mCacheTime = time;
         return this;
     }
 }

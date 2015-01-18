@@ -19,8 +19,6 @@ public class CacheManager {
     private static final boolean DEBUG = Debug.DEBUG_CACHE;
     private static final String LOG_TAG = "cube-cache";
 
-    private static final String DEFAULT_CACHE_DIR = "cube-cache";
-
     private static final int DEFAULT_CACHE_SIZE_IN_KB = 1024 * 10;
 
     private static final byte AFTER_READ_FROM_FILE = 0x01;
@@ -53,7 +51,7 @@ public class CacheManager {
             fileCacheSizeInKB = DEFAULT_CACHE_SIZE_IN_KB;
         }
 
-        DiskFileUtils.CacheDirInfo cacheDirInfo = DiskFileUtils.getDiskCacheDir(content, cacheDir, fileCacheSizeInKB, DEFAULT_CACHE_DIR);
+        DiskFileUtils.CacheDirInfo cacheDirInfo = DiskFileUtils.getDiskCacheDir(content, cacheDir, fileCacheSizeInKB, null);
         mFileCache = DiskCacheProvider.createLru(content, cacheDirInfo.path, cacheDirInfo.realSize);
         mFileCache.openDiskCacheAsync();
 
@@ -388,5 +386,9 @@ public class CacheManager {
                 mCacheAble.createDataForCache(CacheManager.this);
             }
         }
+    }
+
+    public DiskCacheProvider getFileCache() {
+        return mFileCache;
     }
 }

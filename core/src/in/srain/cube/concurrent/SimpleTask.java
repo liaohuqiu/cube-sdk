@@ -97,6 +97,10 @@ public abstract class SimpleTask implements Runnable {
         }
     }
 
+    public static void prepare() {
+        // do nothing, but warm Handler up
+    }
+
     private static class InternalHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
