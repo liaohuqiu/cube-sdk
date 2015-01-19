@@ -25,8 +25,9 @@ import java.io.IOException;
 
 public final class SimpleDiskLruCache implements DiskCache {
 
-    private static final String LOG_TAG = "simple-lru";
+    public static final String LOG_TAG = "cube-disk-cache-simple-lru";
     public static boolean DEBUG = false;
+    private String mString;
 
     private LruActionTracer mActionTracer;
 
@@ -78,18 +79,14 @@ public final class SimpleDiskLruCache implements DiskCache {
         return mActionTracer.beginEdit(key);
     }
 
-    /**
-     * abort edit
-     *
-     * @param cacheEntry
-     */
     @Override
     public void abortEdit(CacheEntry cacheEntry) {
         mActionTracer.abortEdit(cacheEntry);
     }
 
+    @Override
     public void abortEdit(String key) {
-
+        mActionTracer.abortEdit(key);
     }
 
     @Override
@@ -143,5 +140,13 @@ public final class SimpleDiskLruCache implements DiskCache {
     @Override
     public synchronized void close() throws IOException {
         mActionTracer.close();
+    }
+
+    @Override
+    public String toString() {
+        if (mString == null) {
+            mString = String.format("[SimpleDiskLruCache/%s@%s]", getDirectory().getName(), Integer.toHexString(hashCode()));
+        }
+        return mString;
     }
 }

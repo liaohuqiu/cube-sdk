@@ -62,6 +62,16 @@ public interface DiskCache {
      */
     public void abortEdit(CacheEntry cacheEntry);
 
+    /**
+     * abort edit by key
+     *
+     * @param key
+     */
+    public void abortEdit(String key);
+
+    /**
+     * abort edit by key
+     */
     public void commitEdit(CacheEntry cacheEntry) throws IOException;
 
     /**

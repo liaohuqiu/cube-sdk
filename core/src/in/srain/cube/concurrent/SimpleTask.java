@@ -1,6 +1,7 @@
 package in.srain.cube.concurrent;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import in.srain.cube.util.CLog;
 
@@ -24,7 +25,11 @@ public abstract class SimpleTask implements Runnable {
     private static final int STATE_CANCELLED = 0x08;
 
     private static final int MSG_TASK_DONE = 0x01;
-    private static InternalHandler sHandler = new InternalHandler();
+    private static InternalHandler sHandler = null;
+
+    static {
+        sHandler = new InternalHandler(Looper.getMainLooper());
+    }
 
     private Thread mCurrentThread;
     private AtomicInteger mState = new AtomicInteger(STATE_NEW);
@@ -97,11 +102,12 @@ public abstract class SimpleTask implements Runnable {
         }
     }
 
-    public static void prepare() {
-        // do nothing, but warm Handler up
-    }
-
     private static class InternalHandler extends Handler {
+
+        InternalHandler(Looper looper) {
+            super(looper);
+        }
+
         @Override
         public void handleMessage(Message msg) {
             SimpleTask work = (SimpleTask) msg.obj;

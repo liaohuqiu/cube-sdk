@@ -1,12 +1,12 @@
 package in.srain.cube.cache;
 
 import android.content.Context;
-import android.util.Log;
 import in.srain.cube.concurrent.SimpleExecutor;
 import in.srain.cube.concurrent.SimpleTask;
 import in.srain.cube.diskcache.CacheEntry;
 import in.srain.cube.diskcache.DiskCache;
 import in.srain.cube.diskcache.lru.SimpleDiskLruCache;
+import in.srain.cube.util.CLog;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,8 +17,8 @@ public class DiskCacheProvider {
         public void onEvent(int type);
     }
 
-    protected static final boolean DEBUG = true;
-    protected static final String TAG = "cube-file-cache";
+    public static final boolean DEBUG = true;
+    protected static final String LOG_TAG = "cube-disk-cache-provider";
 
     public static final byte TASK_INIT_CACHE = 1;
     public static final byte TASK_CLOSE_CACHE = 2;
@@ -26,6 +26,10 @@ public class DiskCacheProvider {
 
     protected DiskCache mDiskCache;
     private boolean mIsDelayFlushing = false;
+    private final Object mDiskCacheLock = new Object();
+    private boolean mDiskCacheStarting = true;
+    private boolean mDiskCacheReady = false;
+
     private AsyncTaskEventHandler mAsyncTaskEventHandler;
 
     public void setAsyncTaskEventHandler(AsyncTaskEventHandler handler) {
@@ -47,7 +51,7 @@ public class DiskCacheProvider {
             return;
         }
         try {
-            CacheEntry cacheEntry = mDiskCache.beginEdit(key);
+            CacheEntry cacheEntry = getDiskCache().beginEdit(key);
             cacheEntry.setString(str);
             cacheEntry.commit();
         } catch (IOException e) {
@@ -57,7 +61,7 @@ public class DiskCacheProvider {
 
     public String read(String fileCacheKey) {
         try {
-            CacheEntry cacheEntry = mDiskCache.getEntry(fileCacheKey);
+            CacheEntry cacheEntry = getDiskCache().getEntry(fileCacheKey);
             if (cacheEntry != null) {
                 return cacheEntry.getString();
             }
@@ -72,9 +76,12 @@ public class DiskCacheProvider {
      */
     public void openDiskCacheAsync() {
         if (DEBUG) {
-            Log.d(TAG, "initDiskCacheAsync " + this);
+            CLog.d(LOG_TAG, "%s: initDiskCacheAsync", mDiskCache);
         }
-        new FileCacheTask(TASK_INIT_CACHE).executeNow();
+        synchronized (mDiskCacheLock) {
+            mDiskCacheStarting = true;
+            new FileCacheTask(TASK_INIT_CACHE).executeNow();
+        }
     }
 
     /**
@@ -82,7 +89,7 @@ public class DiskCacheProvider {
      */
     public void closeDiskCacheAsync() {
         if (DEBUG) {
-            Log.d(TAG, "closeDiskCacheAsync");
+            CLog.d(LOG_TAG, "%s: closeDiskCacheAsync", mDiskCache);
         }
         new FileCacheTask(TASK_CLOSE_CACHE).executeNow();
     }
@@ -92,7 +99,7 @@ public class DiskCacheProvider {
      */
     public void flushDiskCacheAsync() {
         if (DEBUG) {
-            Log.d(TAG, "flushDishCacheAsync");
+            CLog.d(LOG_TAG, "%s, flushDishCacheAsync", mDiskCache);
         }
         new FileCacheTask(TASK_FLUSH_CACHE).executeNow();
     }
@@ -102,7 +109,7 @@ public class DiskCacheProvider {
      */
     public void flushDiskCacheAsyncWithDelay(int delay) {
         if (DEBUG) {
-            Log.d(TAG, "flushDishCacheAsync");
+            CLog.d(LOG_TAG, "%s, flushDiskCacheAsyncWithDelay", delay);
         }
         if (mIsDelayFlushing) {
             return;
@@ -111,7 +118,29 @@ public class DiskCacheProvider {
         new FileCacheTask(TASK_FLUSH_CACHE).executeAfter(delay);
     }
 
+    /**
+     * If disk is not read, will prepare it first.
+     *
+     * @return
+     */
     public DiskCache getDiskCache() {
+        if (!mDiskCacheReady) {
+            if (DEBUG) {
+                CLog.d(LOG_TAG, "%s, try to access disk cache, but it is not open, try to open it.", mDiskCache);
+            }
+            openDiskCacheAsync();
+        }
+        synchronized (mDiskCacheLock) {
+            while (mDiskCacheStarting) {
+                try {
+                    if (DEBUG) {
+                        CLog.d(LOG_TAG, "%s, try to access, but disk cache is not ready, wait", mDiskCache);
+                    }
+                    mDiskCacheLock.wait();
+                } catch (InterruptedException e) {
+                }
+            }
+        }
         return mDiskCache;
     }
 
@@ -139,7 +168,20 @@ public class DiskCacheProvider {
         private void doWork() throws IOException {
             switch (mTaskType) {
                 case TASK_INIT_CACHE:
-                    mDiskCache.open();
+
+                    synchronized (mDiskCacheLock) {
+                        if (DEBUG) {
+                            CLog.d(LOG_TAG, "begin open disk cache: " + mDiskCache);
+                        }
+                        mDiskCache.open();
+                        mDiskCacheReady = true;
+                        mDiskCacheStarting = false;
+                        if (DEBUG) {
+                            CLog.d(LOG_TAG, "disk cache open successfully, notify all lock: " + mDiskCache);
+                        }
+                        mDiskCacheLock.notifyAll();
+                    }
+
                     break;
                 case TASK_CLOSE_CACHE:
                     mDiskCache.close();

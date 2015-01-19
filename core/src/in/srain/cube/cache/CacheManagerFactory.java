@@ -19,6 +19,6 @@ public class CacheManagerFactory {
     }
 
     public static void initDefaultCache(Context content, String cacheDir, int memoryCacheSizeInKB, int fileCacheSizeInKB) {
-        sDefault = new CacheManager(content, cacheDir, memoryCacheSizeInKB, fileCacheSizeInKB);
+        sDefault = CacheManager.create(content, cacheDir, memoryCacheSizeInKB, fileCacheSizeInKB);
     }
 }

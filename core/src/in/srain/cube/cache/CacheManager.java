@@ -17,7 +17,7 @@ import java.io.IOException;
 public class CacheManager {
 
     private static final boolean DEBUG = Debug.DEBUG_CACHE;
-    private static final String LOG_TAG = "cube-cache";
+    private static final String LOG_TAG = "cube-cache-manager";
 
     private static final int DEFAULT_CACHE_SIZE_IN_KB = 1024 * 10;
 
@@ -33,11 +33,16 @@ public class CacheManager {
     private static final byte CONVERT_FOR_FILE = 0x01;
     private static final byte CONVERT_FOR_ASSERT = 0x02;
     private static final byte CONVERT_FOR_CREATE = 0x04;
+
     private LruCache<String, CacheInfo> mMemoryCache;
     private DiskCacheProvider mFileCache;
     private Context mContext;
 
-    public CacheManager(Context content, String cacheDir, int memoryCacheSizeInKB, int fileCacheSizeInKB) {
+    public static CacheManager create(Context content, String cacheDir, int memoryCacheSizeInKB, int fileCacheSizeInKB) {
+        return new CacheManager(content, cacheDir, memoryCacheSizeInKB, fileCacheSizeInKB);
+    }
+
+    private CacheManager(Context content, String cacheDir, int memoryCacheSizeInKB, int fileCacheSizeInKB) {
         mContext = content;
 
         mMemoryCache = new LruCache<String, CacheInfo>(memoryCacheSizeInKB * 1024) {
@@ -53,11 +58,11 @@ public class CacheManager {
 
         DiskFileUtils.CacheDirInfo cacheDirInfo = DiskFileUtils.getDiskCacheDir(content, cacheDir, fileCacheSizeInKB, null);
         mFileCache = DiskCacheProvider.createLru(content, cacheDirInfo.path, cacheDirInfo.realSize);
-        mFileCache.openDiskCacheAsync();
+        // mFileCache.openDiskCacheAsync();
 
         if (DEBUG) {
             CLog.d(LOG_TAG,
-                    "init file cache. dir: %s => %s, size: %s => %s",
+                    "CacheManger: cache dir: %s => %s, size: %s => %s",
                     cacheDir, cacheDirInfo.path, cacheDirInfo.requireSize, cacheDirInfo.realSize);
         }
     }
@@ -78,7 +83,7 @@ public class CacheManager {
             return;
         }
         if (DEBUG) {
-            CLog.d(LOG_TAG, "%s, setCacheData", cacheKey);
+            CLog.d(LOG_TAG, "key: %s, setCacheData", cacheKey);
         }
         SimpleExecutor.getInstance().execute(
 
@@ -99,7 +104,7 @@ public class CacheManager {
             return;
         }
         if (DEBUG) {
-            CLog.d(LOG_TAG, "%s, set cache to runtime cache list", key);
+            CLog.d(LOG_TAG, "key: %s, set cache to runtime cache list", key);
         }
         mMemoryCache.put(key, data);
     }
@@ -111,7 +116,7 @@ public class CacheManager {
      */
     public void invalidateCache(String key) {
         if (DEBUG) {
-            CLog.d(LOG_TAG, "%s, invalidateCache", key);
+            CLog.d(LOG_TAG, "key: %s, invalidateCache", key);
         }
         try {
             mFileCache.getDiskCache().delete(key);
@@ -212,7 +217,7 @@ public class CacheManager {
 
             if (mCacheAble.cacheIsDisabled()) {
                 if (DEBUG) {
-                    CLog.d(LOG_TAG, "%s, Cache is disabled, query from server", mCacheAble.getCacheKey());
+                    CLog.d(LOG_TAG, "key: %s, Cache is disabled, query from server", mCacheAble.getCacheKey());
                 }
                 mCacheAble.createDataForCache(CacheManager.this);
                 return;
@@ -224,7 +229,7 @@ public class CacheManager {
             mRawData = mMemoryCache.get(cacheKey);
             if (mRawData != null) {
                 if (DEBUG) {
-                    CLog.d(LOG_TAG, "%s, exist in list", mCacheAble.getCacheKey());
+                    CLog.d(LOG_TAG, "key: %s, exist in list", mCacheAble.getCacheKey());
                 }
                 beginConvertDataAsync(CONVERT_FOR_MEMORY);
                 return;
@@ -245,7 +250,7 @@ public class CacheManager {
             }
 
             if (DEBUG) {
-                CLog.d(LOG_TAG, "%s, cache file not exist", mCacheAble.getCacheKey());
+                CLog.d(LOG_TAG, "key: %s, cache file not exist", mCacheAble.getCacheKey());
             }
             mCacheAble.createDataForCache(CacheManager.this);
         }
@@ -253,7 +258,7 @@ public class CacheManager {
         @Override
         public void doInBackground() {
             if (DEBUG) {
-                CLog.d(LOG_TAG, "%s, doInBackground: mWorkType: %s", mCacheAble.getCacheKey(), mWorkType);
+                CLog.d(LOG_TAG, "key: %s, doInBackground: mWorkType: %s", mCacheAble.getCacheKey(), mWorkType);
             }
             switch (mWorkType) {
 
@@ -298,7 +303,7 @@ public class CacheManager {
 
         private void beginQueryFromCacheFileAsync() {
             if (DEBUG) {
-                CLog.d(LOG_TAG, "%s, beginQueryFromCacheFileAsync", mCacheAble.getCacheKey());
+                CLog.d(LOG_TAG, "key: %s, beginQueryFromCacheFileAsync", mCacheAble.getCacheKey());
             }
             mWorkType = DO_READ_FROM_FILE;
             restart();
@@ -307,7 +312,7 @@ public class CacheManager {
 
         private void beginQueryFromAssertCacheFileAsync() {
             if (DEBUG) {
-                CLog.d(LOG_TAG, "%s, beginQueryFromAssertCacheFileAsync", mCacheAble.getCacheKey());
+                CLog.d(LOG_TAG, "key: %s, beginQueryFromAssertCacheFileAsync", mCacheAble.getCacheKey());
             }
             mWorkType = DO_READ_FROM_ASSERT;
             restart();
@@ -316,7 +321,7 @@ public class CacheManager {
 
         private void beginConvertDataAsync(byte convertFor) {
             if (DEBUG) {
-                CLog.d(LOG_TAG, "%s, beginConvertDataAsync", mCacheAble.getCacheKey());
+                CLog.d(LOG_TAG, "key: %s, beginConvertDataAsync", mCacheAble.getCacheKey());
             }
             mConvertFor = convertFor;
             mWorkType = DO_CONVERT;
@@ -326,7 +331,7 @@ public class CacheManager {
 
         private void doQueryFromCacheFileInBackground() {
             if (DEBUG) {
-                CLog.d(LOG_TAG, "%s, try read cache data from file", mCacheAble.getCacheKey());
+                CLog.d(LOG_TAG, "key: %s, try read cache data from file", mCacheAble.getCacheKey());
             }
 
             String cacheContent = mFileCache.read(mCacheAble.getCacheKey());
@@ -337,7 +342,7 @@ public class CacheManager {
         private void doQueryFromAssertCacheFileInBackground() {
 
             if (DEBUG) {
-                CLog.d(LOG_TAG, "%s, try read cache data from assert file", mCacheAble.getCacheKey());
+                CLog.d(LOG_TAG, "key: %s, try read cache data from assert file", mCacheAble.getCacheKey());
             }
 
             String cacheContent = DiskFileUtils.readAssert(mContext, mCacheAble.getAssertInitDataPath());
@@ -347,7 +352,7 @@ public class CacheManager {
 
         private void doConvertDataInBackground() {
             if (DEBUG) {
-                CLog.d(LOG_TAG, "%s, doConvertDataInBackground", mCacheAble.getCacheKey());
+                CLog.d(LOG_TAG, "key: %s, doConvertDataInBackground", mCacheAble.getCacheKey());
             }
             JsonData data = JsonData.create(mRawData.getData());
             mResult = mCacheAble.processRawDataFromCache(data);
@@ -356,7 +361,7 @@ public class CacheManager {
         private void setCurrentStatus(byte status) {
             mCurrentStatus = status;
             if (DEBUG) {
-                CLog.d(LOG_TAG, "%s, setCurrentStatus: %s", mCacheAble.getCacheKey(), status);
+                CLog.d(LOG_TAG, "key: %s, setCurrentStatus: %s", mCacheAble.getCacheKey(), status);
             }
         }
 
@@ -388,7 +393,7 @@ public class CacheManager {
         }
     }
 
-    public DiskCacheProvider getFileCache() {
+    public DiskCacheProvider getDiskCacheProvider() {
         return mFileCache;
     }
 }
