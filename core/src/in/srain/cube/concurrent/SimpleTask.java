@@ -122,6 +122,10 @@ public abstract class SimpleTask implements Runnable {
         }
     }
 
+    public static void post(Runnable r) {
+        sHandler.post(r);
+    }
+
     public static void postDelay(Runnable r, long delayMillis) {
         sHandler.postDelayed(r, delayMillis);
     }

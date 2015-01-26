@@ -162,6 +162,7 @@ public class ImageLoader implements LifeCycleComponent {
                     CLog.d(LOG_TAG, MSG_ATTACK_TO_RUNNING_TASK, imageTask, runningTask.getImageTask());
                 }
                 runningTask.getImageTask().addImageView(imageView);
+                runningTask.getImageTask().notifyLoading(mImageLoadHandler, imageView);
             }
             return;
         } else {

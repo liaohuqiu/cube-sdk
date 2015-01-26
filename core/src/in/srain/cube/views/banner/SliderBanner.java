@@ -14,7 +14,6 @@ import in.srain.cube.views.mix.AutoPlayer;
 
 public class SliderBanner extends RelativeLayout {
 
-
     protected int mIdForViewPager;
     protected int mIdForIndicator;
     protected int mTimeInterval = 2000;

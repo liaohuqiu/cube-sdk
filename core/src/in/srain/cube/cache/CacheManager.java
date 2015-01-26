@@ -38,10 +38,6 @@ public class CacheManager {
     private DiskCacheProvider mFileCache;
     private Context mContext;
 
-    public static CacheManager create(Context content, String cacheDir, int memoryCacheSizeInKB, int fileCacheSizeInKB) {
-        return new CacheManager(content, cacheDir, memoryCacheSizeInKB, fileCacheSizeInKB);
-    }
-
     private CacheManager(Context content, String cacheDir, int memoryCacheSizeInKB, int fileCacheSizeInKB) {
         mContext = content;
 
@@ -65,6 +61,10 @@ public class CacheManager {
                     "CacheManger: cache dir: %s => %s, size: %s => %s",
                     cacheDir, cacheDirInfo.path, cacheDirInfo.requireSize, cacheDirInfo.realSize);
         }
+    }
+
+    public static CacheManager create(Context content, String cacheDir, int memoryCacheSizeInKB, int fileCacheSizeInKB) {
+        return new CacheManager(content, cacheDir, memoryCacheSizeInKB, fileCacheSizeInKB);
     }
 
     public <T> void requestCache(ICacheAble<T> cacheAble) {
@@ -199,6 +199,61 @@ public class CacheManager {
         return 0;
     }
 
+    /**
+     * Request cache
+     *
+     * @param cacheAble
+     * @param <T>
+     * @return if not cache data available, return null
+     */
+    @SuppressWarnings({"unused"})
+    public <T> T requestCacheSync(ICacheAble<T> cacheAble) {
+
+        // try to find in runtime cache
+        String cacheKey = cacheAble.getCacheKey();
+        CacheInfo mRawData = mMemoryCache.get(cacheKey);
+        if (mRawData != null) {
+            if (DEBUG) {
+                CLog.d(LOG_TAG, "key: %s, exist in list", cacheKey);
+            }
+            return convertResultFromCacheInfo(cacheAble, mRawData);
+        }
+
+        // try read from cache data
+        boolean hasFileCache = mFileCache.getDiskCache().has(cacheKey);
+        if (hasFileCache) {
+            String cacheContent = mFileCache.read(cacheKey);
+            JsonData jsonData = JsonData.create(cacheContent);
+            mRawData = CacheInfo.createFromJson(jsonData);
+
+            return convertResultFromCacheInfo(cacheAble, mRawData);
+        }
+
+        // try to read from assert cache file
+        String assertInitDataPath = cacheAble.getAssertInitDataPath();
+        if (assertInitDataPath != null && assertInitDataPath.length() > 0) {
+            String cacheContent = DiskFileUtils.readAssert(mContext, assertInitDataPath);
+            mRawData = CacheInfo.createInvalidated(cacheContent);
+            putDataToMemoryCache(cacheKey, mRawData);
+            return convertResultFromCacheInfo(cacheAble, mRawData);
+        }
+
+        if (DEBUG) {
+            CLog.d(LOG_TAG, "key: %s, cache file not exist", cacheKey);
+        }
+        return null;
+    }
+
+    private <T> T convertResultFromCacheInfo(ICacheAble<T> cacheAble, CacheInfo rawData) {
+        JsonData data = JsonData.create(rawData.getData());
+        T mResult = cacheAble.processRawDataFromCache(data);
+        return mResult;
+    }
+
+    public DiskCacheProvider getDiskCacheProvider() {
+        return mFileCache;
+    }
+
     private class InnerCacheTask<T1> extends SimpleTask {
 
         private ICacheAble<T1> mCacheAble;
@@ -215,28 +270,27 @@ public class CacheManager {
 
         void beginQuery() {
 
+            String cacheKey = mCacheAble.getCacheKey();
             if (mCacheAble.cacheIsDisabled()) {
                 if (DEBUG) {
-                    CLog.d(LOG_TAG, "key: %s, Cache is disabled, query from server", mCacheAble.getCacheKey());
+                    CLog.d(LOG_TAG, "key: %s, Cache is disabled, query from server", cacheKey);
                 }
                 mCacheAble.createDataForCache(CacheManager.this);
                 return;
             }
 
-            String cacheKey = mCacheAble.getCacheKey();
-
             // try to find in runtime cache
             mRawData = mMemoryCache.get(cacheKey);
             if (mRawData != null) {
                 if (DEBUG) {
-                    CLog.d(LOG_TAG, "key: %s, exist in list", mCacheAble.getCacheKey());
+                    CLog.d(LOG_TAG, "key: %s, exist in list", cacheKey);
                 }
                 beginConvertDataAsync(CONVERT_FOR_MEMORY);
                 return;
             }
 
             // try read from cache data
-            boolean hasFileCache = mFileCache.getDiskCache().has(mCacheAble.getCacheKey());
+            boolean hasFileCache = mFileCache.getDiskCache().has(cacheKey);
             if (hasFileCache) {
                 beginQueryFromCacheFileAsync();
                 return;
@@ -391,9 +445,5 @@ public class CacheManager {
                 mCacheAble.createDataForCache(CacheManager.this);
             }
         }
-    }
-
-    public DiskCacheProvider getDiskCacheProvider() {
-        return mFileCache;
     }
 }

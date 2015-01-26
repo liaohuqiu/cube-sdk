@@ -17,7 +17,7 @@ public abstract class BlockListAdapter<T> {
     private int mWidthSpace = 0;
     private int mHeightSpace = 0;
 
-    private int mCloumnNum = 0;
+    private int mColumnNum = 0;
 
     public BlockListAdapter() {
     }
@@ -75,10 +75,10 @@ public abstract class BlockListAdapter<T> {
     }
 
     public void setColumnNum(int num) {
-        mCloumnNum = num;
+        mColumnNum = num;
     }
 
     public int getCloumnNum() {
-        return mCloumnNum;
+        return mColumnNum;
     }
 }

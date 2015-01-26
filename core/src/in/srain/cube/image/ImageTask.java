@@ -2,6 +2,7 @@ package in.srain.cube.image;
 
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
+import android.widget.ImageView;
 import in.srain.cube.image.iface.ImageLoadHandler;
 import in.srain.cube.util.CLog;
 import in.srain.cube.util.Debug;
@@ -320,6 +321,19 @@ public class ImageTask {
                 }
             } while ((holder = holder.mNext) != null);
         }
+    }
+
+    /**
+     * notify loading
+     *
+     * @param handler
+     * @param imageView
+     */
+    public void notifyLoading(ImageLoadHandler handler, CubeImageView imageView) {
+        if (handler == null || imageView == null) {
+            return;
+        }
+        handler.onLoading(this, imageView);
     }
 
     /**
