@@ -14,16 +14,6 @@ public class DefaultMemoryCache implements ImageMemoryCache {
     protected static final String LOG_TAG = Debug.DEBUG_IMAGE_LOG_TAG_PROVIDER;
     private LruCache<String, BitmapDrawable> mMemoryCache;
 
-    private static DefaultMemoryCache sDefault;
-
-    public static DefaultMemoryCache getDefault() {
-        if (null == sDefault) {
-            int size = Math.round(0.2f * Runtime.getRuntime().maxMemory() / 1024);
-            sDefault = new DefaultMemoryCache(size);
-        }
-        return sDefault;
-    }
-
     public DefaultMemoryCache(int cacheSizeInKB) {
 
         // Set up memory cache

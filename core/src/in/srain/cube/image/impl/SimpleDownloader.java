@@ -2,6 +2,7 @@ package in.srain.cube.image.impl;
 
 import android.os.Build;
 import android.util.Log;
+import in.srain.cube.util.CLog;
 import in.srain.cube.util.Debug;
 
 import java.io.*;
@@ -32,15 +33,18 @@ public class SimpleDownloader {
         try {
             final URL url = new URL(urlString);
             urlConnection = (HttpURLConnection) url.openConnection();
+            int len = urlConnection.getContentLength();
+            int total = 0;
             in = new BufferedInputStream(urlConnection.getInputStream(), IO_BUFFER_SIZE);
             out = new BufferedOutputStream(outputStream, IO_BUFFER_SIZE);
             int b;
             while ((b = in.read()) != -1) {
+                total++;
                 out.write(b);
             }
             return true;
         } catch (final IOException e) {
-            Log.e(LOG_TAG, "Error in downloadBitmap - " + e);
+            CLog.e(LOG_TAG, "Error in downloadBitmap - " + e);
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();

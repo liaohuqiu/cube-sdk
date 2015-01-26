@@ -8,16 +8,39 @@ import in.srain.cube.request.JsonData;
 public interface ICacheAble<T> {
 
     /**
+     * set cache time, in seconds
+     *
+     * @param time
+     * @return
+     */
+    public ICacheAble<T> setCacheTime(long time);
+
+    /**
      * In seconds
      *
      * @return
      */
     public long getCacheTime();
 
+    public ICacheAble<T> setCacheKey(String key);
+
     public String getCacheKey();
 
     /**
-     * file path under /res, For example: "/cache_init/test.json";
+     * Using cache data if existent, ignore whether it is expired or not.
+     *
+     * @param use
+     */
+    public ICacheAble<T> useCacheAnyway(boolean use);
+
+    /**
+     * @param path file path under /res, For example: "/cache_init/test.json";
+     * @return
+     */
+    public ICacheAble<T> setAssertInitDataPath(String path);
+
+    /**
+     * @return file path under /res, For example: "/cache_init/test.json";
      */
     public String getAssertInitDataPath();
 
@@ -41,8 +64,10 @@ public interface ICacheAble<T> {
      */
     public void createDataForCache(CacheManager cacheManager);
 
+    public ICacheAble<T> setDisableCache(boolean disable);
+
     /**
-     * temporarily disable cache. The data will no be load from cache and will also not put into cache
+     * temporarily disable cache. The data will no be load from cache and will also not be put into cache
      *
      * @return
      */

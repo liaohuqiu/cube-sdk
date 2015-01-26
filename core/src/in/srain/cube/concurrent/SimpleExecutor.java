@@ -35,7 +35,7 @@ public class SimpleExecutor {
     @TargetApi(Build.VERSION_CODES.GINGERBREAD)
     private SimpleExecutor() {
         mTaskWorkQueue = new LinkedBlockingQueue<Runnable>();
-        mThreadPool = new ThreadPoolExecutor(1, 1, KEEP_ALIVE_TIME, KEEP_ALIVE_TIME_UNIT, mTaskWorkQueue, new DefaultThreadFactory());
+        mThreadPool = new ThreadPoolExecutor(2, 4, KEEP_ALIVE_TIME, KEEP_ALIVE_TIME_UNIT, mTaskWorkQueue, new DefaultThreadFactory());
         if (Version.hasGingerbread()) {
             mThreadPool.allowCoreThreadTimeOut(true);
         }
@@ -46,7 +46,7 @@ public class SimpleExecutor {
      */
     static class DefaultThreadFactory implements ThreadFactory {
         private static final AtomicInteger poolNumber = new AtomicInteger(1);
-        private static final String sPre = "simple-excutor-pool-";
+        private static final String sPre = "simple-executor-pool-";
         private static final String sPost = "-thread-";
         private final ThreadGroup group;
         private final AtomicInteger threadNumber = new AtomicInteger(1);

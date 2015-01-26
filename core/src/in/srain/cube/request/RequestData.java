@@ -51,32 +51,36 @@ public class RequestData {
         return sb.toString();
     }
 
-    public void addPostData(String key, Object data) {
+    public RequestData addPostData(String key, Object data) {
         if (mPostData == null) {
             mPostData = new HashMap<String, Object>();
         }
         mPostData.put(key, data);
+        return this;
     }
 
-    public void addPostData(Map<String, ?> data) {
+    public RequestData addPostData(Map<String, ?> data) {
         if (mPostData == null) {
             mPostData = new HashMap<String, Object>();
         }
         mPostData.putAll(data);
+        return this;
     }
 
-    public void addQueryData(String key, Object data) {
+    public RequestData addQueryData(String key, Object data) {
         if (mQueryData == null) {
             mQueryData = new HashMap<String, Object>();
         }
         mQueryData.put(key, data);
+        return this;
     }
 
-    public void addQueryData(Map<String, ?> data) {
+    public RequestData addQueryData(Map<String, ?> data) {
         if (mQueryData == null) {
             mQueryData = new HashMap<String, Object>();
         }
         mQueryData.putAll(data);
+        return this;
     }
 
     public String getRequestUrl() {
@@ -86,8 +90,9 @@ public class RequestData {
         return mUrl;
     }
 
-    public void setRequestUrl(String url) {
+    public RequestData setRequestUrl(String url) {
         mUrl = url;
+        return this;
     }
 
     public HashMap<String, Object> getQueryData() {
@@ -98,8 +103,9 @@ public class RequestData {
         return mPostData;
     }
 
-    public void usePost(boolean use) {
+    public RequestData usePost(boolean use) {
         mUsePost = use;
+        return this;
     }
 
     public String getPostString() {

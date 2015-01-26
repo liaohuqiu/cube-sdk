@@ -15,6 +15,6 @@ public class RequestCacheManager {
     }
 
     public static void init(Context content, String cacheDir, int memoryCacheSizeInKB, int fileCacheSizeInKB) {
-        sInstance = new CacheManager(content, cacheDir, memoryCacheSizeInKB, fileCacheSizeInKB);
+        sInstance = CacheManager.create(content, cacheDir, memoryCacheSizeInKB, fileCacheSizeInKB);
     }
 }

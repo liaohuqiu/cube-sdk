@@ -3,7 +3,7 @@ package in.srain.cube.mints.base;
 import in.srain.cube.R;
 import in.srain.cube.app.XActivity;
 
-public abstract class DemoBaseActivity extends XActivity {
+public abstract class MintsBaseActivity extends XActivity {
 
     @Override
     protected String getCloseWarning() {

@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/etao-open-source/cube-sdk.svg?branch=dev)](https://travis-ci.org/etao-open-source/cube-sdk)
+
 ##[中文说明](https://github.com/etao-open-source/cube-sdk/blob/master/README-cn.md)
 
 
@@ -22,7 +24,7 @@ Cube-SDK has been pushed to Maven Central, both in `aar` and `apklib` format.
     <groupId>in.srain.cube</groupId>
     <artifactId>cube-sdk</artifactId>
     <type>apklib</type>
-    <version>1.0.42</version>
+    <version>1.0.43-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -33,16 +35,23 @@ or:
     <groupId>in.srain.cube</groupId>
     <artifactId>cube-sdk</artifactId>
     <type>aar</type>
-    <version>1.0.42</version>
+    <version>1.0.43-SNAPSHOT</version>
 </dependency>
 ```
 
 ###### Gradle / Android Studio
 
 ``` gradle 
-compile 'in.srain.cube:cube-sdk:1.0.42@aar'
+compile 'in.srain.cube:cube-sdk:1.0.43-SNAPSHOT@aar'
 `````
 
 ###### Eclipse
 
 Load the content into you eclipse, it's library project. Then use it in your application project.
+
+
+##### Components
+
+cube-sdk contains:
+
+* CLog

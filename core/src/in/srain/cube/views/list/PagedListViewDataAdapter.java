@@ -10,6 +10,10 @@ public class PagedListViewDataAdapter<ItemDataType> extends ListViewDataAdapterB
 
     protected ListPageInfo<ItemDataType> mListPageInfo;
 
+    public PagedListViewDataAdapter() {
+        super();
+    }
+
     /**
      * @param viewHolderCreator The view holder creator will create a View Holder that extends {@link ViewHolderBase}
      */

@@ -15,21 +15,30 @@ import in.srain.cube.image.iface.ImageTaskExecutor;
 import in.srain.cube.util.CLog;
 import in.srain.cube.util.Debug;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author http://www.liaohuqiu.net
  */
 public class ImageLoader implements LifeCycleComponent {
 
+    // for LoadImageTask
+    private static final Object sPoolSync = new Object();
+    private static LoadImageTask sTopLoadImageTask;
+    private static int sPoolSize = 0;
+    private static final int MAX_POOL_SIZE = 0;
+
     private static final String MSG_ATTACK_TO_RUNNING_TASK = "%s attach to running: %s";
 
-    private static final String MSG_TASK_DO_IN_BACKGROUND = "%s doInBackground";
-    private static final String MSG_TASK_FINISH = "%s onFinish";
-    private static final String MSG_TASK_CANCEL = "%s onCancel";
-    private static final String MSG_TASK_HIT_CACHE = "%s hit cache %s %s";
+    private static final String MSG_TASK_DO_IN_BACKGROUND = "%s, %s LoadImageTask.doInBackground";
+    private static final String MSG_TASK_WAITING = "%s, %s LoadImageTask.waiting";
+    private static final String MSG_TASK_FINISH = "%s, %s LoadImageTask.onFinish, mExitTasksEarly? %s";
+    private static final String MSG_TASK_AFTER_fetchBitmapData = "%s, %s LoadImageTask.afterFetchBitmapData, canceled? %s";
+    private static final String MSG_TASK_CANCEL = "%s, %s LoadImageTask.onCancel";
+    private static final String MSG_TASK_RECYCLE = "%s, %s LoadImageTask.removeAndRecycle";
+    private static final String MSG_HIT_CACHE = "%s hit cache %s %s";
 
     protected static final boolean DEBUG = Debug.DEBUG_IMAGE;
     protected static final String LOG_TAG = Debug.DEBUG_IMAGE_LOG_TAG;
@@ -38,20 +47,19 @@ public class ImageLoader implements LifeCycleComponent {
     protected ImageResizer mImageResizer;
     protected ImageProvider mImageProvider;
     protected ImageLoadHandler mImageLoadHandler;
-    protected ImageLoadProgressHandler mLoadProgressHandler;
+    protected ImageLoadProgressHandler mLoadImageLoadProgressHandler;
 
     protected boolean mPauseWork = false;
     protected boolean mExitTasksEarly = false;
 
     private final Object mPauseWorkLock = new Object();
-    private HashMap<String, LoadImageTask> mLoadWorkList;
+    private ConcurrentHashMap<String, LoadImageTask> mLoadWorkList;
     protected Context mContext;
 
     protected Resources mResources;
 
-    public enum ImageTaskOrder {
-        FIRST_IN_FIRST_OUT, LAST_IN_FIRST_OUT
-    }
+    public static final int TASK_ORDER_FIRST_IN_FIRST_OUT = 1;
+    public static final int TASK_ORDER_LAST_IN_FIRST_OUT = 2;
 
     public ImageLoader(Context context, ImageProvider imageProvider, ImageTaskExecutor imageTaskExecutor, ImageResizer imageResizer, ImageLoadHandler imageLoadHandler) {
         mContext = context;
@@ -62,7 +70,7 @@ public class ImageLoader implements LifeCycleComponent {
         mImageResizer = imageResizer;
         mImageLoadHandler = imageLoadHandler;
 
-        mLoadWorkList = new HashMap<String, LoadImageTask>();
+        mLoadWorkList = new ConcurrentHashMap<String, LoadImageTask>();
     }
 
     public void setImageLoadHandler(ImageLoadHandler imageLoadHandler) {
@@ -99,8 +107,7 @@ public class ImageLoader implements LifeCycleComponent {
 
     /**
      * Create an ImageTask.
-     * <p/>
-     * You can override this method to return a customized ImagetTask.
+     * You can override this method to return a customized {@link ImageTask}.
      *
      * @param url
      * @param requestWidth
@@ -129,7 +136,7 @@ public class ImageLoader implements LifeCycleComponent {
             if (!imageTask.isPreLoad() && !imageTask.stillHasRelatedImageView()) {
                 LoadImageTask task = mLoadWorkList.get(imageTask.getIdentityKey());
                 if (task != null) {
-                    task.cancel(true);
+                    task.cancel();
                 }
                 if (DEBUG) {
                     CLog.d(LOG_TAG, "%s previous work is cancelled.", imageTask);
@@ -155,6 +162,7 @@ public class ImageLoader implements LifeCycleComponent {
                     CLog.d(LOG_TAG, MSG_ATTACK_TO_RUNNING_TASK, imageTask, runningTask.getImageTask());
                 }
                 runningTask.getImageTask().addImageView(imageView);
+                runningTask.getImageTask().notifyLoading(mImageLoadHandler, imageView);
             }
             return;
         } else {
@@ -163,7 +171,7 @@ public class ImageLoader implements LifeCycleComponent {
 
         imageTask.onLoading(mImageLoadHandler);
 
-        LoadImageTask loadImageTask = new LoadImageTask(imageTask);
+        LoadImageTask loadImageTask = createLoadImageTask(imageTask);
         mLoadWorkList.put(imageTask.getIdentityKey(), loadImageTask);
         mImageTaskExecutor.execute(loadImageTask);
     }
@@ -185,17 +193,23 @@ public class ImageLoader implements LifeCycleComponent {
         }
 
         if (DEBUG) {
-            CLog.d(LOG_TAG, MSG_TASK_HIT_CACHE, imageTask, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+            CLog.d(LOG_TAG, MSG_HIT_CACHE, imageTask, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
             if (drawable.getIntrinsicWidth() == 270) {
-                CLog.d(LOG_TAG, MSG_TASK_HIT_CACHE, imageTask, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+                CLog.d(LOG_TAG, MSG_HIT_CACHE, imageTask, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
             }
         }
         imageTask.addImageView(imageView);
-        imageTask.onLoadFinish(drawable, mImageLoadHandler);
+        imageTask.onLoadTaskFinish(drawable, mImageLoadHandler);
         return true;
     }
 
-    public void setTaskOrder(ImageTaskOrder order) {
+    /**
+     * set task executed order: {@link @TASK_ORDER_LAST_IN_FIRST_OUT} or {@link #TASK_ORDER_FIRST_IN_FIRST_OUT}
+     *
+     * @param order
+     */
+    @SuppressWarnings({"unused"})
+    public void setTaskOrder(int order) {
         if (null != mImageTaskExecutor) {
             mImageTaskExecutor.setTaskOrder(order);
         }
@@ -210,28 +224,53 @@ public class ImageLoader implements LifeCycleComponent {
         }
     }
 
+    private LoadImageTask createLoadImageTask(ImageTask imageTask) {
+        // pop top, make top.next as top
+        synchronized (sPoolSync) {
+            if (sTopLoadImageTask != null) {
+                LoadImageTask m = sTopLoadImageTask;
+                m.mNextImageTask = null;
+                m.renew(this, imageTask);
+
+                sTopLoadImageTask = m.mNextImageTask;
+                sPoolSize--;
+                return m;
+            }
+        }
+        return new LoadImageTask().renew(this, imageTask);
+    }
+
     /**
      * Inner class to process the image loading task in background threads.
+     * <p/>
+     * Memory required:
+     * Shadow heap size: 24(Parent class, {@link SimpleTask}) + 4 * 3 = 36. Align to 40 bytes.
+     * Retained heap size: 40 + 24(AtomicInteger introduced by {@link SimpleTask} = 64 bytes.
      *
      * @author http://www.liaohuqiu.net
      */
-    private class LoadImageTask extends SimpleTask {
+    private static class LoadImageTask extends SimpleTask {
 
         private ImageTask mImageTask;
         private BitmapDrawable mDrawable;
-
-        public LoadImageTask(ImageTask imageTask) {
-            this.mImageTask = imageTask;
-        }
+        private LoadImageTask mNextImageTask;
+        private ImageLoader mImageLoader;
 
         public ImageTask getImageTask() {
             return mImageTask;
         }
 
+        public LoadImageTask renew(ImageLoader imageLoader, ImageTask imageTask) {
+            mImageLoader = imageLoader;
+            mImageTask = imageTask;
+            restart();
+            return this;
+        }
+
         @Override
         public void doInBackground() {
             if (DEBUG) {
-                CLog.d(LOG_TAG, MSG_TASK_DO_IN_BACKGROUND, mImageTask);
+                CLog.d(LOG_TAG, MSG_TASK_DO_IN_BACKGROUND, this, mImageTask);
             }
 
             if (mImageTask.getStatistics() != null) {
@@ -239,13 +278,13 @@ public class ImageLoader implements LifeCycleComponent {
             }
             Bitmap bitmap = null;
             // Wait here if work is paused and the task is not cancelled
-            synchronized (mPauseWorkLock) {
-                while (mPauseWork && !isCancelled()) {
+            synchronized (mImageLoader.mPauseWorkLock) {
+                while (mImageLoader.mPauseWork && !isCancelled()) {
                     try {
                         if (DEBUG) {
-                            CLog.d(LOG_TAG, "%s wait to begin", mImageTask);
+                            CLog.d(LOG_TAG, MSG_TASK_WAITING, this, mImageTask);
                         }
-                        mPauseWorkLock.wait();
+                        mImageLoader.mPauseWorkLock.wait();
                     } catch (InterruptedException e) {
                     }
                 }
@@ -255,14 +294,17 @@ public class ImageLoader implements LifeCycleComponent {
             // thread and the ImageView that was originally bound to this task is still bound back
             // to this task and our "exit early" flag is not set then try and fetch the bitmap from
             // the cache
-            if (!isCancelled() && !mExitTasksEarly && (mImageTask.isPreLoad() || mImageTask.stillHasRelatedImageView())) {
+            if (!isCancelled() && !mImageLoader.mExitTasksEarly && (mImageTask.isPreLoad() || mImageTask.stillHasRelatedImageView())) {
                 try {
-                    bitmap = mImageProvider.fetchBitmapData(ImageLoader.this, mImageTask, mImageResizer);
-                    if (mImageTask.getStatistics() != null) {
+                    bitmap = mImageLoader.mImageProvider.fetchBitmapData(mImageLoader, mImageTask, mImageLoader.mImageResizer);
+                    if (DEBUG) {
+                        CLog.d(LOG_TAG, MSG_TASK_AFTER_fetchBitmapData, this, mImageTask, isCancelled());
+                    }
+                    if (mImageTask != null && mImageTask.getStatistics() != null) {
                         mImageTask.getStatistics().afterDecode();
                     }
-                    mDrawable = mImageProvider.createBitmapDrawable(mResources, bitmap);
-                    mImageProvider.addBitmapToMemCache(mImageTask.getIdentityKey(), mDrawable);
+                    mDrawable = mImageLoader.mImageProvider.createBitmapDrawable(mImageLoader.mResources, bitmap);
+                    mImageLoader.mImageProvider.addBitmapToMemCache(mImageTask.getIdentityKey(), mDrawable);
                     if (mImageTask.getStatistics() != null) {
                         mImageTask.getStatistics().afterCreateBitmapDrawable();
                     }
@@ -275,29 +317,53 @@ public class ImageLoader implements LifeCycleComponent {
         }
 
         @Override
-        public void onFinish() {
+        public void onFinish(boolean canceled) {
             if (DEBUG) {
-                CLog.d(LOG_TAG, MSG_TASK_FINISH, mImageTask);
+                CLog.d(LOG_TAG, MSG_TASK_FINISH, this, mImageTask, mImageLoader.mExitTasksEarly);
             }
-            if (mExitTasksEarly) {
+            if (mImageLoader.mExitTasksEarly) {
                 return;
             }
-            mLoadWorkList.remove(mImageTask.getIdentityKey());
 
-            if (!isCancelled() && !mExitTasksEarly) {
-                mImageTask.onLoadFinish(mDrawable, mImageLoadHandler);
+            if (!isCancelled() && !mImageLoader.mExitTasksEarly) {
+                mImageTask.onLoadTaskFinish(mDrawable, mImageLoader.mImageLoadHandler);
             }
-            mImageTask.tryToRecycle();
+
+            mImageLoader.mLoadWorkList.remove(mImageTask.getIdentityKey());
         }
 
         @Override
         public void onCancel() {
             if (DEBUG) {
-                CLog.d(LOG_TAG, MSG_TASK_CANCEL, mImageTask);
+                CLog.d(LOG_TAG, MSG_TASK_CANCEL, this, mImageTask);
             }
-            mLoadWorkList.remove(mImageTask.getIdentityKey());
-            mImageTask.onCancel();
-            mImageTask.tryToRecycle();
+            mImageLoader.getImageProvider().cancelTask(mImageTask);
+            mImageTask.onLoadTaskCancel();
+            mImageLoader.mLoadWorkList.remove(mImageTask.getIdentityKey());
+        }
+
+        private void removeAndRecycle() {
+            if (DEBUG) {
+                CLog.d(LOG_TAG, MSG_TASK_RECYCLE, this, mImageTask);
+            }
+            // unlink
+            mImageLoader = null;
+            mImageTask = null;
+            mDrawable = null;
+
+            // mark top as the next of current, then push current as pop
+            synchronized (sPoolSync) {
+                if (sPoolSize < MAX_POOL_SIZE) {
+                    mNextImageTask = sTopLoadImageTask;
+                    sTopLoadImageTask = this;
+                    sPoolSize++;
+                }
+            }
+        }
+
+        @Override
+        public String toString() {
+            return "[LoadImageTask" + '@' + Integer.toHexString(hashCode()) + ']';
         }
     }
 
@@ -379,7 +445,7 @@ public class ImageLoader implements LifeCycleComponent {
             final LoadImageTask task = item.getValue();
             it.remove();
             if (task != null) {
-                task.cancel(true);
+                task.cancel();
             }
         }
         mLoadWorkList.clear();
@@ -446,7 +512,7 @@ public class ImageLoader implements LifeCycleComponent {
     }
 
     /**
-     * Process LifeCycle
+     * LiefCycle phase will be same to CubeFragment, an will be processed automatically.
      *
      * @param fragment
      * @return

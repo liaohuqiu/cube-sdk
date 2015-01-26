@@ -38,7 +38,7 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
  */
 public class TabPageIndicator extends HorizontalScrollView implements PageIndicator {
 
-    private static final String LOG_TAG = "cube_page_indicator";
+    private static final String LOG_TAG = "cube-views-page-indicator";
     private static final boolean DEBUG = Debug.DEBUG_PAGE_INDICATOR;
 
     /**
@@ -231,7 +231,11 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
             view.setFocusable(true);
             view.setOnClickListener(mTabClickListener);
             view.setTag(viewHolder);
-            mTabLayout.addView(view, new LinearLayout.LayoutParams(0, MATCH_PARENT, 1));
+            if (view.getLayoutParams() == null) {
+                mTabLayout.addView(view, new LinearLayout.LayoutParams(WRAP_CONTENT, MATCH_PARENT));
+            } else {
+                mTabLayout.addView(view);
+            }
         }
         mSelectedTabIndex = mViewPager.getCurrentItem();
         updateTab(mSelectedTabIndex);

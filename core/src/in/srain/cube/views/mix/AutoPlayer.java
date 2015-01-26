@@ -48,6 +48,7 @@ public class AutoPlayer {
     private boolean mSkipNext = false;
     private int mTotal;
     private boolean mPlaying = false;
+    private boolean mPaused = false;
 
     public AutoPlayer(Playable playable) {
         mPlayable = playable;
@@ -75,7 +76,9 @@ public class AutoPlayer {
         mTimerTask = new Runnable() {
             @Override
             public void run() {
-                playNextFrame();
+                if (!mPaused) {
+                    playNextFrame();
+                }
                 if (mPlaying) {
                     handler.postDelayed(mTimerTask, mTimeInterval);
                 }
@@ -135,6 +138,14 @@ public class AutoPlayer {
                 playPrevious();
             }
         }
+    }
+
+    public void pause() {
+        mPaused = true;
+    }
+
+    public void resume() {
+        mPaused = false;
     }
 
     private void playTo(int to) {

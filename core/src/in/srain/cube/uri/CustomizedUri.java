@@ -2,20 +2,34 @@ package in.srain.cube.uri;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Bundle;
 import android.text.TextUtils;
 import in.srain.cube.request.JsonData;
+import in.srain.cube.util.CLog;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.Iterator;
 
 public class CustomizedUri {
 
     private static final String KEY = "CUBE_URL";
+    private static final String[] PUB_SCHEMA_LIST = new String[]{"http://", "https://"};
+
     private JsonData mQueryData;
+
+    private String mSchemaPre = null;
     private String mPath = null;
     private String mQuery = null;
-    private String mUrl = null;
+    private String mOriginUrl = null;
+
+    private boolean mIsCustomized;
 
     public String getPath() {
         return mPath;
+    }
+
+    public boolean isCustomized() {
+        return mIsCustomized;
     }
 
     public String getQueryString() {
@@ -26,8 +40,8 @@ public class CustomizedUri {
         return mQueryData;
     }
 
-    public String getUrl() {
-        return mUrl;
+    public String getOriginUrl() {
+        return mOriginUrl;
     }
 
     public static CustomizedUri parse(String url, String customizedSchema) {
@@ -35,18 +49,59 @@ public class CustomizedUri {
             throw new RuntimeException("url is null");
         }
 
-        if (TextUtils.isEmpty(url)) {
-            throw new RuntimeException("url is null");
+        if (url.startsWith(customizedSchema)) {
+            CustomizedUri uri = new CustomizedUri(url, customizedSchema);
+            uri.mIsCustomized = true;
+            return uri;
+        } else {
+            for (int i = 0; i < PUB_SCHEMA_LIST.length; i++) {
+                String schema = PUB_SCHEMA_LIST[i];
+                if (url.startsWith(schema)) {
+                    return new CustomizedUri(url, schema);
+                }
+            }
         }
-
-        if (!url.startsWith(customizedSchema)) {
-            return null;
-        }
-        return new CustomizedUri(url, customizedSchema.length());
+        return null;
     }
 
     public void writeToBundle(Intent intent) {
-        intent.putExtra(KEY, getUrl());
+        CLog.d("test", "writeToBundle: %s %s", mOriginUrl, buildUrl());
+        intent.putExtra(KEY, buildUrl());
+    }
+
+    private static String decode(String content, String encoding) {
+        try {
+            return URLDecoder.decode(content, encoding != null ? encoding : "ISO-8859-1");
+        } catch (UnsupportedEncodingException var3) {
+            throw new IllegalArgumentException(var3);
+        }
+    }
+
+    private String buildUrl() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(mSchemaPre).append(mPath);
+
+        if (mQueryData != null && mQueryData.length() > 0) {
+            sb.append("?");
+            Iterator<String> names = mQueryData.keys();
+            boolean first = true;
+            while (names.hasNext()) {
+                String name = names.next();
+                String encodedName = Uri.encode(name);
+                String value = mQueryData.optString(name);
+                String encodedValue = value != null ? Uri.encode(value) : "";
+                if (first) {
+                    first = false;
+                } else {
+                    sb.append("&");
+                }
+
+                sb.append(encodedName);
+                sb.append("=");
+                sb.append(encodedValue);
+            }
+        }
+        return sb.toString();
     }
 
     public static CustomizedUri fromIntent(Intent intent, String schema) {
@@ -60,8 +115,9 @@ public class CustomizedUri {
         return parse(url, schema);
     }
 
-    private CustomizedUri(String url, int len) {
-        mUrl = url;
+    private CustomizedUri(String url, String schemaPre) {
+        mSchemaPre = schemaPre;
+        mOriginUrl = url;
 
         // process segment
         int pos_seg = url.indexOf('#');
@@ -75,7 +131,7 @@ public class CustomizedUri {
             mQuery = url.substring(pos_sp + 1);
             url = url.substring(0, pos_sp);
         }
-        mPath = url.substring(len);
+        mPath = url.substring(schemaPre.length());
 
         if (!TextUtils.isEmpty(mQuery)) {
             parseQuery();

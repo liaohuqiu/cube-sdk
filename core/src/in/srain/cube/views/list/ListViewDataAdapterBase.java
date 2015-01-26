@@ -43,40 +43,8 @@ public abstract class ListViewDataAdapterBase<ItemDataType> extends BaseAdapter 
         mViewHolderCreator = viewHolderCreator;
     }
 
-    public void setViewHolderClass(final Object enclosingInstance, final Class<?> cls) {
-        if (cls == null) {
-            throw new IllegalArgumentException("ViewHolderClass is null.");
-        }
-        mLazyCreator = new ViewHolderCreator<ItemDataType>() {
-            @Override
-            public ViewHolderBase<ItemDataType> createViewHolder() {
-                Object object = null;
-                try {
-                    // top class
-                    if (cls.getEnclosingClass() == null) {
-                        Constructor<?> constructor = cls.getDeclaredConstructor();
-                        constructor.setAccessible(true);
-                        object = constructor.newInstance();
-                    } else {
-                        if (Modifier.isStatic(cls.getModifiers())) {
-                            Constructor<?> constructor = cls.getDeclaredConstructor();
-                            constructor.setAccessible(true);
-                            object = constructor.newInstance();
-                        } else {
-                            Constructor<?> constructor = cls.getDeclaredConstructor(enclosingInstance.getClass());
-                            constructor.setAccessible(true);
-                            object = constructor.newInstance(enclosingInstance);
-                        }
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-                if (object == null || !(object instanceof ViewHolderBase)) {
-                    throw new IllegalArgumentException("ViewHolderClass can not be initiated");
-                }
-                return (ViewHolderBase<ItemDataType>) object;
-            }
-        };
+    public void setViewHolderClass(final Object enclosingInstance, final Class<?> cls, final Object... args) {
+        mLazyCreator = LazyViewHolderCreator.create(enclosingInstance, cls, args);
     }
 
     private ViewHolderBase<ItemDataType> createViewHolder() {
