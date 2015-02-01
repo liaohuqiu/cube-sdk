@@ -2,7 +2,6 @@ package in.srain.cube.image;
 
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
-import android.widget.ImageView;
 import in.srain.cube.image.iface.ImageLoadHandler;
 import in.srain.cube.util.CLog;
 import in.srain.cube.util.Debug;

@@ -192,7 +192,10 @@ public final class LruActionTracer implements Runnable {
     public void abortEdit(String key) {
         CacheEntry cacheEntry = mEditList.get(key);
         if (cacheEntry != null) {
-            abortEdit(cacheEntry);
+            try {
+                cacheEntry.abortEdit();
+            } catch (IOException e) {
+            }
         }
     }
 

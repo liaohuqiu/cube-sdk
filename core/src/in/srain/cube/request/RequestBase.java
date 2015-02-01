@@ -24,6 +24,9 @@ public abstract class RequestBase<T> implements IRequest<T> {
     @Override
     public T onDataFromServer(String data) {
         JsonData jsonData = JsonData.create(data);
+        if (jsonData == null || jsonData.length() == 0) {
+            return null;
+        }
         return processOriginDataFromServer(jsonData);
     }
 

@@ -1,5 +1,7 @@
 package in.srain.cube.request;
 
+import android.text.TextUtils;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -18,6 +20,7 @@ public class RequestData {
     private HashMap<String, Object> mQueryData;
     private HashMap<String, Object> mPostData;
     private boolean mUsePost = false;
+    private String mTag;
 
     public static String buildQueryString(Map<String, ?> data, String url) {
 
@@ -41,9 +44,15 @@ public class RequestData {
             }
 
             try {
+                if (TextUtils.isEmpty(item.getKey())) {
+                    continue;
+                }
                 sb.append(URLEncoder.encode(item.getKey(), CHAR_SET));
                 sb.append(CHAR_EQ);
                 sb.append(URLEncoder.encode(item.getValue().toString(), CHAR_SET));
+                if (item.getValue() != null) {
+                    // sb.append(URLEncoder.encode(item.getValue().toString(), CHAR_SET));
+                }
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
@@ -106,6 +115,18 @@ public class RequestData {
     public RequestData usePost(boolean use) {
         mUsePost = use;
         return this;
+    }
+
+    /**
+     * Set a tag to mark this request
+     */
+    public RequestData setTag(String tag) {
+        mTag = tag;
+        return this;
+    }
+
+    public String getTag() {
+        return mTag;
     }
 
     public String getPostString() {

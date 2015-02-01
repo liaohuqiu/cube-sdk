@@ -3,7 +3,6 @@ package in.srain.cube.request;
 import android.text.TextUtils;
 import in.srain.cube.cache.CacheManager;
 import in.srain.cube.cache.CacheResultType;
-import in.srain.cube.cache.ICacheAble;
 import in.srain.cube.concurrent.SimpleTask;
 import in.srain.cube.util.CLog;
 import in.srain.cube.util.Debug;
@@ -219,11 +218,14 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
         if (DEBUG) {
             CLog.d(LOG_TAG, "%s, onDataFromServer", getCacheKey());
         }
+
+        T ret = super.onDataFromServer(data);
+
         // cache the data
-        if (!TextUtils.isEmpty(data) && cacheRequestResult()) {
+        if (!TextUtils.isEmpty(data) && ret != null && cacheRequestResult()) {
             RequestCacheManager.getInstance().setCacheData(this.getCacheKey(), data);
         }
-        return super.onDataFromServer(data);
+        return ret;
     }
 
     @Override

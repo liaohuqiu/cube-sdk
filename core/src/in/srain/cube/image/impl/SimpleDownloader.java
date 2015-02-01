@@ -1,11 +1,13 @@
 package in.srain.cube.image.impl;
 
 import android.os.Build;
-import android.util.Log;
 import in.srain.cube.util.CLog;
 import in.srain.cube.util.Debug;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 

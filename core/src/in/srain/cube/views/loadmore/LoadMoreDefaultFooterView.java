@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import in.srain.cube.R;
-import in.srain.cube.util.CLog;
 
 public class LoadMoreDefaultFooterView extends RelativeLayout implements LoadMoreUIHandler {
 

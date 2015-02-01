@@ -2,10 +2,10 @@ package in.srain.cube.image;
 
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
+import in.srain.cube.cache.DiskCacheProvider;
 import in.srain.cube.diskcache.CacheEntry;
 import in.srain.cube.diskcache.DiskCache;
 import in.srain.cube.diskcache.lru.SimpleDiskLruCache;
-import in.srain.cube.cache.DiskCacheProvider;
 import in.srain.cube.image.impl.SimpleDownloader;
 import in.srain.cube.util.CLog;
 import in.srain.cube.util.Debug;

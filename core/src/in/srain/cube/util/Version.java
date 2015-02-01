@@ -18,7 +18,6 @@ package in.srain.cube.util;
 
 import android.annotation.TargetApi;
 import android.os.Build;
-import android.os.Build.VERSION_CODES;
 import android.os.StrictMode;
 
 /**

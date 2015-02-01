@@ -21,7 +21,6 @@ public class LoadMoreGridViewContainer extends LoadMoreContainerBase {
         super(context, attrs);
     }
 
-
     @Override
     protected void addFooterView(View view) {
         mGridView.addFooterView(view);

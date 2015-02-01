@@ -8,7 +8,6 @@ import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
-import in.srain.cube.diskcache.DiskCache;
 import in.srain.cube.image.drawable.RecyclingBitmapDrawable;
 import in.srain.cube.image.iface.ImageMemoryCache;
 import in.srain.cube.image.iface.ImageResizer;
@@ -153,6 +152,7 @@ public class ImageProvider {
     }
 
     public void cancelTask(ImageTask task) {
+        mDiskCacheProvider.getDiskCache().abortEdit(task.getFileCacheKey());
     }
 
     /**

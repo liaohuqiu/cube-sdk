@@ -7,9 +7,6 @@ import android.widget.BaseAdapter;
 import in.srain.cube.util.CLog;
 import in.srain.cube.util.Debug;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Modifier;
-
 /**
  * A adapter using View Holder to display the item of a list view;
  *
