@@ -33,7 +33,7 @@ public class SimpleRequestManager {
                         break;
 
                     case REQUEST_FAILED:
-                        request.onRequestFail((FailData) msg.obj);
+                        request.onRequestFail(request.getFailData());
                         break;
 
                     default:
@@ -45,10 +45,10 @@ public class SimpleRequestManager {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                StringBuilder sb = new StringBuilder();
                 T data = null;
                 try {
 
+                    StringBuilder sb = new StringBuilder();
                     RequestData requestData = request.getRequestData();
 
                     if (DEBUG) {
@@ -81,7 +81,6 @@ public class SimpleRequestManager {
                 if (null == data) {
                     Message msg = Message.obtain();
                     msg.what = REQUEST_FAILED;
-                    msg.obj = new FailData(sb.toString());
                     handler.sendMessage(msg);
                 } else {
                     Message msg = Message.obtain();

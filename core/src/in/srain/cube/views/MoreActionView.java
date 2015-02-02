@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.util.AttributeSet;
 import android.view.View;
 import in.srain.cube.R;
@@ -78,10 +80,26 @@ public class MoreActionView extends View {
         setMeasuredDimension(width, height);
     }
 
+    public void setColor(int color) {
+        mPaint.setColor(color);
+    }
+
+    public void setColorFilter(int color) {
+        setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+    }
+
+    public final void setColorFilter(int color, PorterDuff.Mode mode) {
+        mPaint.setColorFilter(new PorterDuffColorFilter(color, mode));
+        invalidate();
+    }
+
+    public final void clearColorFilter() {
+        mPaint.setColorFilter(null);
+        invalidate();
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
-
-        super.onDraw(canvas);
 
         for (int i = 0; i < 3; i++) {
             float x = i * (mDotRadius * 2 + mDotSpan) + mDotRadius;

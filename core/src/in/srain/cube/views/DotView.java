@@ -140,4 +140,26 @@ public class DotView extends LinearLayout implements PagerIndicator {
             canvas.drawCircle(mLittleDotSize / 2, mDotRadius, mDotRadius, mPaint);
         }
     }
+
+    public void setSelectedColor(int color) {
+        if (mSelectedColor != color) {
+            mSelectedColor = color;
+            invalidate();
+        }
+    }
+
+    public void setColor(int selectedColor, int unSelectedColor) {
+        if (mSelectedColor != selectedColor || mUnSelectedColor != unSelectedColor) {
+            mSelectedColor = selectedColor;
+            mUnSelectedColor = unSelectedColor;
+            invalidate();
+        }
+    }
+
+    public void setUnSelectedColor(int color) {
+        if (mUnSelectedColor != color) {
+            mSelectedColor = color;
+            invalidate();
+        }
+    }
 }

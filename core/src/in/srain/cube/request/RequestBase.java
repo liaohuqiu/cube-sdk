@@ -3,6 +3,7 @@ package in.srain.cube.request;
 public abstract class RequestBase<T> implements IRequest<T> {
 
     private RequestData mRequestData = new RequestData();
+    private FailData mFailData;
     private boolean mHasBeenCanceled = false;
 
     public RequestData getRequestData() {
@@ -25,6 +26,7 @@ public abstract class RequestBase<T> implements IRequest<T> {
     public T onDataFromServer(String data) {
         JsonData jsonData = JsonData.create(data);
         if (jsonData == null || jsonData.length() == 0) {
+            setFailData(FailData.dataFormatError(data));
             return null;
         }
         return processOriginDataFromServer(jsonData);
@@ -36,6 +38,17 @@ public abstract class RequestBase<T> implements IRequest<T> {
 
     protected void onCancel() {
 
+    }
+
+    @Override
+    public RequestBase setFailData(FailData failData) {
+        mFailData = failData;
+        return this;
+    }
+
+    @Override
+    public FailData getFailData() {
+        return mFailData;
     }
 
     /**
