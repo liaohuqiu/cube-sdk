@@ -1,13 +1,12 @@
 package in.srain.cube.request;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
+import in.srain.cube.request.sender.BaseRequestSender;
+import in.srain.cube.request.sender.RequestSenderFactory;
 import in.srain.cube.util.CLog;
 import in.srain.cube.util.Debug;
-
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 /**
  * @author http://www.liaohuqiu.net
@@ -23,7 +22,7 @@ public class SimpleRequestManager {
 
     public static <T> void sendRequest(final IRequest<T> request) {
 
-        final Handler handler = new Handler() {
+        final Handler handler = new Handler(Looper.getMainLooper()) {
             @SuppressWarnings("unchecked")
             @Override
             public void handleMessage(Message msg) {
@@ -47,35 +46,20 @@ public class SimpleRequestManager {
             public void run() {
                 T data = null;
                 try {
-
                     StringBuilder sb = new StringBuilder();
                     RequestData requestData = request.getRequestData();
-
                     if (DEBUG) {
                         CLog.d(LOG_TAG, "url: %s", requestData.getRequestUrl());
                     }
-                    URL url = new URL(request.getRequestData().getRequestUrl());
-                    HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-                    if (requestData.shouldPost()) {
-                        urlConnection.setRequestMethod("POST");
-                        OutputStreamWriter writer = new OutputStreamWriter(urlConnection.getOutputStream());
-                        writer.write(requestData.getPostString());
-                        writer.flush();
+                    BaseRequestSender requestSender = RequestSenderFactory.create(request);
+                    if (requestSender != null) {
+                        requestSender.send();
+                        requestSender.getResponse(sb);
+                        data = request.onDataFromServer(sb.toString());
                     }
-                    InputStream ips = new BufferedInputStream(urlConnection.getInputStream());
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(ips, "UTF-8"));
-
-                    char[] buffer = new char[1024];
-                    int bufferLength;
-                    while ((bufferLength = reader.read(buffer, 0, buffer.length)) > 0) {
-                        sb.append(buffer, 0, bufferLength);
-                    }
-                    reader.close();
-                    ips.close();
-                    data = request.onDataFromServer(sb.toString());
                 } catch (Exception e) {
                     e.printStackTrace();
+                    request.setFailData(FailData.networkError());
                 }
 
                 if (null == data) {

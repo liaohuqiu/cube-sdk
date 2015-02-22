@@ -3,4 +3,9 @@
 
     <string name="cube_mints_exit_tip">再按一次，退出程序</string>
 
+    <string name="cube_views_load_more_loading">加载中...</string>
+    <string name="cube_views_load_more_click_to_load_more">点击加载更多</string>
+    <string name="cube_views_load_more_loaded_no_more">全部数据加载完毕</string>
+    <string name="cube_views_load_more_loaded_empty">数据为空</string>
+
 </resources>

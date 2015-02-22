@@ -15,7 +15,7 @@ import in.srain.cube.util.Debug;
  */
 public abstract class ListViewDataAdapterBase<ItemDataType> extends BaseAdapter {
 
-    private static String LOG_TAG = "cube_list";
+    private static final String LOG_TAG = "cube-list";
 
     protected ViewHolderCreator<ItemDataType> mViewHolderCreator;
     protected ViewHolderCreator<ItemDataType> mLazyCreator;

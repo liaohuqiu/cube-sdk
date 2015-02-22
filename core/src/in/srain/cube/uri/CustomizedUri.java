@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.text.TextUtils;
 import in.srain.cube.request.JsonData;
-import in.srain.cube.util.CLog;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -15,7 +14,7 @@ public class CustomizedUri {
     private static final String KEY = "CUBE_URL";
     private static final String[] PUB_SCHEMA_LIST = new String[]{"http://", "https://"};
 
-    private JsonData mQueryData;
+    private JsonData mQueryData = JsonData.newMap();
 
     private String mSchemaPre = null;
     private String mPath = null;
@@ -65,7 +64,6 @@ public class CustomizedUri {
     }
 
     public void writeToBundle(Intent intent) {
-        CLog.d("test", "writeToBundle: %s %s", mOriginUrl, buildUrl());
         intent.putExtra(KEY, buildUrl());
     }
 

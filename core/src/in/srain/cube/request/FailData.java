@@ -2,19 +2,34 @@ package in.srain.cube.request;
 
 public class FailData {
 
-    public static final int TYPE_DATA_FORMAT_ERROR = 1;
-    public static final int TYPE_CUSTOMIZE_ERROR = 2;
+    public static final int ERROR_UNKNOWN = 0;
+    public static final int ERROR_INPUT = 1;
+    public static final int ERROR_NETWORK = 2;
+    public static final int ERROR_DATA_FORMAT = 3;
+    public static final int ERROR_CUSTOMIZED = 100;
 
-    public int mErrorType = TYPE_DATA_FORMAT_ERROR;
+    public int mErrorType = ERROR_DATA_FORMAT;
     public int mCustomErrorType;
     public Object mData;
 
+    public static FailData unknown() {
+        return new FailData(ERROR_UNKNOWN, -1, null);
+    }
+
+    public static FailData inputError() {
+        return new FailData(ERROR_INPUT, -1, null);
+    }
+
+    public static FailData networkError() {
+        return new FailData(ERROR_NETWORK, -1, null);
+    }
+
     public static FailData dataFormatError(String content) {
-        return new FailData(TYPE_DATA_FORMAT_ERROR, -1, content);
+        return new FailData(ERROR_DATA_FORMAT, -1, content);
     }
 
     public static FailData customizedError(int error, Object data) {
-        return new FailData(TYPE_CUSTOMIZE_ERROR, error, data);
+        return new FailData(ERROR_CUSTOMIZED, error, data);
     }
 
     private FailData(int errorType, int customErrorType, Object data) {

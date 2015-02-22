@@ -18,7 +18,7 @@ public class TitleHeaderBar extends RelativeLayout {
     private RelativeLayout mRightViewContainer;
     private RelativeLayout mCenterViewContainer;
 
-    private String title;
+    private String mTitle;
 
     public TitleHeaderBar(Context context) {
         this(context, null);
@@ -51,8 +51,12 @@ public class TitleHeaderBar extends RelativeLayout {
     }
 
     public void setTitle(String title) {
-        this.title = title;
+        mTitle = title;
         mCenterTitleTextView.setText(title);
+    }
+
+    public String getTitle() {
+        return mTitle;
     }
 
     private RelativeLayout.LayoutParams makeLayoutParams(View view) {

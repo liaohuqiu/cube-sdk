@@ -64,10 +64,13 @@ public interface ICacheAble<T> {
      */
     public void createDataForCache(CacheManager cacheManager);
 
+    /**
+     * temporarily disable cache. The data will no be load from cache and will also not be put into cache
+     */
     public ICacheAble<T> setDisableCache(boolean disable);
 
     /**
-     * temporarily disable cache. The data will no be load from cache and will also not be put into cache
+     * check if cache is disabled
      *
      * @return
      */

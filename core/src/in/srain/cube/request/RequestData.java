@@ -2,6 +2,7 @@ package in.srain.cube.request;
 
 import android.text.TextUtils;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -19,6 +20,8 @@ public class RequestData {
 
     private HashMap<String, Object> mQueryData;
     private HashMap<String, Object> mPostData;
+    private HashMap<String, Object> mHeaderData;
+    private HashMap<String, UploadFileInfo> mUploadFileInfoHashMap;
     private boolean mUsePost = false;
     private String mTag;
 
@@ -49,9 +52,8 @@ public class RequestData {
                 }
                 sb.append(URLEncoder.encode(item.getKey(), CHAR_SET));
                 sb.append(CHAR_EQ);
-                sb.append(URLEncoder.encode(item.getValue().toString(), CHAR_SET));
                 if (item.getValue() != null) {
-                    // sb.append(URLEncoder.encode(item.getValue().toString(), CHAR_SET));
+                    sb.append(URLEncoder.encode(item.getValue().toString(), CHAR_SET));
                 }
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
@@ -65,6 +67,14 @@ public class RequestData {
             mPostData = new HashMap<String, Object>();
         }
         mPostData.put(key, data);
+        return this;
+    }
+
+    public RequestData addHeader(String key, Object data) {
+        if (mHeaderData == null) {
+            mHeaderData = new HashMap<String, Object>();
+        }
+        mHeaderData.put(key, data);
         return this;
     }
 
@@ -104,6 +114,10 @@ public class RequestData {
         return this;
     }
 
+    public HashMap<String, Object> getHeaderData() {
+        return mHeaderData;
+    }
+
     public HashMap<String, Object> getQueryData() {
         return mQueryData;
     }
@@ -118,10 +132,56 @@ public class RequestData {
     }
 
     /**
-     * Set a tag to mark this request
+     * add file to be uploaded
+     *
+     * @param fieldName
+     * @param uploadFile, will extract extension from the file name
+     * @return
      */
-    public RequestData setTag(String tag) {
-        mTag = tag;
+    @SuppressWarnings({"unused"})
+    public RequestData addFile(String fieldName, String uploadFile) {
+        addFile(fieldName, uploadFile, null);
+        return this;
+    }
+
+    /**
+     * add file to be uploaded
+     *
+     * @param fieldName
+     * @param uploadFile
+     * @param fileName   if provided, will use this as filename
+     * @return
+     */
+    @SuppressWarnings({"unused"})
+    public RequestData addFile(String fieldName, String uploadFile, String fileName) {
+        addFile(fieldName, new File(uploadFile), fileName);
+        return this;
+    }
+
+    /**
+     * @param fieldName
+     * @param uploadFile
+     * @return
+     */
+    @SuppressWarnings({"unused"})
+    public RequestData addFile(String fieldName, File uploadFile) {
+        addFile(fieldName, uploadFile, null);
+        return this;
+    }
+
+    @SuppressWarnings({"unused"})
+    public RequestData addFile(String fieldName, File uploadFile, String fileName) {
+
+        if (mUploadFileInfoHashMap == null) {
+            mUploadFileInfoHashMap = new HashMap<String, UploadFileInfo>();
+        }
+
+        UploadFileInfo uploadFileInfo = new UploadFileInfo();
+        uploadFileInfo.fieldName = fieldName;
+        uploadFileInfo.uploadFile = uploadFile;
+        uploadFileInfo.fileName = fileName;
+
+        mUploadFileInfoHashMap.put(fieldName, uploadFileInfo);
         return this;
     }
 
@@ -129,11 +189,33 @@ public class RequestData {
         return mTag;
     }
 
+    /**
+     * Set a tag to mark this request
+     */
+    public RequestData setTag(String tag) {
+        mTag = tag;
+        return this;
+    }
+
     public String getPostString() {
         return buildQueryString(mPostData, null);
     }
 
     public boolean shouldPost() {
-        return mUsePost || (mPostData != null && mPostData.size() > 0);
+        return mUsePost || (mPostData != null && mPostData.size() > 0) || isMultiPart();
+    }
+
+    public HashMap<String, UploadFileInfo> getUploadFiles() {
+        return mUploadFileInfoHashMap;
+    }
+
+    public boolean isMultiPart() {
+        return mUploadFileInfoHashMap != null && mUploadFileInfoHashMap.size() > 0;
+    }
+
+    public static class UploadFileInfo {
+        public File uploadFile;
+        public String fileName;
+        public String fieldName;
     }
 }
