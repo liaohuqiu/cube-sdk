@@ -6,33 +6,33 @@ import org.json.JSONObject;
 /**
  * A description for the data in cache system
  */
-public class CacheInfo {
+public class CacheMetaData {
 
     private String mData;
     private long mTime;
     private int mSize;
 
-    public static CacheInfo createForNow(String data) {
-        CacheInfo info = new CacheInfo(data);
+    public static CacheMetaData createForNow(String data) {
+        CacheMetaData info = new CacheMetaData(data);
         info.mTime = (int) (System.currentTimeMillis() / 1000);
         return info;
     }
 
-    public static CacheInfo createInvalidated(String data) {
+    public static CacheMetaData createInvalidated(String data) {
         return create(data, -2);
     }
 
-    public static CacheInfo createFromJson(JsonData jsonData) {
+    public static CacheMetaData createFromJson(JsonData jsonData) {
         return create(jsonData.optString("data"), jsonData.optInt("time"));
     }
 
-    private static CacheInfo create(String data, long time) {
-        CacheInfo cacheInfo = new CacheInfo(data);
-        cacheInfo.mTime = time;
-        return cacheInfo;
+    private static CacheMetaData create(String data, long time) {
+        CacheMetaData cacheMetaData = new CacheMetaData(data);
+        cacheMetaData.mTime = time;
+        return cacheMetaData;
     }
 
-    private CacheInfo(String data) {
+    private CacheMetaData(String data) {
         this.mData = data;
         mSize = (data.getBytes().length + 8);
     }
@@ -43,6 +43,13 @@ public class CacheInfo {
 
     public long getTime() {
         return mTime;
+    }
+
+    public boolean isOutOfDateFor(ICacheAble<?> cacheAble) {
+        long lastTime = getTime();
+        long timeInterval = System.currentTimeMillis() / 1000 - lastTime;
+        boolean outOfDate = timeInterval > cacheAble.getCacheTime() || timeInterval < 0;
+        return outOfDate;
     }
 
     public String getData() {

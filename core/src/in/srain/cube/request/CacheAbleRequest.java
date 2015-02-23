@@ -63,6 +63,20 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
     }
 
     /**
+     * Timeout will not be considerate
+     *
+     * @return
+     */
+    @Override
+    protected T doRequestSync() {
+        T data = RequestCacheManager.getInstance().requestCacheSync(this);
+        if (data == null) {
+            data = SimpleRequestManager.requestSync(this);
+        }
+        return data;
+    }
+
+    /**
      * prepare request
      */
     @Override
@@ -79,9 +93,14 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
     }
 
     @Override
-    public CacheAbleRequest<T> useCacheAnyway(boolean use) {
+    public CacheAbleRequest<T> setUseCacheAnyway(boolean use) {
         mUseCacheAnyway = use;
         return this;
+    }
+
+    @Override
+    public boolean useCacheAnyway() {
+        return mUseCacheAnyway;
     }
 
     @Override
@@ -126,9 +145,9 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
     }
 
     @Override
-    public void createDataForCache(CacheManager cacheManager) {
+    public void onNoCacheData(CacheManager cacheManager) {
         if (DEBUG) {
-            CLog.d(LOG_TAG, "%s, createDataForCache", getCacheKey());
+            CLog.d(LOG_TAG, "%s, onNoCacheData", getCacheKey());
         }
         if (hasBeenCanceled()) {
             return;
@@ -166,7 +185,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
         }
         mCacheData = data;
         mOutOfDate = outOfDate;
-        if (null != mHandler) {
+        if (null == mHandler) {
             mHandler.onCacheData(data, outOfDate);
 
             if (mUseCacheAnyway) {

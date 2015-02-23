@@ -17,6 +17,12 @@ public abstract class RequestBase<T> implements IRequest<T> {
     }
 
     @Override
+    public T requestSync() {
+        prepareRequest();
+        return doRequestSync();
+    }
+
+    @Override
     public void cancelRequest() {
         mHasBeenCanceled = true;
         onCancel();
@@ -55,6 +61,11 @@ public abstract class RequestBase<T> implements IRequest<T> {
      * implement this method to process request data
      */
     protected abstract void doSendRequest();
+
+    /**
+     * implement this method to request data synchronously
+     */
+    protected abstract T doRequestSync();
 
     /**
      * prepare request

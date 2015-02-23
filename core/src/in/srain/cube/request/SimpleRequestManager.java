@@ -20,6 +20,33 @@ public class SimpleRequestManager {
 
     private final static int REQUEST_FAILED = 0x02;
 
+    public static <T> T requestSync(final IRequest<T> request) {
+        T data = null;
+        try {
+            StringBuilder sb = new StringBuilder();
+            RequestData requestData = request.getRequestData();
+            if (DEBUG) {
+                CLog.d(LOG_TAG, "url: %s", requestData.getRequestUrl());
+            }
+            BaseRequestSender requestSender = RequestSenderFactory.create(request);
+            if (requestSender != null) {
+                requestSender.send();
+                requestSender.getResponse(sb);
+                data = request.onDataFromServer(sb.toString());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setFailData(FailData.networkError());
+        }
+
+        if (null == data) {
+            request.onRequestFail(request.getFailData());
+        } else {
+            request.onRequestSuccess(data);
+        }
+        return data;
+    }
+
     public static <T> void sendRequest(final IRequest<T> request) {
 
         final Handler handler = new Handler(Looper.getMainLooper()) {

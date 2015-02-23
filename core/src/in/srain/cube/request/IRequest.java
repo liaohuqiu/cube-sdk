@@ -17,6 +17,11 @@ public interface IRequest<T> {
      */
     public void send();
 
+    /**
+     * request synchronously
+     */
+    public T requestSync();
+
     public void cancelRequest();
 
     public T onDataFromServer(String data);
