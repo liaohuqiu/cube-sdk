@@ -6,15 +6,15 @@ import android.os.Message;
 import in.srain.cube.request.sender.BaseRequestSender;
 import in.srain.cube.request.sender.RequestSenderFactory;
 import in.srain.cube.util.CLog;
-import in.srain.cube.util.Debug;
+import in.srain.cube.util.CubeDebug;
 
 /**
  * @author http://www.liaohuqiu.net
  */
 public class SimpleRequestManager {
 
-    private static final boolean DEBUG = Debug.DEBUG_REQUEST;
-    private static final String LOG_TAG = Debug.DEBUG_REQUEST_LOG_TAG;
+    private static final boolean DEBUG = CubeDebug.DEBUG_REQUEST;
+    private static final String LOG_TAG = CubeDebug.DEBUG_REQUEST_LOG_TAG;
 
     private final static int REQUEST_SUCCESS = 0x01;
 
@@ -36,7 +36,7 @@ public class SimpleRequestManager {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            request.setFailData(FailData.networkError());
+            request.setFailData(FailData.networkError(request));
         }
 
         if (null == data) {
@@ -86,7 +86,7 @@ public class SimpleRequestManager {
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    request.setFailData(FailData.networkError());
+                    request.setFailData(FailData.networkError(request));
                 }
 
                 if (null == data) {
@@ -100,6 +100,6 @@ public class SimpleRequestManager {
                     handler.sendMessage(msg);
                 }
             }
-        }, "SimpleRequestBase-Manager").start();
+        }, "cube-simple-request-manager").start();
     }
 }

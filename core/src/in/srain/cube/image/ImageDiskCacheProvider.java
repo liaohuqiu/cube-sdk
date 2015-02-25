@@ -8,7 +8,7 @@ import in.srain.cube.diskcache.DiskCache;
 import in.srain.cube.diskcache.lru.SimpleDiskLruCache;
 import in.srain.cube.image.impl.SimpleDownloader;
 import in.srain.cube.util.CLog;
-import in.srain.cube.util.Debug;
+import in.srain.cube.util.CubeDebug;
 
 import java.io.*;
 
@@ -21,8 +21,8 @@ import java.io.*;
  */
 public class ImageDiskCacheProvider extends DiskCacheProvider {
 
-    protected static final boolean DEBUG = Debug.DEBUG_IMAGE;
-    protected static final String LOG_TAG = Debug.DEBUG_IMAGE_LOG_TAG_PROVIDER;
+    protected static final boolean DEBUG = CubeDebug.DEBUG_IMAGE;
+    protected static final String LOG_TAG = CubeDebug.DEBUG_IMAGE_LOG_TAG_PROVIDER;
 
     // Compression settings when writing images to disk cache
     private static final CompressFormat DEFAULT_COMPRESS_FORMAT = CompressFormat.JPEG;

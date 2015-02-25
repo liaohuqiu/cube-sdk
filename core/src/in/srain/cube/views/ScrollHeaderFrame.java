@@ -11,14 +11,14 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import in.srain.cube.R;
 import in.srain.cube.util.CLog;
-import in.srain.cube.util.Debug;
+import in.srain.cube.util.CubeDebug;
 
 /**
  * @author http://www.liaohuqiu.net
  */
 public class ScrollHeaderFrame extends RelativeLayout {
 
-    private static final boolean DEBUG = Debug.DEBUG_SCROLL_HEADER_FRAME;
+    private static final boolean DEBUG = CubeDebug.DEBUG_SCROLL_HEADER_FRAME;
     private static final String LOG_TAG = ScrollHeaderFrame.class.getName();
 
     private int mHeaderHeight;

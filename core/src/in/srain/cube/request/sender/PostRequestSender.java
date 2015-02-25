@@ -9,8 +9,8 @@ import java.net.HttpURLConnection;
 
 public class PostRequestSender extends BaseRequestSender {
 
-    public PostRequestSender(IRequest<?> request, HttpURLConnection httpURLConnection, RequestData requestData) {
-        super(request, httpURLConnection, requestData);
+    public PostRequestSender(IRequest<?> request, HttpURLConnection httpURLConnection) {
+        super(request, httpURLConnection);
     }
 
     @Override

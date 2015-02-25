@@ -5,7 +5,7 @@ import android.util.Log;
 import in.srain.cube.app.lifecycle.IComponentContainer;
 import in.srain.cube.app.lifecycle.LifeCycleComponent;
 import in.srain.cube.app.lifecycle.LifeCycleComponentManager;
-import in.srain.cube.util.Debug;
+import in.srain.cube.util.CubeDebug;
 
 /**
  * 1. manager the components when move from a lifetime to another
@@ -16,7 +16,7 @@ public abstract class XActivity extends CubeFragmentActivity implements ICompone
 
     private LifeCycleComponentManager mComponentContainer = new LifeCycleComponentManager();
 
-    private static final boolean DEBUG = Debug.DEBUG_LIFE_CYCLE;
+    private static final boolean DEBUG = CubeDebug.DEBUG_LIFE_CYCLE;
 
     @Override
     protected void onRestart() {

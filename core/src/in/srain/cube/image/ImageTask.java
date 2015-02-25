@@ -4,7 +4,7 @@ import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import in.srain.cube.image.iface.ImageLoadHandler;
 import in.srain.cube.util.CLog;
-import in.srain.cube.util.Debug;
+import in.srain.cube.util.CubeDebug;
 import in.srain.cube.util.Encrypt;
 
 import java.lang.ref.WeakReference;
@@ -16,7 +16,7 @@ import java.lang.ref.WeakReference;
  */
 public class ImageTask {
 
-    protected static final String LOG_TAG = Debug.DEBUG_IMAGE_LOG_TAG_TASK;
+    protected static final String LOG_TAG = CubeDebug.DEBUG_IMAGE_LOG_TAG_TASK;
     private static final Object sPoolSync = new Object();
     private static ImageTask sTop;
     private static int sPoolSize = 0;
@@ -99,7 +99,7 @@ public class ImageTask {
                 m.next = null;
                 sPoolSize--;
                 m.mHasRecycled = false;
-                if (Debug.DEBUG_IMAGE) {
+                if (CubeDebug.DEBUG_IMAGE) {
                     CLog.d(LOG_TAG, "%s, obtain reused, pool remain: %d", m, sPoolSize);
                 }
                 return m;
@@ -120,10 +120,10 @@ public class ImageTask {
                 next = sTop;
                 sTop = this;
                 sPoolSize++;
-                if (Debug.DEBUG_IMAGE) {
+                if (CubeDebug.DEBUG_IMAGE) {
                     CLog.d(LOG_TAG, "%s is put to recycle poll, pool size: %d", this, sPoolSize);
                 } else {
-                    if (Debug.DEBUG_IMAGE) {
+                    if (CubeDebug.DEBUG_IMAGE) {
                         CLog.d(LOG_TAG, "%s is not recycled, the poll is full: %d", this, sPoolSize);
                     }
                 }
@@ -132,7 +132,7 @@ public class ImageTask {
     }
 
     public ImageTask renew() {
-        if (Debug.DEBUG_IMAGE) {
+        if (CubeDebug.DEBUG_IMAGE) {
             int lastId = mId;
             mId = ++sId;
             CLog.d(LOG_TAG, "%s, renew: %s => %s", this, lastId, mId);

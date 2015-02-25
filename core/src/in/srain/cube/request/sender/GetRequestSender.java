@@ -8,8 +8,8 @@ import java.net.HttpURLConnection;
 
 public class GetRequestSender extends BaseRequestSender {
 
-    public GetRequestSender(IRequest<?> request, HttpURLConnection httpURLConnection, RequestData requestData) {
-        super(request, httpURLConnection, requestData);
+    public GetRequestSender(IRequest<?> request, HttpURLConnection httpURLConnection) {
+        super(request, httpURLConnection);
     }
 
     @Override

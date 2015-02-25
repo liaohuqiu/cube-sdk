@@ -12,7 +12,7 @@ import in.srain.cube.image.drawable.RecyclingBitmapDrawable;
 import in.srain.cube.image.iface.ImageMemoryCache;
 import in.srain.cube.image.iface.ImageResizer;
 import in.srain.cube.util.CLog;
-import in.srain.cube.util.Debug;
+import in.srain.cube.util.CubeDebug;
 import in.srain.cube.util.Version;
 
 import java.io.FileDescriptor;
@@ -29,9 +29,9 @@ import java.io.InputStream;
  */
 public class ImageProvider {
 
-    protected static final boolean DEBUG = Debug.DEBUG_IMAGE;
+    protected static final boolean DEBUG = CubeDebug.DEBUG_IMAGE;
 
-    protected static final String TAG = Debug.DEBUG_IMAGE_LOG_TAG_PROVIDER;
+    protected static final String TAG = CubeDebug.DEBUG_IMAGE_LOG_TAG_PROVIDER;
 
     private static final String MSG_FETCH_BEGIN = "%s fetchBitmapData";
     private static final String MSG_FETCH_BEGIN_IDENTITY_KEY = "%s identityKey: %s";

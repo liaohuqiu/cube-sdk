@@ -32,7 +32,7 @@ public abstract class RequestBase<T> implements IRequest<T> {
     public T onDataFromServer(String data) {
         JsonData jsonData = JsonData.create(data);
         if (jsonData == null || jsonData.length() == 0) {
-            setFailData(FailData.dataFormatError(data));
+            setFailData(FailData.dataFormatError(this, data));
             return null;
         }
         return processOriginDataFromServer(jsonData);

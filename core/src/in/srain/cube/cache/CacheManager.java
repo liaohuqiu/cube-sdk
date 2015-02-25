@@ -7,7 +7,7 @@ import in.srain.cube.concurrent.SimpleExecutor;
 import in.srain.cube.concurrent.SimpleTask;
 import in.srain.cube.request.JsonData;
 import in.srain.cube.util.CLog;
-import in.srain.cube.util.Debug;
+import in.srain.cube.util.CubeDebug;
 
 import java.io.IOException;
 
@@ -16,7 +16,7 @@ import java.io.IOException;
  */
 public class CacheManager {
 
-    private static final boolean DEBUG = Debug.DEBUG_CACHE;
+    private static final boolean DEBUG = CubeDebug.DEBUG_CACHE;
     private static final String LOG_TAG = "cube-cache-manager";
 
     private static final int DEFAULT_CACHE_SIZE_IN_KB = 1024 * 10;

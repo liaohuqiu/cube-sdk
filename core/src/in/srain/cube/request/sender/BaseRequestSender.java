@@ -16,10 +16,10 @@ public abstract class BaseRequestSender implements IRequestSender {
     protected RequestData mRequestData;
     protected IRequest<?> mRequest;
 
-    public BaseRequestSender(IRequest<?> request, HttpURLConnection httpURLConnection, RequestData requestData) {
+    public BaseRequestSender(IRequest<?> request, HttpURLConnection httpURLConnection) {
         mRequest = request;
         mHttpURLConnection = httpURLConnection;
-        mRequestData = requestData;
+        mRequestData = request.getRequestData();
     }
 
     @Override

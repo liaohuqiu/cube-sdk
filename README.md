@@ -15,7 +15,7 @@ http://cube-sdk.liaohuqiu.net
 
 ### Import to your project
 
-The latest version: `1.0.44.6-SNAPSHOT`, has been published to: https://oss.sonatype.org/content/repositories/snapshots, in gradle:
+The latest version: `1.0.44.7-SNAPSHOT`, has been published to: https://oss.sonatype.org/content/repositories/snapshots, in gradle:
 
 ```
 maven {
@@ -38,7 +38,7 @@ pom.xml, latest version:
     <type>aar</type>
     <!-- or apklib format, if you want -->
     <!-- <type>apklib</type> -->
-    <version>1.0.44.6-SNAPSHOT</version>
+    <version>1.0.44.7-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -58,7 +58,7 @@ pom.xml, stable version:
 gradle, latest version:
 
 ```
-compile 'in.srain.cube:cube-sdk:1.0.44.6-SNAPSHOT@aar'
+compile 'in.srain.cube:cube-sdk:1.0.44.7-SNAPSHOT@aar'
 ```
 
 gradle, stable version:

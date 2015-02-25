@@ -21,8 +21,8 @@ public class MultiPartRequestSender extends PostRequestSender {
     private OutputStream mOutputStream;
     private PrintWriter mWriter;
 
-    public MultiPartRequestSender(IRequest<?> request, HttpURLConnection httpURLConnection, RequestData requestData) {
-        super(request, httpURLConnection, requestData);
+    public MultiPartRequestSender(IRequest<?> request, HttpURLConnection httpURLConnection) {
+        super(request, httpURLConnection);
     }
 
     @Override
