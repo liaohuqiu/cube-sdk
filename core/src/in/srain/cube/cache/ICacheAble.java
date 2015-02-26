@@ -67,7 +67,8 @@ public interface ICacheAble<T> {
     public void onCacheData(CacheResultType cacheResultType, T cacheData, boolean outOfDate);
 
     /**
-     * When there is no cache data is available. This method will be called.
+     * When there is no cache data is available, this method will be called.
+     * Will always in Main UI thread
      */
     public void onNoCacheData(CacheManager cacheManager);
 

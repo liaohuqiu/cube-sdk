@@ -19,8 +19,6 @@ public class CacheManager {
     private static final boolean DEBUG = CubeDebug.DEBUG_CACHE;
     private static final String LOG_TAG = "cube-cache-manager";
 
-    private static final int DEFAULT_CACHE_SIZE_IN_KB = 1024 * 10;
-
     private static final byte AFTER_READ_FROM_FILE = 0x01;
     private static final byte AFTER_READ_FROM_ASSERT = 0x02;
     private static final byte AFTER_CONVERT = 0x04;
@@ -38,8 +36,19 @@ public class CacheManager {
     private DiskCacheProvider mFileCache;
     private Context mContext;
 
-    private CacheManager(Context content, String cacheDir, int memoryCacheSizeInKB, int fileCacheSizeInKB) {
+    public CacheManager(Context content, String cacheDir, int memoryCacheSizeInKB, int fileCacheSizeInKB) {
         mContext = content;
+
+        if (TextUtils.isEmpty(cacheDir)) {
+            throw new IllegalArgumentException("cacheDir can not be empty");
+        }
+
+        if (memoryCacheSizeInKB <= 0) {
+            throw new IllegalArgumentException("memoryCacheSizeInKB <= 0");
+        }
+        if (fileCacheSizeInKB <= 0) {
+            throw new IllegalArgumentException("fileCacheSizeInKB <= 0");
+        }
 
         mMemoryCache = new LruCache<String, CacheMetaData>(memoryCacheSizeInKB * 1024) {
             @Override
@@ -48,23 +57,15 @@ public class CacheManager {
             }
         };
 
-        if (fileCacheSizeInKB < 0) {
-            fileCacheSizeInKB = DEFAULT_CACHE_SIZE_IN_KB;
-        }
 
         DiskFileUtils.CacheDirInfo cacheDirInfo = DiskFileUtils.getDiskCacheDir(content, cacheDir, fileCacheSizeInKB, null);
         mFileCache = DiskCacheProvider.createLru(content, cacheDirInfo.path, cacheDirInfo.realSize);
-        // mFileCache.openDiskCacheAsync();
 
         if (DEBUG) {
             CLog.d(LOG_TAG,
                     "CacheManger: cache dir: %s => %s, size: %s => %s",
                     cacheDir, cacheDirInfo.path, cacheDirInfo.requireSize, cacheDirInfo.realSize);
         }
-    }
-
-    public static CacheManager create(Context content, String cacheDir, int memoryCacheSizeInKB, int fileCacheSizeInKB) {
-        return new CacheManager(content, cacheDir, memoryCacheSizeInKB, fileCacheSizeInKB);
     }
 
     public <T> void requestCache(ICacheAble<T> cacheAble) {

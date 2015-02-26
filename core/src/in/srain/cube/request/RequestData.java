@@ -221,9 +221,19 @@ public class RequestData {
         return mUploadFileInfoHashMap != null && mUploadFileInfoHashMap.size() > 0;
     }
 
+    @Override
+    public String toString() {
+        return String.format("RequestData: [%s, G: %s, P: %s, F: %s]", getRequestUrl(), mQueryData, mPostData, mUploadFileInfoHashMap);
+    }
+
     public static class UploadFileInfo {
         public File uploadFile;
         public String fileName;
         public String fieldName;
+
+        @Override
+        public String toString() {
+            return String.format("UploadFileInfo:[%s %s %s]", fieldName, fileName, uploadFile);
+        }
     }
 }

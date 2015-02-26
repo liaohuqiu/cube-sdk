@@ -27,7 +27,7 @@ public class SimpleRequestManager {
             StringBuilder sb = new StringBuilder();
             RequestData requestData = request.getRequestData();
             if (DEBUG) {
-                CLog.d(LOG_TAG, "url: %s", requestData.getRequestUrl());
+                CLog.d(LOG_TAG, "%s", requestData);
             }
             BaseRequestSender requestSender = RequestSenderFactory.create(request);
             if (requestSender != null) {
@@ -86,7 +86,7 @@ public class SimpleRequestManager {
                     StringBuilder sb = new StringBuilder();
                     RequestData requestData = request.getRequestData();
                     if (DEBUG) {
-                        CLog.d(LOG_TAG, "%s, %s", requestData.getRequestUrl(), requestData.getPostData());
+                        CLog.d(LOG_TAG, "%s", requestData);
                     }
                     BaseRequestSender requestSender = RequestSenderFactory.create(request);
                     if (requestSender != null) {

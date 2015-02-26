@@ -11,6 +11,10 @@ import in.srain.cube.util.CLog;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * It's easy to use.
+ * Auto open.
+ */
 public class DiskCacheProvider {
 
     public interface AsyncTaskEventHandler {
