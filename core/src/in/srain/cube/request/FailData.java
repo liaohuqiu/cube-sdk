@@ -58,4 +58,8 @@ public class FailData {
         }
         return (T) mData;
     }
+
+    public Object getRawData() {
+        return mData;
+    }
 }

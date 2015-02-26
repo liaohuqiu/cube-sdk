@@ -14,7 +14,7 @@ Demo 项目移到了这里: https://github.com/liaohuqiu/android-cube-app
 
 项目已经发布到了Maven中央库，包括`aar`和`apklib`两种格式。在Maven或者Gradle中可如下直接引入。
 
-最新版版本号: `1.0.44.7-SNAPSHOT`, 发布到了: `https://oss.sonatype.org/content/repositories/snapshots`
+最新版版本号: `1.0.44.8-SNAPSHOT`, 发布到了: `https://oss.sonatype.org/content/repositories/snapshots`
 
 在gradle中:
 
@@ -43,7 +43,7 @@ mavenCentral()
     <type>aar</type>
     <!-- or apklib format, if you want -->
     <!-- <type>apklib</type> -->
-    <version>1.0.44.7-SNAPSHOT</version>
+    <version>1.0.44.8-SNAPSHOT</version>
 </dependency>
 
 稳定版
@@ -62,7 +62,7 @@ mavenCentral()
 gradle / Android Studio, 最新版
 
 ```
-compile 'in.srain.cube:cube-sdk:1.0.44.7-SNAPSHOT@aar'
+compile 'in.srain.cube:cube-sdk:1.0.44.8-SNAPSHOT@aar'
 ```
 
 gradle / Android Studio, 稳定版

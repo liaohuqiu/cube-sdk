@@ -11,6 +11,7 @@ import java.util.Map;
 
 public class RequestData {
 
+    private static final String EMPTY = "";
     private static final String CHAR_QM = "?";
     private static final String CHAR_AND = "&";
     private static final String CHAR_EQ = "=";
@@ -26,6 +27,10 @@ public class RequestData {
     private String mTag;
 
     public static String buildQueryString(Map<String, ?> data, String url) {
+
+        if (data == null || data.size() == 0) {
+            return url;
+        }
 
         StringBuilder sb = new StringBuilder();
         boolean append = false;
@@ -198,6 +203,9 @@ public class RequestData {
     }
 
     public String getPostString() {
+        if (mPostData == null || mPostData.size() == 0) {
+            return EMPTY;
+        }
         return buildQueryString(mPostData, null);
     }
 

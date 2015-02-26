@@ -3,6 +3,7 @@ package in.srain.cube.request;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import in.srain.cube.concurrent.SimpleTask;
 import in.srain.cube.request.sender.BaseRequestSender;
 import in.srain.cube.request.sender.RequestSenderFactory;
 import in.srain.cube.util.CLog;
@@ -39,11 +40,20 @@ public class SimpleRequestManager {
             request.setFailData(FailData.networkError(request));
         }
 
-        if (null == data) {
-            request.onRequestFail(request.getFailData());
-        } else {
-            request.onRequestSuccess(data);
-        }
+        final T finalData = data;
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                if (finalData == null) {
+                    request.onRequestFail(request.getFailData());
+                } else {
+                    request.onRequestSuccess(finalData);
+                }
+            }
+        };
+
+        SimpleTask.post(runnable);
+
         return data;
     }
 
@@ -76,7 +86,7 @@ public class SimpleRequestManager {
                     StringBuilder sb = new StringBuilder();
                     RequestData requestData = request.getRequestData();
                     if (DEBUG) {
-                        CLog.d(LOG_TAG, "url: %s", requestData.getRequestUrl());
+                        CLog.d(LOG_TAG, "%s, %s", requestData.getRequestUrl(), requestData.getPostData());
                     }
                     BaseRequestSender requestSender = RequestSenderFactory.create(request);
                     if (requestSender != null) {
