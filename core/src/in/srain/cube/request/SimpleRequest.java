@@ -26,6 +26,11 @@ public class SimpleRequest<T> extends RequestBase<T> implements IRequest<T> {
     }
 
     @Override
+    protected T doRequestSync() {
+        return SimpleRequestManager.requestSync(this);
+    }
+
+    @Override
     protected void prepareRequest() {
     }
 

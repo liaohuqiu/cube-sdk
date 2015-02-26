@@ -1,29 +1,65 @@
 package in.srain.cube.request;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
+import in.srain.cube.concurrent.SimpleTask;
+import in.srain.cube.request.sender.BaseRequestSender;
+import in.srain.cube.request.sender.RequestSenderFactory;
 import in.srain.cube.util.CLog;
-import in.srain.cube.util.Debug;
-
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import in.srain.cube.util.CubeDebug;
 
 /**
  * @author http://www.liaohuqiu.net
  */
 public class SimpleRequestManager {
 
-    private static final boolean DEBUG = Debug.DEBUG_REQUEST;
-    private static final String LOG_TAG = Debug.DEBUG_REQUEST_LOG_TAG;
+    private static final boolean DEBUG = CubeDebug.DEBUG_REQUEST;
+    private static final String LOG_TAG = CubeDebug.DEBUG_REQUEST_LOG_TAG;
 
     private final static int REQUEST_SUCCESS = 0x01;
 
     private final static int REQUEST_FAILED = 0x02;
 
+    public static <T> T requestSync(final IRequest<T> request) {
+        T data = null;
+        try {
+            StringBuilder sb = new StringBuilder();
+            RequestData requestData = request.getRequestData();
+            if (DEBUG) {
+                CLog.d(LOG_TAG, "url: %s", requestData.getRequestUrl());
+            }
+            BaseRequestSender requestSender = RequestSenderFactory.create(request);
+            if (requestSender != null) {
+                requestSender.send();
+                requestSender.getResponse(sb);
+                data = request.onDataFromServer(sb.toString());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setFailData(FailData.networkError(request));
+        }
+
+        final T finalData = data;
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                if (finalData == null) {
+                    request.onRequestFail(request.getFailData());
+                } else {
+                    request.onRequestSuccess(finalData);
+                }
+            }
+        };
+
+        SimpleTask.post(runnable);
+
+        return data;
+    }
+
     public static <T> void sendRequest(final IRequest<T> request) {
 
-        final Handler handler = new Handler() {
+        final Handler handler = new Handler(Looper.getMainLooper()) {
             @SuppressWarnings("unchecked")
             @Override
             public void handleMessage(Message msg) {
@@ -33,7 +69,7 @@ public class SimpleRequestManager {
                         break;
 
                     case REQUEST_FAILED:
-                        request.onRequestFail(null);
+                        request.onRequestFail(request.getFailData());
                         break;
 
                     default:
@@ -47,35 +83,20 @@ public class SimpleRequestManager {
             public void run() {
                 T data = null;
                 try {
-
-                    RequestData requestData = request.getRequestData();
-
-                    if (DEBUG) {
-                        CLog.d(LOG_TAG, "url: %s", requestData.getRequestUrl());
-                    }
                     StringBuilder sb = new StringBuilder();
-                    URL url = new URL(request.getRequestData().getRequestUrl());
-                    HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-                    if (requestData.shouldPost()) {
-                        urlConnection.setRequestMethod("POST");
-                        OutputStreamWriter writer = new OutputStreamWriter(urlConnection.getOutputStream());
-                        writer.write(requestData.getPostString());
-                        writer.flush();
+                    RequestData requestData = request.getRequestData();
+                    if (DEBUG) {
+                        CLog.d(LOG_TAG, "%s, %s", requestData.getRequestUrl(), requestData.getPostData());
                     }
-                    InputStream ips = new BufferedInputStream(urlConnection.getInputStream());
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(ips, "UTF-8"));
-
-                    char[] buffer = new char[1024];
-                    int bufferLength;
-                    while ((bufferLength = reader.read(buffer, 0, buffer.length)) > 0) {
-                        sb.append(buffer, 0, bufferLength);
+                    BaseRequestSender requestSender = RequestSenderFactory.create(request);
+                    if (requestSender != null) {
+                        requestSender.send();
+                        requestSender.getResponse(sb);
+                        data = request.onDataFromServer(sb.toString());
                     }
-                    reader.close();
-                    ips.close();
-                    data = request.onDataFromServer(sb.toString());
                 } catch (Exception e) {
                     e.printStackTrace();
+                    request.setFailData(FailData.networkError(request));
                 }
 
                 if (null == data) {
@@ -89,6 +110,6 @@ public class SimpleRequestManager {
                     handler.sendMessage(msg);
                 }
             }
-        }, "SimpleRequestBase-Manager").start();
+        }, "cube-simple-request-manager").start();
     }
 }

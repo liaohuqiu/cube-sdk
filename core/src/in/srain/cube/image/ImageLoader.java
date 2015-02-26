@@ -13,7 +13,7 @@ import in.srain.cube.image.iface.ImageLoadProgressHandler;
 import in.srain.cube.image.iface.ImageResizer;
 import in.srain.cube.image.iface.ImageTaskExecutor;
 import in.srain.cube.util.CLog;
-import in.srain.cube.util.Debug;
+import in.srain.cube.util.CubeDebug;
 
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -40,8 +40,8 @@ public class ImageLoader implements LifeCycleComponent {
     private static final String MSG_TASK_RECYCLE = "%s, %s LoadImageTask.removeAndRecycle";
     private static final String MSG_HIT_CACHE = "%s hit cache %s %s";
 
-    protected static final boolean DEBUG = Debug.DEBUG_IMAGE;
-    protected static final String LOG_TAG = Debug.DEBUG_IMAGE_LOG_TAG;
+    protected static final boolean DEBUG = CubeDebug.DEBUG_IMAGE;
+    protected static final String LOG_TAG = CubeDebug.DEBUG_IMAGE_LOG_TAG;
 
     protected ImageTaskExecutor mImageTaskExecutor;
     protected ImageResizer mImageResizer;

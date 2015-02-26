@@ -15,43 +15,58 @@ http://cube-sdk.liaohuqiu.net
 
 ### Import to your project
 
-Cube-SDK has been pushed to Maven Central, both in `aar` and `apklib` format.
+The latest version: `{cube_sdk_version}`, has been published to: https://oss.sonatype.org/content/repositories/snapshots, in gradle:
 
-##### Using in pom.xml
+```
+maven {
+    url 'https://oss.sonatype.org/content/repositories/snapshots'
+}
+```
+
+The stable version: `{cube_sdk_stable_version}`, https://oss.sonatype.org/content/repositories/releases, in gradle:
+
+```
+mavenCentral()
+```
+
+pom.xml, latest version:
 
 ```xml
 <dependency>
     <groupId>in.srain.cube</groupId>
     <artifactId>cube-sdk</artifactId>
-    <type>apklib</type>
+    <type>aar</type>
+    <!-- or apklib format, if you want -->
+    <!-- <type>apklib</type> -->
     <version>{cube_sdk_version}</version>
 </dependency>
 ```
 
-or:
+pom.xml, stable version:
 
-```
+```xml
 <dependency>
     <groupId>in.srain.cube</groupId>
     <artifactId>cube-sdk</artifactId>
     <type>aar</type>
-    <version>{cube_sdk_version}</version>
+    <!-- or apklib format, if you want -->
+    <!-- <type>apklib</type> -->
+    <version>{cube_sdk_stable_version}</version>
 </dependency>
 ```
 
-###### Gradle / Android Studio
+gradle, latest version:
 
-``` gradle 
+```
 compile 'in.srain.cube:cube-sdk:{cube_sdk_version}@aar'
-`````
+```
+
+gradle, stable version:
+
+```
+compile 'in.srain.cube:cube-sdk:{cube_sdk_stable_version}@aar'
+```
 
 ###### Eclipse
 
-Load the content into you eclipse, it's library project. Then use it in your application project.
-
-
-##### Components
-
-cube-sdk contains:
-
-* CLog
+Load the content into you eclipse, it's a library project. Then use it in your application project.

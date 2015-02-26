@@ -5,10 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import in.srain.cube.util.CLog;
-import in.srain.cube.util.Debug;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Modifier;
+import in.srain.cube.util.CubeDebug;
 
 /**
  * A adapter using View Holder to display the item of a list view;
@@ -18,7 +15,7 @@ import java.lang.reflect.Modifier;
  */
 public abstract class ListViewDataAdapterBase<ItemDataType> extends BaseAdapter {
 
-    private static String LOG_TAG = "cube_list";
+    private static final String LOG_TAG = "cube-list";
 
     protected ViewHolderCreator<ItemDataType> mViewHolderCreator;
     protected ViewHolderCreator<ItemDataType> mLazyCreator;
@@ -67,7 +64,7 @@ public abstract class ListViewDataAdapterBase<ItemDataType> extends BaseAdapter 
     @SuppressWarnings("unchecked")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        if (Debug.DEBUG_LIST) {
+        if (CubeDebug.DEBUG_LIST) {
             CLog.d(LOG_TAG, "getView %s", position);
         }
         ItemDataType itemData = getItem(position);

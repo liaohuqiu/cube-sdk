@@ -7,7 +7,7 @@ import in.srain.cube.concurrent.SimpleExecutor;
 import in.srain.cube.concurrent.SimpleTask;
 import in.srain.cube.request.JsonData;
 import in.srain.cube.util.CLog;
-import in.srain.cube.util.Debug;
+import in.srain.cube.util.CubeDebug;
 
 import java.io.IOException;
 
@@ -16,7 +16,7 @@ import java.io.IOException;
  */
 public class CacheManager {
 
-    private static final boolean DEBUG = Debug.DEBUG_CACHE;
+    private static final boolean DEBUG = CubeDebug.DEBUG_CACHE;
     private static final String LOG_TAG = "cube-cache-manager";
 
     private static final int DEFAULT_CACHE_SIZE_IN_KB = 1024 * 10;
@@ -34,16 +34,16 @@ public class CacheManager {
     private static final byte CONVERT_FOR_ASSERT = 0x02;
     private static final byte CONVERT_FOR_CREATE = 0x04;
 
-    private LruCache<String, CacheInfo> mMemoryCache;
+    private LruCache<String, CacheMetaData> mMemoryCache;
     private DiskCacheProvider mFileCache;
     private Context mContext;
 
     private CacheManager(Context content, String cacheDir, int memoryCacheSizeInKB, int fileCacheSizeInKB) {
         mContext = content;
 
-        mMemoryCache = new LruCache<String, CacheInfo>(memoryCacheSizeInKB * 1024) {
+        mMemoryCache = new LruCache<String, CacheMetaData>(memoryCacheSizeInKB * 1024) {
             @Override
-            protected int sizeOf(String key, CacheInfo value) {
+            protected int sizeOf(String key, CacheMetaData value) {
                 return (value.getSize() + key.getBytes().length);
             }
         };
@@ -90,16 +90,16 @@ public class CacheManager {
                 new Runnable() {
                     @Override
                     public void run() {
-                        CacheInfo cacheInfo = CacheInfo.createForNow(data);
-                        putDataToMemoryCache(cacheKey, cacheInfo);
-                        mFileCache.write(cacheKey, cacheInfo.getCacheData());
+                        CacheMetaData cacheMetaData = CacheMetaData.createForNow(data);
+                        putDataToMemoryCache(cacheKey, cacheMetaData);
+                        mFileCache.write(cacheKey, cacheMetaData.getCacheData());
                         mFileCache.flushDiskCacheAsyncWithDelay(1000);
                     }
                 }
         );
     }
 
-    private void putDataToMemoryCache(String key, CacheInfo data) {
+    private void putDataToMemoryCache(String key, CacheMetaData data) {
         if (TextUtils.isEmpty(key)) {
             return;
         }
@@ -200,54 +200,65 @@ public class CacheManager {
     }
 
     /**
-     * Request cache
+     * Request cache synchronously.
+     * If there is not cache data available, return null,
+     * and {@link ICacheAble#onNoCacheData} will not no be called.
      *
      * @param cacheAble
      * @param <T>
-     * @return if not cache data available, return null
+     * @return if not cache data available, return null, {@link ICacheAble#onNoCacheData} will not no be called.
      */
     @SuppressWarnings({"unused"})
     public <T> T requestCacheSync(ICacheAble<T> cacheAble) {
 
+        if (cacheAble.cacheIsDisabled()) {
+            return null;
+        }
+
         // try to find in runtime cache
         String cacheKey = cacheAble.getCacheKey();
-        CacheInfo mRawData = mMemoryCache.get(cacheKey);
+        CacheMetaData mRawData = mMemoryCache.get(cacheKey);
         if (mRawData != null) {
             if (DEBUG) {
                 CLog.d(LOG_TAG, "key: %s, exist in list", cacheKey);
             }
-            return convertResultFromCacheInfo(cacheAble, mRawData);
         }
 
         // try read from cache data
-        boolean hasFileCache = mFileCache.getDiskCache().has(cacheKey);
-        if (hasFileCache) {
-            String cacheContent = mFileCache.read(cacheKey);
-            JsonData jsonData = JsonData.create(cacheContent);
-            mRawData = CacheInfo.createFromJson(jsonData);
-
-            return convertResultFromCacheInfo(cacheAble, mRawData);
+        if (mRawData == null) {
+            boolean hasFileCache = mFileCache.getDiskCache().has(cacheKey);
+            if (hasFileCache) {
+                String cacheContent = mFileCache.read(cacheKey);
+                JsonData jsonData = JsonData.create(cacheContent);
+                mRawData = CacheMetaData.createFromJson(jsonData);
+            }
         }
 
         // try to read from assert cache file
-        String assertInitDataPath = cacheAble.getAssertInitDataPath();
-        if (assertInitDataPath != null && assertInitDataPath.length() > 0) {
-            String cacheContent = DiskFileUtils.readAssert(mContext, assertInitDataPath);
-            mRawData = CacheInfo.createInvalidated(cacheContent);
-            putDataToMemoryCache(cacheKey, mRawData);
-            return convertResultFromCacheInfo(cacheAble, mRawData);
+        if (mRawData == null) {
+            String assertInitDataPath = cacheAble.getAssertInitDataPath();
+            if (assertInitDataPath != null && assertInitDataPath.length() > 0) {
+                String cacheContent = DiskFileUtils.readAssert(mContext, assertInitDataPath);
+                mRawData = CacheMetaData.createInvalidated(cacheContent);
+                putDataToMemoryCache(cacheKey, mRawData);
+            }
+        }
+
+        if (mRawData != null) {
+            boolean outOfDate = mRawData.isOutOfDateFor(cacheAble);
+            if (outOfDate && !cacheAble.useCacheAnyway()) {
+                return null;
+            }
+            JsonData data = JsonData.create(mRawData.getData());
+            T ret = cacheAble.processRawDataFromCache(data);
+            cacheAble.onCacheData(CacheResultType.FROM_INIT_FILE, ret, outOfDate);
+            return ret;
         }
 
         if (DEBUG) {
             CLog.d(LOG_TAG, "key: %s, cache file not exist", cacheKey);
         }
         return null;
-    }
-
-    private <T> T convertResultFromCacheInfo(ICacheAble<T> cacheAble, CacheInfo rawData) {
-        JsonData data = JsonData.create(rawData.getData());
-        T mResult = cacheAble.processRawDataFromCache(data);
-        return mResult;
     }
 
     public DiskCacheProvider getDiskCacheProvider() {
@@ -258,7 +269,7 @@ public class CacheManager {
 
         private ICacheAble<T1> mCacheAble;
 
-        private CacheInfo mRawData;
+        private CacheMetaData mRawData;
         private T1 mResult;
         private byte mWorkType = 0;
         private byte mConvertFor = 0;
@@ -275,7 +286,7 @@ public class CacheManager {
                 if (DEBUG) {
                     CLog.d(LOG_TAG, "key: %s, Cache is disabled, query from server", cacheKey);
                 }
-                mCacheAble.createDataForCache(CacheManager.this);
+                mCacheAble.onNoCacheData(CacheManager.this);
                 return;
             }
 
@@ -306,7 +317,7 @@ public class CacheManager {
             if (DEBUG) {
                 CLog.d(LOG_TAG, "key: %s, cache file not exist", mCacheAble.getCacheKey());
             }
-            mCacheAble.createDataForCache(CacheManager.this);
+            mCacheAble.onNoCacheData(CacheManager.this);
         }
 
         @Override
@@ -390,7 +401,7 @@ public class CacheManager {
 
             String cacheContent = mFileCache.read(mCacheAble.getCacheKey());
             JsonData jsonData = JsonData.create(cacheContent);
-            mRawData = CacheInfo.createFromJson(jsonData);
+            mRawData = CacheMetaData.createFromJson(jsonData);
         }
 
         private void doQueryFromAssertCacheFileInBackground() {
@@ -400,7 +411,7 @@ public class CacheManager {
             }
 
             String cacheContent = DiskFileUtils.readAssert(mContext, mCacheAble.getAssertInitDataPath());
-            mRawData = CacheInfo.createInvalidated(cacheContent);
+            mRawData = CacheMetaData.createInvalidated(cacheContent);
             putDataToMemoryCache(mCacheAble.getCacheKey(), mRawData);
         }
 
@@ -421,9 +432,7 @@ public class CacheManager {
 
         private void done() {
 
-            long lastTime = mRawData.getTime();
-            long timeInterval = System.currentTimeMillis() / 1000 - lastTime;
-            boolean outOfDate = timeInterval > mCacheAble.getCacheTime() || timeInterval < 0;
+            boolean outOfDate = mRawData.isOutOfDateFor(mCacheAble);
 
             if (mResult != null) {
                 switch (mConvertFor) {
@@ -442,7 +451,7 @@ public class CacheManager {
                 }
             }
             if (mResult == null || outOfDate) {
-                mCacheAble.createDataForCache(CacheManager.this);
+                mCacheAble.onNoCacheData(CacheManager.this);
             }
         }
     }

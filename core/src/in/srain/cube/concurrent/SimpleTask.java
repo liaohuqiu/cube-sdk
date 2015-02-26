@@ -3,7 +3,6 @@ package in.srain.cube.concurrent;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import in.srain.cube.util.CLog;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -85,14 +84,12 @@ public abstract class SimpleTask implements Runnable {
     }
 
     public void cancel() {
-        CLog.d("cube-simple-task", "cancel: %s", this);
         if (mState.get() >= STATE_FINISH) {
             return;
         } else {
             if (mState.get() == STATE_RUNNING && null != mCurrentThread) {
                 try {
                     mCurrentThread.interrupt();
-                    CLog.d("cube-simple-task", "cancel: %s", this);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -113,8 +110,9 @@ public abstract class SimpleTask implements Runnable {
             SimpleTask work = (SimpleTask) msg.obj;
             switch (msg.what) {
                 case MSG_TASK_DONE:
+                    boolean isCanceled = work.isCancelled();
                     work.mState.set(STATE_FINISH);
-                    work.onFinish(work.isCancelled());
+                    work.onFinish(isCanceled);
                     break;
                 default:
                     break;

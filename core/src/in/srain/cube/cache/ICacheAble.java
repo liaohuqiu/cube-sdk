@@ -31,7 +31,14 @@ public interface ICacheAble<T> {
      *
      * @param use
      */
-    public ICacheAble<T> useCacheAnyway(boolean use);
+    public ICacheAble<T> setUseCacheAnyway(boolean use);
+
+    /**
+     * check if use cache anyway
+     *
+     * @return
+     */
+    public boolean useCacheAnyway();
 
     /**
      * @param path file path under /res, For example: "/cache_init/test.json";
@@ -60,14 +67,17 @@ public interface ICacheAble<T> {
     public void onCacheData(CacheResultType cacheResultType, T cacheData, boolean outOfDate);
 
     /**
-     * create data when no cache is available.
+     * When there is no cache data is available. This method will be called.
      */
-    public void createDataForCache(CacheManager cacheManager);
-
-    public ICacheAble<T> setDisableCache(boolean disable);
+    public void onNoCacheData(CacheManager cacheManager);
 
     /**
      * temporarily disable cache. The data will no be load from cache and will also not be put into cache
+     */
+    public ICacheAble<T> setDisableCache(boolean disable);
+
+    /**
+     * check if cache is disabled
      *
      * @return
      */

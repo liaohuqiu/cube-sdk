@@ -1,11 +1,13 @@
 package in.srain.cube.image.impl;
 
 import android.os.Build;
-import android.util.Log;
 import in.srain.cube.util.CLog;
-import in.srain.cube.util.Debug;
+import in.srain.cube.util.CubeDebug;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -14,7 +16,7 @@ import java.net.URL;
  */
 public class SimpleDownloader {
 
-    protected static final String LOG_TAG = Debug.DEBUG_IMAGE_LOG_TAG_PROVIDER;
+    protected static final String LOG_TAG = CubeDebug.DEBUG_IMAGE_LOG_TAG_PROVIDER;
 
     private static final int IO_BUFFER_SIZE = 8 * 1024;
 

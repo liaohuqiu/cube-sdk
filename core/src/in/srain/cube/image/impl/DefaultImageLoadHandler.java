@@ -15,7 +15,7 @@ import in.srain.cube.image.drawable.RoundedDrawable;
 import in.srain.cube.image.drawable.TextDrawable;
 import in.srain.cube.image.iface.ImageLoadHandler;
 import in.srain.cube.util.CLog;
-import in.srain.cube.util.Debug;
+import in.srain.cube.util.CubeDebug;
 import in.srain.cube.util.Version;
 
 /**
@@ -27,8 +27,8 @@ import in.srain.cube.util.Version;
  */
 public class DefaultImageLoadHandler implements ImageLoadHandler {
 
-    private final static boolean DEBUG = Debug.DEBUG_IMAGE;
-    private final static String LOG_TAG = Debug.DEBUG_IMAGE_LOG_TAG;
+    private final static boolean DEBUG = CubeDebug.DEBUG_IMAGE;
+    private final static String LOG_TAG = CubeDebug.DEBUG_IMAGE_LOG_TAG;
     private final static String MSG_LOADING = "%s => %s handler on loading";
     private final static String MSG_LOAD_ERROR = "%s => %s handler on load error";
     private final static String MSG_LOAD_FINISH = "%s => %s handler on load finish: %s %s %s %s";

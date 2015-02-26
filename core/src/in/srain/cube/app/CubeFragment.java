@@ -10,7 +10,7 @@ import in.srain.cube.app.lifecycle.IComponentContainer;
 import in.srain.cube.app.lifecycle.LifeCycleComponent;
 import in.srain.cube.app.lifecycle.LifeCycleComponentManager;
 import in.srain.cube.util.CLog;
-import in.srain.cube.util.Debug;
+import in.srain.cube.util.CubeDebug;
 
 /**
  * Implement {@link ICubeFragment}, {@link IComponentContainer}
@@ -19,7 +19,7 @@ import in.srain.cube.util.Debug;
  */
 public abstract class CubeFragment extends Fragment implements ICubeFragment, IComponentContainer {
 
-    private static final boolean DEBUG = Debug.DEBUG_LIFE_CYCLE;
+    private static final boolean DEBUG = CubeDebug.DEBUG_LIFE_CYCLE;
     protected Object mDataIn;
     private boolean mFirstResume = true;
 

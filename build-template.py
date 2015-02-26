@@ -1,6 +1,7 @@
 import os
 vars = {
-        'cube_sdk_version': '1.0.43-SNAPSHOT'
+        'cube_sdk_version': '1.0.44.8-SNAPSHOT',
+        'cube_sdk_stable_version': '1.0.42'
         }
 
 files = [

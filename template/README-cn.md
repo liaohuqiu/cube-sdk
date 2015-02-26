@@ -10,39 +10,69 @@ Demo 项目移到了这里: https://github.com/liaohuqiu/android-cube-app
 
 ### 在项目中引入
 
+#### 中央库依赖
 
-项目现在已经发布到了maven中央库，有 `aar` and `apklib` 和两种格式
+项目已经发布到了Maven中央库，包括`aar`和`apklib`两种格式。在Maven或者Gradle中可如下直接引入。
 
-##### 在 pom.xml 中
+最新版版本号: `{cube_sdk_version}`, 发布到了: `https://oss.sonatype.org/content/repositories/snapshots`
 
-引用apklib:
+在gradle中:
+
+```
+maven {
+    url 'https://oss.sonatype.org/content/repositories/snapshots'
+}
+```
+
+稳定版: `{cube_sdk_stable_version}`, 发布到了: `https://oss.sonatype.org/content/repositories/releases`
+
+在gradle中:
+
+```
+mavenCentral()
+```
+
+`pom.xml` 文件中
+
+最新版:
 
 ```xml
 <dependency>
     <groupId>in.srain.cube</groupId>
     <artifactId>cube-sdk</artifactId>
-    <type>apklib</type>
+    <type>aar</type>
+    <!-- or apklib format, if you want -->
+    <!-- <type>apklib</type> -->
     <version>{cube_sdk_version}</version>
 </dependency>
-```
 
-或者引入aar:
+稳定版
 
-```
+```xml
 <dependency>
     <groupId>in.srain.cube</groupId>
     <artifactId>cube-sdk</artifactId>
     <type>aar</type>
-    <version>{cube_sdk_version}</version>
+    <!-- or apklib format, if you want -->
+    <!-- <type>apklib</type> -->
+    <version>{cube_sdk_stable_version}</version>
 </dependency>
 ```
 
-##### 在 Gradle / Android Studio
+gradle / Android Studio, 最新版
 
-``` gradle 
+```
 compile 'in.srain.cube:cube-sdk:{cube_sdk_version}@aar'
-`````
+```
+
+gradle / Android Studio, 稳定版
+
+```
+compile 'in.srain.cube:cube-sdk:{cube_sdk_stable_version}@aar'
+```
 
 ##### eclipse
 
-直接将core文件夹下的内容作为一个类库加载，然后在项目中引用
+项目在Eclipse中也是可以加载编译的，但强烈建议使用Intellij IDEA 或者 Android Stuido。
+
+直接将core文件夹下的内容作为一个类库加载，然后在项目中引用。

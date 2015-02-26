@@ -3,10 +3,9 @@ package in.srain.cube.request;
 import android.text.TextUtils;
 import in.srain.cube.cache.CacheManager;
 import in.srain.cube.cache.CacheResultType;
-import in.srain.cube.cache.ICacheAble;
 import in.srain.cube.concurrent.SimpleTask;
 import in.srain.cube.util.CLog;
-import in.srain.cube.util.Debug;
+import in.srain.cube.util.CubeDebug;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -21,7 +20,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
         USE_CACHE_ON_FAIL,
     }
 
-    protected static final boolean DEBUG = Debug.DEBUG_CACHE;
+    protected static final boolean DEBUG = CubeDebug.DEBUG_CACHE;
     protected static final String LOG_TAG = "cube-cache-request";
 
     private CacheAbleRequestHandler<T> mHandler;
@@ -64,6 +63,20 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
     }
 
     /**
+     * Timeout will not be considerate
+     *
+     * @return
+     */
+    @Override
+    protected T doRequestSync() {
+        T data = RequestCacheManager.getInstance().requestCacheSync(this);
+        if (data == null) {
+            data = SimpleRequestManager.requestSync(this);
+        }
+        return data;
+    }
+
+    /**
      * prepare request
      */
     @Override
@@ -80,9 +93,14 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
     }
 
     @Override
-    public CacheAbleRequest<T> useCacheAnyway(boolean use) {
+    public CacheAbleRequest<T> setUseCacheAnyway(boolean use) {
         mUseCacheAnyway = use;
         return this;
+    }
+
+    @Override
+    public boolean useCacheAnyway() {
+        return mUseCacheAnyway;
     }
 
     @Override
@@ -127,9 +145,9 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
     }
 
     @Override
-    public void createDataForCache(CacheManager cacheManager) {
+    public void onNoCacheData(CacheManager cacheManager) {
         if (DEBUG) {
-            CLog.d(LOG_TAG, "%s, createDataForCache", getCacheKey());
+            CLog.d(LOG_TAG, "%s, onNoCacheData", getCacheKey());
         }
         if (hasBeenCanceled()) {
             return;
@@ -167,7 +185,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
         }
         mCacheData = data;
         mOutOfDate = outOfDate;
-        if (null != mHandler) {
+        if (mHandler != null) {
             mHandler.onCacheData(data, outOfDate);
 
             if (mUseCacheAnyway) {
@@ -219,11 +237,14 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
         if (DEBUG) {
             CLog.d(LOG_TAG, "%s, onDataFromServer", getCacheKey());
         }
+
+        T ret = super.onDataFromServer(data);
+
         // cache the data
-        if (!TextUtils.isEmpty(data) && cacheRequestResult()) {
+        if (!TextUtils.isEmpty(data) && ret != null && cacheRequestResult()) {
             RequestCacheManager.getInstance().setCacheData(this.getCacheKey(), data);
         }
-        return super.onDataFromServer(data);
+        return ret;
     }
 
     @Override

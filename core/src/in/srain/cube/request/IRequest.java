@@ -8,10 +8,19 @@ public interface IRequest<T> {
 
     public void onRequestFail(FailData failData);
 
+    public RequestBase setFailData(FailData failData);
+
+    public FailData getFailData();
+
     /**
      * send request
      */
     public void send();
+
+    /**
+     * request synchronously
+     */
+    public T requestSync();
 
     public void cancelRequest();
 

@@ -4,7 +4,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
-import in.srain.cube.util.Debug;
+import in.srain.cube.util.CubeDebug;
 
 /**
  * A BitmapDrawable that keeps track of whether it is being displayed or cached.
@@ -15,7 +15,7 @@ import in.srain.cube.util.Debug;
  */
 public class RecyclingBitmapDrawable extends BitmapDrawable {
 
-    private final static String LOG_TAG = Debug.DEBUG_IMAGE_LOG_TAG;
+    private final static String LOG_TAG = CubeDebug.DEBUG_IMAGE_LOG_TAG;
     static final boolean DEBUG = false;
 
     private int mCacheRefCount = 0;

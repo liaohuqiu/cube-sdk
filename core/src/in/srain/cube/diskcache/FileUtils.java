@@ -100,6 +100,20 @@ public class FileUtils {
         }
     }
 
+    public static void chmod(String mode, String path) {
+        try {
+            String command = "chmod " + mode + " " + path;
+            Runtime runtime = Runtime.getRuntime();
+            Process process = runtime.exec(command);
+            process.waitFor();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     /**
      * recursively delete
      *

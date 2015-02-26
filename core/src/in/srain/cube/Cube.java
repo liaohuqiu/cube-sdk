@@ -3,8 +3,6 @@ package in.srain.cube;
 import android.app.Application;
 import android.content.Context;
 import android.provider.Settings;
-import android.util.DisplayMetrics;
-import android.view.WindowManager;
 import in.srain.cube.util.LocalDisplay;
 import in.srain.cube.util.NetworkStatusManager;
 
