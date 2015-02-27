@@ -10,7 +10,7 @@ public abstract class CacheAbleRequestDefaultHandler<T1> implements CacheAbleReq
 
     @Override
     public void onRequestFail(FailData failData) {
-        if (failData.getRequest() != null && failData.getRequest().getRequestData() != null) {
+        if (failData != null && failData.getRequest() != null && failData.getRequest().getRequestData() != null) {
             CLog.e(CubeDebug.DEBUG_REQUEST_LOG_TAG, "onRequestFail: %s", failData.getRequest().getRequestData().getRequestUrl());
         }
     }
@@ -18,7 +18,7 @@ public abstract class CacheAbleRequestDefaultHandler<T1> implements CacheAbleReq
     @Override
     public void onRequestFinish(T1 data) {
         if (CubeDebug.DEBUG_REQUEST) {
-            CLog.e(CubeDebug.DEBUG_REQUEST_LOG_TAG, "onRequestFinish: %s", data);
+            CLog.d(CubeDebug.DEBUG_REQUEST_LOG_TAG, "onRequestFinish: %s", data);
         }
     }
 }

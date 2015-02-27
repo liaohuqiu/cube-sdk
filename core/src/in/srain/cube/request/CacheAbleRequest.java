@@ -138,8 +138,6 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
             mHandler.onRequestFail(failData);
             if (mCacheData != null && !cacheIsDisabled() && !mUseCacheAnyway) {
                 notifyRequestFinish(ResultType.USE_CACHE_ON_FAIL, mCacheData, true);
-            } else {
-                mHandler.onRequestFail(null);
             }
         }
     }
