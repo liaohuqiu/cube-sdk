@@ -10,12 +10,11 @@ public class CubeDebug {
 
     public static String DEBUG_IMAGE_LOG_TAG = "cube-image";
     public static String DEBUG_IMAGE_LOG_TAG_TASK = "cube-image-task";
-    public static String DEBUG_IMAGE_LOG_TAG_PROVIDER = "cube-image-    provider";
+    public static String DEBUG_IMAGE_LOG_TAG_PROVIDER = "cube-image-provider";
 
     public static boolean DEBUG_SCROLL_HEADER_FRAME = false;
     public static boolean DEBUG_PAGE_INDICATOR = false;
     public static boolean DEBUG_LIST = false;
-    public static boolean DEBUG_PTR_FRAME = false;
 
     // print lifecycle information by log tag "cube-lifecycle"
     public static boolean DEBUG_LIFE_CYCLE = false;
