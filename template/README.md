@@ -15,21 +15,45 @@ http://cube-sdk.liaohuqiu.net
 
 ### Import to your project
 
+#### Repository
+
 The latest version: `{cube_sdk_version}`, has been published to: https://oss.sonatype.org/content/repositories/snapshots, in gradle:
 
-```
-maven {
-    url 'https://oss.sonatype.org/content/repositories/snapshots'
-}
-```
+*   gradle
+
+    ```
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots'
+    }
+    ```
+    
+*   pom.xml
+    
+    ```
+    <repository>
+        <id>oss-snapshots</id>
+        <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        <releases>
+            <enabled>false</enabled>
+        </releases>
+        <snapshots>
+            <enabled>true</enabled>
+        </snapshots>
+    </repository>
+    ```
 
 The stable version: `{cube_sdk_stable_version}`, https://oss.sonatype.org/content/repositories/releases, in gradle:
 
-```
-mavenCentral()
-```
 
-pom.xml, latest version:
+*   gradle
+
+    ```
+    mavenCentral()
+    ```
+
+#### dependency
+
+*   pom.xml, latest version:
 
 ```xml
 <dependency>
@@ -42,7 +66,7 @@ pom.xml, latest version:
 </dependency>
 ```
 
-pom.xml, stable version:
+*  pom.xml, stable version:
 
 ```xml
 <dependency>
@@ -55,13 +79,13 @@ pom.xml, stable version:
 </dependency>
 ```
 
-gradle, latest version:
+*   gradle, latest version:
 
 ```
 compile 'in.srain.cube:cube-sdk:{cube_sdk_version}@aar'
 ```
 
-gradle, stable version:
+*   gradle, stable version:
 
 ```
 compile 'in.srain.cube:cube-sdk:{cube_sdk_stable_version}@aar'
