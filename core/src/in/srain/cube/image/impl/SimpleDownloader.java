@@ -1,6 +1,9 @@
 package in.srain.cube.image.impl;
 
 import android.os.Build;
+import in.srain.cube.image.ImageTask;
+import in.srain.cube.image.iface.ImageDownloader;
+import in.srain.cube.image.iface.ProgressUpdateHandler;
 import in.srain.cube.util.CLog;
 import in.srain.cube.util.CubeDebug;
 
@@ -14,19 +17,24 @@ import java.net.URL;
 /**
  * A simple class that fetches images from a URL.
  */
-public class SimpleDownloader {
+public class SimpleDownloader implements ImageDownloader {
 
     protected static final String LOG_TAG = CubeDebug.DEBUG_IMAGE_LOG_TAG_PROVIDER;
 
     private static final int IO_BUFFER_SIZE = 8 * 1024;
+    private static SimpleDownloader sInstance;
+
+    public static SimpleDownloader getInstance() {
+        if (sInstance == null) {
+            sInstance = new SimpleDownloader();
+        }
+        return sInstance;
+    }
 
     /**
      * Download a bitmap from a URL and write the content to an output stream.
-     *
-     * @param urlString The URL to fetch
-     * @return true if successful, false otherwise
      */
-    public static boolean downloadUrlToStream(String urlString, OutputStream outputStream) {
+    public boolean downloadToStream(ImageTask imageTask, String urlString, OutputStream outputStream, ProgressUpdateHandler progressUpdateHandler) {
         disableConnectionReuseIfNecessary();
         HttpURLConnection urlConnection = null;
         BufferedOutputStream out = null;
@@ -43,6 +51,9 @@ public class SimpleDownloader {
             while ((b = in.read()) != -1) {
                 total++;
                 out.write(b);
+                if (progressUpdateHandler != null) {
+                    progressUpdateHandler.onProgressUpdate(total, len);
+                }
             }
             return true;
         } catch (final IOException e) {

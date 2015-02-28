@@ -220,7 +220,7 @@ public class ImageProvider {
                 if (DEBUG) {
                     Log.d(TAG, String.format(MSG_FETCH_DOWNLOAD, imageTask, url));
                 }
-                inputStream = mDiskCacheProvider.downloadAndGetInputStream(fileCacheKey, url);
+                inputStream = mDiskCacheProvider.downloadAndGetInputStream(imageLoader.getImageDownloader(), imageTask, fileCacheKey, url);
                 if (imageTask.getStatistics() != null) {
                     imageTask.getStatistics().afterDownload();
                 }

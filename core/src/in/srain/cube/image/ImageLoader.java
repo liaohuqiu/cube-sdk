@@ -8,10 +8,7 @@ import in.srain.cube.app.CubeFragment;
 import in.srain.cube.app.lifecycle.LifeCycleComponent;
 import in.srain.cube.app.lifecycle.LifeCycleComponentManager;
 import in.srain.cube.concurrent.SimpleTask;
-import in.srain.cube.image.iface.ImageLoadHandler;
-import in.srain.cube.image.iface.ImageLoadProgressHandler;
-import in.srain.cube.image.iface.ImageResizer;
-import in.srain.cube.image.iface.ImageTaskExecutor;
+import in.srain.cube.image.iface.*;
 import in.srain.cube.util.CLog;
 import in.srain.cube.util.CubeDebug;
 
@@ -48,6 +45,7 @@ public class ImageLoader implements LifeCycleComponent {
     protected ImageProvider mImageProvider;
     protected ImageLoadHandler mImageLoadHandler;
     protected ImageLoadProgressHandler mLoadImageLoadProgressHandler;
+    protected ImageDownloader mImageDownloader;
 
     protected boolean mPauseWork = false;
     protected boolean mExitTasksEarly = false;
@@ -79,6 +77,14 @@ public class ImageLoader implements LifeCycleComponent {
 
     public ImageLoadHandler getImageLoadHandler() {
         return mImageLoadHandler;
+    }
+
+    public ImageDownloader getImageDownloader() {
+        return mImageDownloader;
+    }
+
+    public void setImageDownloader(ImageDownloader imageDownloader) {
+        mImageDownloader = imageDownloader;
     }
 
     public void setImageResizer(ImageResizer resizer) {

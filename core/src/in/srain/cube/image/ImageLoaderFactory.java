@@ -3,14 +3,8 @@ package in.srain.cube.image;
 import android.content.Context;
 import android.text.TextUtils;
 import in.srain.cube.cache.DiskFileUtils;
-import in.srain.cube.image.iface.ImageLoadHandler;
-import in.srain.cube.image.iface.ImageMemoryCache;
-import in.srain.cube.image.iface.ImageResizer;
-import in.srain.cube.image.iface.ImageTaskExecutor;
-import in.srain.cube.image.impl.DefaultImageLoadHandler;
-import in.srain.cube.image.impl.DefaultImageResizer;
-import in.srain.cube.image.impl.DefaultImageTaskExecutor;
-import in.srain.cube.image.impl.DefaultMemoryCache;
+import in.srain.cube.image.iface.*;
+import in.srain.cube.image.impl.*;
 
 /**
  * Create an {@link ImageLoader}.
@@ -32,6 +26,7 @@ public class ImageLoaderFactory {
     private static ImageTaskExecutor sDefaultImageTaskExecutor;
     private static ImageLoadHandler sDefaultImageLoadHandler;
     private static ImageMemoryCache sDefaultImageMemoryCache;
+    private static ImageDownloader sImageDownloader;
 
     public static int getDefaultMemoryCacheSizeInKB() {
         float percent = 0.2f;
@@ -167,7 +162,21 @@ public class ImageLoaderFactory {
             imageLoadHandler = new DefaultImageLoadHandler(context);
         }
         ImageLoader imageLoader = new ImageLoader(context, imageProvider, imageTaskExecutor, imageResizer, imageLoadHandler);
+
+        if (sImageDownloader != null) {
+            imageLoader.setImageDownloader(sImageDownloader);
+        }
         return imageLoader;
+    }
+
+    /**
+     * set a default {@link ImageDownloader} for all {@link ImageLoader}
+     *
+     * @param imageDownloader
+     */
+    @SuppressWarnings({"unused"})
+    public static void setDefaultImageDownloader(ImageDownloader imageDownloader) {
+        sImageDownloader = imageDownloader;
     }
 
     public static void setDefaultImageResizer(ImageResizer imageResizer) {

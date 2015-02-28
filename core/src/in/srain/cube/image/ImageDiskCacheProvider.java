@@ -6,6 +6,7 @@ import in.srain.cube.cache.DiskCacheProvider;
 import in.srain.cube.diskcache.CacheEntry;
 import in.srain.cube.diskcache.DiskCache;
 import in.srain.cube.diskcache.lru.SimpleDiskLruCache;
+import in.srain.cube.image.iface.ImageDownloader;
 import in.srain.cube.image.impl.SimpleDownloader;
 import in.srain.cube.util.CLog;
 import in.srain.cube.util.CubeDebug;
@@ -51,12 +52,15 @@ public class ImageDiskCacheProvider extends DiskCacheProvider {
         return null;
     }
 
-    public FileInputStream downloadAndGetInputStream(String fileCacheKey, String url) {
+    public FileInputStream downloadAndGetInputStream(ImageDownloader imageDownloader, ImageTask imageTask, String fileCacheKey, String url) {
+        if (imageDownloader == null) {
+            imageDownloader = SimpleDownloader.getInstance();
+        }
         try {
             CacheEntry cacheEntry = mDiskCache.beginEdit(fileCacheKey);
             if (cacheEntry != null) {
                 OutputStream outputStream = cacheEntry.newOutputStream();
-                boolean ret = SimpleDownloader.downloadUrlToStream(url, outputStream);
+                boolean ret = imageDownloader.downloadToStream(imageTask, url, outputStream, null);
                 if (DEBUG) {
                     CLog.i(LOG_TAG, "download: %s %s %s", ret, fileCacheKey, url);
                 }

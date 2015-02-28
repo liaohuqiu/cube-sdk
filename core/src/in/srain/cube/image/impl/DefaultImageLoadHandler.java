@@ -197,7 +197,7 @@ public class DefaultImageLoadHandler implements ImageLoadHandler {
             }
             if ((mDisplayTag & DISPLAY_FADE_IN) == DISPLAY_FADE_IN) {
                 int loadingColor = android.R.color.transparent;
-                if (mLoadingColor != -1) {
+                if (mLoadingColor != -1 && (mDisplayTag & DISPLAY_ROUNDED) != DISPLAY_ROUNDED) {
                     loadingColor = mLoadingColor;
                 }
                 final TransitionDrawable td = new TransitionDrawable(new Drawable[]{new ColorDrawable(loadingColor), d});
