@@ -20,7 +20,7 @@ public abstract class LoadMoreContainerBase extends LinearLayout implements Load
     private boolean mAutoLoadMore = true;
     private boolean mShowLoadingForFirstPage = true;
     private View mFooterView;
-
+    private boolean mIsError = false; //false  无错误 正常展示,   true  有错误 网络异常等, 底部显示加载失败
     private AbsListView mAbsListView;
     private boolean mListEmpty = true;
 
@@ -102,12 +102,27 @@ public abstract class LoadMoreContainerBase extends LinearLayout implements Load
         if (mAutoLoadMore) {
             performLoadMore();
         } else {
+        	if(mIsLoading){
+        		return;
+        	}
             if (mHasMore) {
-                mLoadMoreUIHandler.onWaitToLoadMore(this);
+            	mLoadMoreUIHandler.onWaitToLoadMore(this,mIsError);
             }
         }
     }
-
+    
+    /**
+     * 
+     * @createdate 2015-2-27 上午9:47:08
+     * @Description: 加载失败 展示提示信息
+     *
+     */
+    public void setLoadingError(){
+    	mIsLoading = false;
+    	mIsError = true;
+    	mLoadMoreUIHandler.onWaitToLoadMore(this,mIsError);
+    }
+    
     @Override
     public void setShowLoadingForFirstPage(boolean showLoading) {
         mShowLoadingForFirstPage = showLoading;
@@ -140,6 +155,7 @@ public abstract class LoadMoreContainerBase extends LinearLayout implements Load
         mFooterView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
+            	mIsError=false;
                 performLoadMore();
             }
         });
