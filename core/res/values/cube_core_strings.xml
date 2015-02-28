@@ -5,5 +5,5 @@
     <string name="cube_views_load_more_click_to_load_more">Click to load more</string>
     <string name="cube_views_load_more_loaded_no_more">All the data has been loaded</string>
     <string name="cube_views_load_more_loaded_empty">It is empty. :(</string>
-
+    <string name="cube_views_load_more_error">Load error,click retry</string>
 </resources>
