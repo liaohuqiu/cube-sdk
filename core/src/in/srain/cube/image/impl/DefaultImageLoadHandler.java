@@ -49,8 +49,8 @@ public class DefaultImageLoadHandler implements ImageLoadHandler {
 
     public DefaultImageLoadHandler(Context context) {
         mContext = context;
-        mLoadingDrawable = new TextDrawable("loading...");
-        mErrorDrawable = new TextDrawable("error");
+        mLoadingDrawable = new ColorDrawable(0xfff1f1f1);
+        mErrorDrawable = new ColorDrawable(Color.RED);
     }
 
     /**

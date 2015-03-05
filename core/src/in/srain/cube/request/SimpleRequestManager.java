@@ -92,6 +92,9 @@ public class SimpleRequestManager {
                     if (requestSender != null) {
                         requestSender.send();
                         requestSender.getResponse(sb);
+                        if (DEBUG) {
+                            CLog.d(LOG_TAG, "%s: %s", requestData, sb.toString());
+                        }
                         data = request.onDataFromServer(sb.toString());
                     }
                 } catch (Exception e) {

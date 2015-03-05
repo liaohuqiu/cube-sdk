@@ -175,16 +175,13 @@ public class ImageTask {
 
     /**
      * In some situations, we may store the same image in some different servers. So the same image will related to some different urls.
-     * <p/>
      * Generate the identity url according your situation.
-     * <p/>
      * {@link #mIdentityUrl}
      *
      * @return
      */
     protected String generateIdentityUrl(String originUrl) {
         return originUrl;
-
     }
 
     /**

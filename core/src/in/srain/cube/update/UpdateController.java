@@ -100,6 +100,8 @@ public class UpdateController implements DownLoadListener {
 
         notification.contentIntent = contentIntent;
         mNotifyManager.notify(NOTIFY_ID, notification);
+
+        openFile();
     }
 
     private void notifyDownLoadStart() {

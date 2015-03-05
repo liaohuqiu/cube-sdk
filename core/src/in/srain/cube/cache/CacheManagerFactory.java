@@ -9,8 +9,8 @@ public class CacheManagerFactory {
     private static CacheManager sDefault;
 
     private static final String DEFAULT_CACHE_DIR = "cube-default-cache";
-    private static final int DEFAULT_CACHE_MEMORY_CACHE_SIZE = 1024;
-    private static final int DEFAULT_CACHE_DISK_CACHE_SIZE = 1024 * 10;
+    private static final int DEFAULT_CACHE_MEMORY_CACHE_SIZE = 1024;    // 1M
+    private static final int DEFAULT_CACHE_DISK_CACHE_SIZE = 1024 * 10; // 10M
 
     public static CacheManager getDefault() {
         if (sDefault == null) {
