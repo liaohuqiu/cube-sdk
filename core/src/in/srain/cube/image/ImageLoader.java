@@ -87,8 +87,8 @@ public class ImageLoader implements LifeCycleComponent {
         mImageDownloader = imageDownloader;
     }
 
-    public void setImageReSizer(ImageReSizer resizer) {
-        mImageReSizer = resizer;
+    public void setImageReSizer(ImageReSizer reSizer) {
+        mImageReSizer = reSizer;
     }
 
     public ImageReSizer getImageReSizer() {

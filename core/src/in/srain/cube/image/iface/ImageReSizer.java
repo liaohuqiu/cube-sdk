@@ -4,7 +4,7 @@ import android.graphics.BitmapFactory;
 import in.srain.cube.image.ImageTask;
 
 /**
- * A ImageResizer process the resize logical when loading image from network an disk.
+ * A ImageReSizer process the resize logical when loading image from network an disk.
  */
 public interface ImageReSizer {
 
