@@ -40,53 +40,6 @@ public class RoundedDrawable extends Drawable {
         Matrix shaderMatrix = new Matrix();
         shaderMatrix.setRectToRect(new RectF(0, 0, mBitmapWidth, mBitmapHeight), mRect, Matrix.ScaleToFit.FILL);
         mBitmapShader.setLocalMatrix(shaderMatrix);
-
-        CLog.d("test", "onBoundsChange: %s %s %s %s", bounds.width(), bounds.height(), mBitmapWidth, mBitmapHeight);
-    }
-
-    protected void onBoundsChange1(Rect bounds) {
-        super.onBoundsChange(bounds);
-
-        int x = 0;
-        int y = 0;
-        int width = 0;
-        int height = 0;
-        /**
-         *    bitmap
-         *  +--------+
-         *  |        |
-         *  +--------+
-         *
-         *   bounds
-         *   +----+
-         *   |    |
-         *   +----+
-         */
-        if (mBitmapWidth * bounds.height() > mBitmapHeight * bounds.width()) {
-            height = mBitmapHeight;
-            width = height * bounds.width() / bounds.height();
-        }
-        /**
-         *   bitmap
-         *   +----+
-         *   |    |
-         *   |    |
-         *   +----+
-         *    bounds
-         *  +--------+
-         *  |        |
-         *  +--------+
-         */
-        else {
-            width = mBitmapWidth;
-            height = width * bounds.height() / bounds.width();
-        }
-        x = (bounds.width() - width) / 2;
-        y = (bounds.height() - height) / 2;
-        mRect.set(x, y, width + x, height + y);
-        CLog.d("test", "onBoundsChange %s %s / %s %s / %s %s %s %s", bounds.width(), bounds.height(), mBitmapWidth, mBitmapHeight,
-                x, y, width, height
-        );
     }
 
     @Override
