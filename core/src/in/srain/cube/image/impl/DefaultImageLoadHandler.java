@@ -193,7 +193,7 @@ public class DefaultImageLoadHandler implements ImageLoadHandler {
 
             // RoundedDrawable will not recycle automatically when API level is lower than 11
             if ((mDisplayTag & DISPLAY_ROUNDED) == DISPLAY_ROUNDED && Version.hasHoneycomb()) {
-                d = new RoundedDrawable(drawable.getBitmap(), mCornerRadius, 0);
+                d = new RoundedDrawable(drawable.getBitmap(), mCornerRadius);
             }
             if ((mDisplayTag & DISPLAY_FADE_IN) == DISPLAY_FADE_IN) {
                 int loadingColor = android.R.color.transparent;

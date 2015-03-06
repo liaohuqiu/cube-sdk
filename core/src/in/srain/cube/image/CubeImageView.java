@@ -160,15 +160,15 @@ public class CubeImageView extends ImageView {
         loadImage(imageLoader, url, specifiedSize, specifiedSize, imageReuseInfo);
     }
 
-    public void loadImage(ImageLoader imageLoader, String url, int specifiedWidth, int specifieHeight) {
-        loadImage(imageLoader, url, specifiedWidth, specifieHeight, null);
+    public void loadImage(ImageLoader imageLoader, String url, int specifiedWidth, int specifiedHeight) {
+        loadImage(imageLoader, url, specifiedWidth, specifiedHeight, null);
     }
 
-    public void loadImage(ImageLoader imageLoader, String url, int specifiedWidth, int specifieHeight, ImageReuseInfo imageReuseInfo) {
+    public void loadImage(ImageLoader imageLoader, String url, int specifiedWidth, int specifiedHeight, ImageReuseInfo imageReuseInfo) {
         mImageLoader = imageLoader;
         mUrl = url;
         mSpecifiedWidth = specifiedWidth;
-        mSpecifiedHeight = specifieHeight;
+        mSpecifiedHeight = specifiedHeight;
         mImageReuseInfo = imageReuseInfo;
         tryLoadImage();
     }

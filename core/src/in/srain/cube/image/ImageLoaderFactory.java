@@ -22,7 +22,7 @@ public class ImageLoaderFactory {
     private static ImageProvider sDefaultImageProvider;
     private static ImageProvider sStableImageProvider;
 
-    private static ImageResizer sDefaultImageResizer;
+    private static ImageReSizer sDefaultImageReSizer;
     private static ImageTaskExecutor sDefaultImageTaskExecutor;
     private static ImageLoadHandler sDefaultImageLoadHandler;
     private static ImageMemoryCache sDefaultImageMemoryCache;
@@ -141,10 +141,10 @@ public class ImageLoaderFactory {
     }
 
     private static ImageLoader createInner(Context context, ImageProvider imageProvider, ImageLoadHandler imageLoadHandler) {
-        return create(context, imageProvider, sDefaultImageTaskExecutor, sDefaultImageResizer, imageLoadHandler);
+        return create(context, imageProvider, sDefaultImageTaskExecutor, sDefaultImageReSizer, imageLoadHandler);
     }
 
-    private static ImageLoader create(Context context, ImageProvider imageProvider, ImageTaskExecutor imageTaskExecutor, ImageResizer imageResizer, ImageLoadHandler imageLoadHandler) {
+    private static ImageLoader create(Context context, ImageProvider imageProvider, ImageTaskExecutor imageTaskExecutor, ImageReSizer imageReSizer, ImageLoadHandler imageLoadHandler) {
 
         if (imageProvider == null) {
             imageProvider = getDefaultImageProvider(context);
@@ -154,14 +154,14 @@ public class ImageLoaderFactory {
             imageTaskExecutor = DefaultImageTaskExecutor.getInstance();
         }
 
-        if (imageResizer == null) {
-            imageResizer = DefaultImageResizer.getInstance();
+        if (imageReSizer == null) {
+            imageReSizer = DefaultImageReSizer.getInstance();
         }
 
         if (imageLoadHandler == null) {
             imageLoadHandler = new DefaultImageLoadHandler(context);
         }
-        ImageLoader imageLoader = new ImageLoader(context, imageProvider, imageTaskExecutor, imageResizer, imageLoadHandler);
+        ImageLoader imageLoader = new ImageLoader(context, imageProvider, imageTaskExecutor, imageReSizer, imageLoadHandler);
 
         if (sImageDownloader != null) {
             imageLoader.setImageDownloader(sImageDownloader);
@@ -179,8 +179,8 @@ public class ImageLoaderFactory {
         sImageDownloader = imageDownloader;
     }
 
-    public static void setDefaultImageResizer(ImageResizer imageResizer) {
-        sDefaultImageResizer = imageResizer;
+    public static void setDefaultImageReSizer(ImageReSizer imageReSizer) {
+        sDefaultImageReSizer = imageReSizer;
     }
 
     public static void setDefaultImageTaskExecutor(ImageTaskExecutor imageTaskExecutor) {

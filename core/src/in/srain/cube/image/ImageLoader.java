@@ -41,7 +41,7 @@ public class ImageLoader implements LifeCycleComponent {
     protected static final String LOG_TAG = CubeDebug.DEBUG_IMAGE_LOG_TAG;
 
     protected ImageTaskExecutor mImageTaskExecutor;
-    protected ImageResizer mImageResizer;
+    protected ImageReSizer mImageReSizer;
     protected ImageProvider mImageProvider;
     protected ImageLoadHandler mImageLoadHandler;
     protected ImageLoadProgressHandler mLoadImageLoadProgressHandler;
@@ -59,13 +59,13 @@ public class ImageLoader implements LifeCycleComponent {
     public static final int TASK_ORDER_FIRST_IN_FIRST_OUT = 1;
     public static final int TASK_ORDER_LAST_IN_FIRST_OUT = 2;
 
-    public ImageLoader(Context context, ImageProvider imageProvider, ImageTaskExecutor imageTaskExecutor, ImageResizer imageResizer, ImageLoadHandler imageLoadHandler) {
+    public ImageLoader(Context context, ImageProvider imageProvider, ImageTaskExecutor imageTaskExecutor, ImageReSizer imageReSizer, ImageLoadHandler imageLoadHandler) {
         mContext = context;
         mResources = context.getResources();
 
         mImageProvider = imageProvider;
         mImageTaskExecutor = imageTaskExecutor;
-        mImageResizer = imageResizer;
+        mImageReSizer = imageReSizer;
         mImageLoadHandler = imageLoadHandler;
 
         mLoadWorkList = new ConcurrentHashMap<String, LoadImageTask>();
@@ -87,12 +87,12 @@ public class ImageLoader implements LifeCycleComponent {
         mImageDownloader = imageDownloader;
     }
 
-    public void setImageResizer(ImageResizer resizer) {
-        mImageResizer = resizer;
+    public void setImageReSizer(ImageReSizer resizer) {
+        mImageReSizer = resizer;
     }
 
-    public ImageResizer getImageResizer() {
-        return mImageResizer;
+    public ImageReSizer getImageReSizer() {
+        return mImageReSizer;
     }
 
     public ImageProvider getImageProvider() {
@@ -200,9 +200,6 @@ public class ImageLoader implements LifeCycleComponent {
 
         if (DEBUG) {
             CLog.d(LOG_TAG, MSG_HIT_CACHE, imageTask, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
-            if (drawable.getIntrinsicWidth() == 270) {
-                CLog.d(LOG_TAG, MSG_HIT_CACHE, imageTask, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
-            }
         }
         imageTask.addImageView(imageView);
         imageTask.onLoadTaskFinish(drawable, mImageLoadHandler);
@@ -302,7 +299,7 @@ public class ImageLoader implements LifeCycleComponent {
             // the cache
             if (!isCancelled() && !mImageLoader.mExitTasksEarly && (mImageTask.isPreLoad() || mImageTask.stillHasRelatedImageView())) {
                 try {
-                    bitmap = mImageLoader.mImageProvider.fetchBitmapData(mImageLoader, mImageTask, mImageLoader.mImageResizer);
+                    bitmap = mImageLoader.mImageProvider.fetchBitmapData(mImageLoader, mImageTask, mImageLoader.mImageReSizer);
                     if (DEBUG) {
                         CLog.d(LOG_TAG, MSG_TASK_AFTER_fetchBitmapData, this, mImageTask, isCancelled());
                     }

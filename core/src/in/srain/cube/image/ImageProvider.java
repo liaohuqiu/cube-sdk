@@ -10,7 +10,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
 import in.srain.cube.image.drawable.RecyclingBitmapDrawable;
 import in.srain.cube.image.iface.ImageMemoryCache;
-import in.srain.cube.image.iface.ImageResizer;
+import in.srain.cube.image.iface.ImageReSizer;
 import in.srain.cube.util.CLog;
 import in.srain.cube.util.CubeDebug;
 import in.srain.cube.util.Version;
@@ -160,7 +160,7 @@ public class ImageProvider {
      * <p/>
      * If no file cache can be used, download then save to file.
      */
-    public Bitmap fetchBitmapData(ImageLoader imageLoader, ImageTask imageTask, ImageResizer imageResizer) {
+    public Bitmap fetchBitmapData(ImageLoader imageLoader, ImageTask imageTask, ImageReSizer imageReSizer) {
         Bitmap bitmap = null;
         if (mDiskCacheProvider != null) {
             FileInputStream inputStream = null;
@@ -216,7 +216,7 @@ public class ImageProvider {
 
             // We've got nothing from file cache
             if (inputStream == null) {
-                String url = imageResizer.getRemoteUrl(imageTask);
+                String url = imageReSizer.getRemoteUrl(imageTask);
                 if (DEBUG) {
                     Log.d(TAG, String.format(MSG_FETCH_DOWNLOAD, imageTask, url));
                 }
@@ -231,23 +231,23 @@ public class ImageProvider {
             }
             if (inputStream != null) {
                 try {
-                    bitmap = decodeSampledBitmapFromDescriptor(inputStream.getFD(), imageTask, imageResizer);
+                    bitmap = decodeSampledBitmapFromDescriptor(inputStream.getFD(), imageTask, imageReSizer);
                     if (bitmap == null) {
                         imageTask.setError(ImageTask.ERROR_BAD_FORMAT);
-                        CLog.e(TAG, "%s decode bitmap fail, bad format. %s, %s", imageTask, fileCacheKey, imageResizer.getRemoteUrl(imageTask));
+                        CLog.e(TAG, "%s decode bitmap fail, bad format. %s, %s", imageTask, fileCacheKey, imageReSizer.getRemoteUrl(imageTask));
                     }
                 } catch (IOException e) {
-                    CLog.e(TAG, "%s decode bitmap fail, may be out of memory. %s, %s", imageTask, fileCacheKey, imageResizer.getRemoteUrl(imageTask));
+                    CLog.e(TAG, "%s decode bitmap fail, may be out of memory. %s, %s", imageTask, fileCacheKey, imageReSizer.getRemoteUrl(imageTask));
                     e.printStackTrace();
                 }
             } else {
-                CLog.e(TAG, "%s fetch bitmap fail. %s, %s", imageTask, fileCacheKey, imageResizer.getRemoteUrl(imageTask));
+                CLog.e(TAG, "%s fetch bitmap fail. %s, %s", imageTask, fileCacheKey, imageReSizer.getRemoteUrl(imageTask));
             }
         }
         return bitmap;
     }
 
-    private Bitmap decodeSampledBitmapFromDescriptor(FileDescriptor fileDescriptor, ImageTask imageTask, ImageResizer imageResizer) {
+    private Bitmap decodeSampledBitmapFromDescriptor(FileDescriptor fileDescriptor, ImageTask imageTask, ImageReSizer imageReSizer) {
 
         // First decode with inJustDecodeBounds=true to check dimensions
         final BitmapFactory.Options options = new BitmapFactory.Options();
@@ -257,7 +257,7 @@ public class ImageProvider {
         imageTask.setBitmapOriginSize(options.outWidth, options.outHeight);
 
         // Calculate inSampleSize
-        options.inSampleSize = imageResizer.getInSampleSize(imageTask);
+        options.inSampleSize = imageReSizer.getInSampleSize(imageTask);
 
         // Decode bitmap with inSampleSize set
         options.inJustDecodeBounds = false;
@@ -271,7 +271,7 @@ public class ImageProvider {
         return bitmap;
     }
 
-    private Bitmap decodeSampledBitmapFromInputStream(InputStream stream, ImageTask imageTask, ImageResizer imageResizer) {
+    private Bitmap decodeSampledBitmapFromInputStream(InputStream stream, ImageTask imageTask, ImageReSizer imageReSizer) {
         // First decode with inJustDecodeBounds=true to check dimensions
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
@@ -282,7 +282,7 @@ public class ImageProvider {
         imageTask.setBitmapOriginSize(options.outWidth, options.outHeight);
 
         // Calculate inSampleSize
-        options.inSampleSize = imageResizer.getInSampleSize(imageTask);
+        options.inSampleSize = imageReSizer.getInSampleSize(imageTask);
 
         // Decode bitmap with inSampleSize set
         options.inJustDecodeBounds = false;

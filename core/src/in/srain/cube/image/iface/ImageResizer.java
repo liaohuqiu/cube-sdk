@@ -6,7 +6,7 @@ import in.srain.cube.image.ImageTask;
 /**
  * A ImageResizer process the resize logical when loading image from network an disk.
  */
-public interface ImageResizer {
+public interface ImageReSizer {
 
     /**
      * Return the {@link BitmapFactory.Options#inSampleSize}, which will be used when load the image from the disk.

@@ -2,20 +2,20 @@ package in.srain.cube.image.impl;
 
 import android.graphics.BitmapFactory;
 import in.srain.cube.image.ImageTask;
-import in.srain.cube.image.iface.ImageResizer;
+import in.srain.cube.image.iface.ImageReSizer;
 
 /**
- * A default implementation of {@link ImageResizer}
+ * A default implementation of {@link in.srain.cube.image.iface.ImageReSizer}
  *
  * @author http://www.liaohuqiu.net
  */
-public class DefaultImageResizer implements ImageResizer {
+public class DefaultImageReSizer implements ImageReSizer {
 
-    private static DefaultImageResizer sInstance;
+    private static DefaultImageReSizer sInstance;
 
-    public static DefaultImageResizer getInstance() {
+    public static DefaultImageReSizer getInstance() {
         if (sInstance == null) {
-            sInstance = new DefaultImageResizer();
+            sInstance = new DefaultImageReSizer();
         }
         return sInstance;
     }
