@@ -78,6 +78,9 @@ public class DiskFileUtils {
 
         if (hasSDCardMounted()) {
             sdPath = getExternalCacheDir(context);
+            if (!sdPath.exists()) {
+                sdPath.mkdirs();
+            }
             sdCardFree = getUsableSpace(sdPath);
         }
 
@@ -223,8 +226,9 @@ public class DiskFileUtils {
      */
     public static String wantFilesPath(Context context, boolean externalStorageFirst) {
         String path = null;
-        if (externalStorageFirst && DiskFileUtils.hasSDCardMounted()) {
-            path = context.getExternalFilesDir("").getAbsolutePath();
+        File f = null;
+        if (externalStorageFirst && DiskFileUtils.hasSDCardMounted() && (f = context.getExternalFilesDir("xxx")) != null) {
+            path = f.getAbsolutePath();
         } else {
             path = context.getFilesDir().getAbsolutePath();
         }
