@@ -4,7 +4,10 @@ import android.content.Context;
 import android.text.TextUtils;
 import in.srain.cube.cache.DiskFileUtils;
 import in.srain.cube.image.iface.*;
-import in.srain.cube.image.impl.*;
+import in.srain.cube.image.impl.DefaultImageLoadHandler;
+import in.srain.cube.image.impl.DefaultImageReSizer;
+import in.srain.cube.image.impl.DefaultImageTaskExecutor;
+import in.srain.cube.image.impl.DefaultMemoryCache;
 
 /**
  * Create an {@link ImageLoader}.

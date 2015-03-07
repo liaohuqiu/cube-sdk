@@ -43,7 +43,7 @@ public class DefaultMemoryCache implements ImageMemoryCache {
              */
             @Override
             protected int sizeOf(String key, BitmapDrawable value) {
-                final int bitmapSize = ImageProvider.getBitmapSize(value) / 1024;
+                final int bitmapSize = (int) (ImageProvider.getBitmapSize(value) / 1024);
                 return bitmapSize == 0 ? 1 : bitmapSize;
             }
         };

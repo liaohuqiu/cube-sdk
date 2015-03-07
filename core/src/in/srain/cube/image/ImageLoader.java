@@ -192,7 +192,7 @@ public class ImageLoader implements LifeCycleComponent {
         BitmapDrawable drawable = mImageProvider.getBitmapFromMemCache(imageTask);
 
         if (imageTask.getStatistics() != null) {
-            imageTask.getStatistics().afterMemoryCache(drawable != null);
+            imageTask.getStatistics().s0_afterCheckMemoryCache(drawable != null);
         }
         if (drawable == null) {
             return false;
@@ -277,7 +277,7 @@ public class ImageLoader implements LifeCycleComponent {
             }
 
             if (mImageTask.getStatistics() != null) {
-                mImageTask.getStatistics().beginLoad();
+                mImageTask.getStatistics().s1_beginLoad();
             }
             Bitmap bitmap = null;
             // Wait here if work is paused and the task is not cancelled
@@ -303,14 +303,8 @@ public class ImageLoader implements LifeCycleComponent {
                     if (DEBUG) {
                         CLog.d(LOG_TAG, MSG_TASK_AFTER_fetchBitmapData, this, mImageTask, isCancelled());
                     }
-                    if (mImageTask != null && mImageTask.getStatistics() != null) {
-                        mImageTask.getStatistics().afterDecode();
-                    }
                     mDrawable = mImageLoader.mImageProvider.createBitmapDrawable(mImageLoader.mResources, bitmap);
                     mImageLoader.mImageProvider.addBitmapToMemCache(mImageTask.getIdentityKey(), mDrawable);
-                    if (mImageTask.getStatistics() != null) {
-                        mImageTask.getStatistics().afterCreateBitmapDrawable();
-                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 } catch (OutOfMemoryError e) {

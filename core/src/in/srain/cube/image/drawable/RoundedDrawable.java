@@ -2,7 +2,6 @@ package in.srain.cube.image.drawable;
 
 import android.graphics.*;
 import android.graphics.drawable.Drawable;
-import in.srain.cube.util.CLog;
 
 /**
  * A drawable with rounded corners;

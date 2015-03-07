@@ -80,7 +80,7 @@ public class ImageProvider {
      * @return size in bytes
      */
     @TargetApi(19) // @TargetApi(VERSION_CODES.KITKAT)
-    public static int getBitmapSize(BitmapDrawable value) {
+    public static long getBitmapSize(BitmapDrawable value) {
         if (null == value) {
             return 0;
         }
@@ -162,87 +162,91 @@ public class ImageProvider {
      */
     public Bitmap fetchBitmapData(ImageLoader imageLoader, ImageTask imageTask, ImageReSizer imageReSizer) {
         Bitmap bitmap = null;
-        if (mDiskCacheProvider != null) {
-            FileInputStream inputStream = null;
+        if (mDiskCacheProvider == null) {
+            return null;
+        }
+        FileInputStream inputStream = null;
 
-            String fileCacheKey = imageTask.getFileCacheKey();
-            ImageReuseInfo reuseInfo = imageTask.getImageReuseInfo();
+        String fileCacheKey = imageTask.getFileCacheKey();
+        ImageReuseInfo reuseInfo = imageTask.getImageReuseInfo();
 
-            if (DEBUG) {
-                Log.d(TAG, String.format(MSG_FETCH_BEGIN, imageTask));
-                Log.d(TAG, String.format(MSG_FETCH_BEGIN_IDENTITY_KEY, imageTask, imageTask.getIdentityKey()));
-                Log.d(TAG, String.format(MSG_FETCH_BEGIN_FILE_CACHE_KEY, imageTask, fileCacheKey));
-                Log.d(TAG, String.format(MSG_FETCH_BEGIN_ORIGIN_URL, imageTask, imageTask.getOriginUrl()));
-                Log.d(TAG, String.format(MSG_FETCH_BEGIN_IDENTITY_URL, imageTask, imageTask.getIdentityUrl()));
-            }
+        if (DEBUG) {
+            Log.d(TAG, String.format(MSG_FETCH_BEGIN, imageTask));
+            Log.d(TAG, String.format(MSG_FETCH_BEGIN_IDENTITY_KEY, imageTask, imageTask.getIdentityKey()));
+            Log.d(TAG, String.format(MSG_FETCH_BEGIN_FILE_CACHE_KEY, imageTask, fileCacheKey));
+            Log.d(TAG, String.format(MSG_FETCH_BEGIN_ORIGIN_URL, imageTask, imageTask.getOriginUrl()));
+            Log.d(TAG, String.format(MSG_FETCH_BEGIN_IDENTITY_URL, imageTask, imageTask.getIdentityUrl()));
+        }
 
-            // read from file cache
-            inputStream = mDiskCacheProvider.getInputStream(fileCacheKey);
+        // read from file cache
+        inputStream = mDiskCacheProvider.getInputStream(fileCacheKey);
 
-            // try to reuse
-            if (inputStream == null) {
-                if (reuseInfo != null && reuseInfo.getReuseSizeList() != null && reuseInfo.getReuseSizeList().length > 0) {
-                    if (DEBUG) {
-                        Log.d(TAG, String.format(MSG_FETCH_TRY_REUSE, imageTask));
-                    }
+        // try to reuse
+        if (inputStream == null) {
+            if (reuseInfo != null && reuseInfo.getReuseSizeList() != null && reuseInfo.getReuseSizeList().length > 0) {
+                if (DEBUG) {
+                    Log.d(TAG, String.format(MSG_FETCH_TRY_REUSE, imageTask));
+                }
 
-                    final String[] sizeKeyList = reuseInfo.getReuseSizeList();
-                    for (int i = 0; i < sizeKeyList.length; i++) {
-                        String size = sizeKeyList[i];
-                        final String key = imageTask.generateFileCacheKeyForReuse(size);
-                        inputStream = mDiskCacheProvider.getInputStream(key);
+                final String[] sizeKeyList = reuseInfo.getReuseSizeList();
+                for (int i = 0; i < sizeKeyList.length; i++) {
+                    String size = sizeKeyList[i];
+                    final String key = imageTask.generateFileCacheKeyForReuse(size);
+                    inputStream = mDiskCacheProvider.getInputStream(key);
 
-                        if (inputStream != null) {
-                            if (DEBUG) {
-                                Log.d(TAG, String.format(MSG_FETCH_REUSE_SUCCESS, imageTask, size));
-                            }
-                            break;
-                        } else {
-                            if (DEBUG) {
-                                Log.d(TAG, String.format(MSG_FETCH_REUSE_FAIL, imageTask, size, key));
-                            }
+                    if (inputStream != null) {
+                        if (DEBUG) {
+                            Log.d(TAG, String.format(MSG_FETCH_REUSE_SUCCESS, imageTask, size));
+                        }
+                        break;
+                    } else {
+                        if (DEBUG) {
+                            Log.d(TAG, String.format(MSG_FETCH_REUSE_FAIL, imageTask, size, key));
                         }
                     }
                 }
-            } else {
-                if (DEBUG) {
-                    Log.d(TAG, String.format(MSG_FETCH_HIT_DISK_CACHE, imageTask));
-                }
             }
+        } else {
+            if (DEBUG) {
+                Log.d(TAG, String.format(MSG_FETCH_HIT_DISK_CACHE, imageTask));
+            }
+        }
 
+        if (imageTask.getStatistics() != null) {
+            imageTask.getStatistics().s2_afterCheckFileCache(inputStream != null);
+        }
+
+        // We've got nothing from file cache
+        if (inputStream == null) {
+            String url = imageReSizer.getRemoteUrl(imageTask);
+            if (DEBUG) {
+                Log.d(TAG, String.format(MSG_FETCH_DOWNLOAD, imageTask, url));
+            }
+            inputStream = mDiskCacheProvider.downloadAndGetInputStream(imageLoader.getImageDownloader(), imageTask, fileCacheKey, url);
             if (imageTask.getStatistics() != null) {
-                imageTask.getStatistics().afterFileCache(inputStream != null);
+                imageTask.getStatistics().s3_afterDownload();
             }
-
-            // We've got nothing from file cache
             if (inputStream == null) {
-                String url = imageReSizer.getRemoteUrl(imageTask);
-                if (DEBUG) {
-                    Log.d(TAG, String.format(MSG_FETCH_DOWNLOAD, imageTask, url));
-                }
-                inputStream = mDiskCacheProvider.downloadAndGetInputStream(imageLoader.getImageDownloader(), imageTask, fileCacheKey, url);
-                if (imageTask.getStatistics() != null) {
-                    imageTask.getStatistics().afterDownload();
-                }
-                if (inputStream == null) {
-                    imageTask.setError(ImageTask.ERROR_NETWORK);
-                    CLog.e(TAG, "%s download fail: %s %s", imageTask, fileCacheKey, url);
-                }
+                imageTask.setError(ImageTask.ERROR_NETWORK);
+                CLog.e(TAG, "%s download fail: %s %s", imageTask, fileCacheKey, url);
             }
-            if (inputStream != null) {
-                try {
-                    bitmap = decodeSampledBitmapFromDescriptor(inputStream.getFD(), imageTask, imageReSizer);
-                    if (bitmap == null) {
-                        imageTask.setError(ImageTask.ERROR_BAD_FORMAT);
-                        CLog.e(TAG, "%s decode bitmap fail, bad format. %s, %s", imageTask, fileCacheKey, imageReSizer.getRemoteUrl(imageTask));
-                    }
-                } catch (IOException e) {
-                    CLog.e(TAG, "%s decode bitmap fail, may be out of memory. %s, %s", imageTask, fileCacheKey, imageReSizer.getRemoteUrl(imageTask));
-                    e.printStackTrace();
+        }
+        if (inputStream != null) {
+            try {
+                bitmap = decodeSampledBitmapFromDescriptor(inputStream.getFD(), imageTask, imageReSizer);
+                if (bitmap == null) {
+                    imageTask.setError(ImageTask.ERROR_BAD_FORMAT);
+                    CLog.e(TAG, "%s decode bitmap fail, bad format. %s, %s", imageTask, fileCacheKey, imageReSizer.getRemoteUrl(imageTask));
                 }
-            } else {
-                CLog.e(TAG, "%s fetch bitmap fail. %s, %s", imageTask, fileCacheKey, imageReSizer.getRemoteUrl(imageTask));
+            } catch (IOException e) {
+                CLog.e(TAG, "%s decode bitmap fail, may be out of memory. %s, %s", imageTask, fileCacheKey, imageReSizer.getRemoteUrl(imageTask));
+                e.printStackTrace();
             }
+        } else {
+            CLog.e(TAG, "%s fetch bitmap fail. %s, %s", imageTask, fileCacheKey, imageReSizer.getRemoteUrl(imageTask));
+        }
+        if (imageTask != null && imageTask.getStatistics() != null) {
+            imageTask.getStatistics().s4_afterDecode(mDiskCacheProvider.getSize(fileCacheKey));
         }
         return bitmap;
     }

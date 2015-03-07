@@ -39,6 +39,19 @@ public class ImageDiskCacheProvider extends DiskCacheProvider {
         return provider;
     }
 
+    public long getSize(String key) {
+        if (!mDiskCache.has(key)) {
+            return -1;
+        }
+        try {
+            CacheEntry cacheEntry = mDiskCache.getEntry(key);
+            return cacheEntry.getSize();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
     public FileInputStream getInputStream(String key) {
         if (!mDiskCache.has(key)) {
             return null;

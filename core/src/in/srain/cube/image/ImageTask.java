@@ -351,7 +351,7 @@ public class ImageTask {
         }
 
         if (null != mImageTaskStatistics) {
-            mImageTaskStatistics.showBegin();
+            mImageTaskStatistics.s5_beforeShow();
         }
         if (mFirstImageViewHolder == null) {
             handler.onLoadFinish(this, null, drawable);
@@ -366,7 +366,8 @@ public class ImageTask {
             } while ((holder = holder.mNext) != null);
         }
         if (null != mImageTaskStatistics) {
-            mImageTaskStatistics.showComplete(ImageProvider.getBitmapSize(drawable));
+            mImageTaskStatistics.s6_afterShow(ImageProvider.getBitmapSize(drawable));
+            ImagePerformanceStatistics.onImageLoaded(this, mImageTaskStatistics);
         }
     }
 

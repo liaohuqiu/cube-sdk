@@ -5,124 +5,150 @@ package in.srain.cube.image;
  */
 public class ImageTaskStatistics {
 
-    private long mStart;
-    private long mAfterMemoryCache;
-    private long mBeginLoad;
-    private long mAfterFileCache;
-    private long mAfterDownload;
-    private long mAfterDecode;
-    private long mAfterCreateBitmapDrawable;
-    private long mShowBegin;
-    private long mShowComplete;
-    private int mSize;
+
+    private long m0Start;
+    private long m1BeginLoad;
+    private long m2AfterCheckFileCache;
+    private long m3AfterDownload;
+    private long m4AfterDecode;
+    private long m5ShowStart;
+    private long m6ShowComplete;
+
+    /**
+     * in byte
+     */
+    private long mImageFileSize;
+    private long mBitmapDrawableSize;
+
     private boolean mHitMemoryCache;
     private boolean mHitFileCache;
 
     public ImageTaskStatistics() {
-        mStart = System.currentTimeMillis();
+        m0Start = System.currentTimeMillis();
     }
 
-    public void afterMemoryCache(boolean hasCache) {
+    public void s0_afterCheckMemoryCache(boolean hasCache) {
         mHitMemoryCache = hasCache;
-        mAfterMemoryCache = System.currentTimeMillis();
         if (hasCache) {
-            mBeginLoad = mAfterFileCache = mAfterDownload = mAfterDecode = mAfterCreateBitmapDrawable = mAfterMemoryCache;
+            m1BeginLoad = m2AfterCheckFileCache = m3AfterDownload = m4AfterDecode = System.currentTimeMillis();
         }
     }
 
-    public void beginLoad() {
-        mBeginLoad = System.currentTimeMillis();
+    public void s1_beginLoad() {
+        m1BeginLoad = System.currentTimeMillis();
     }
 
-    public void afterFileCache(boolean hasCache) {
+    public void s2_afterCheckFileCache(boolean hasCache) {
         mHitFileCache = hasCache;
-        mAfterFileCache = System.currentTimeMillis();
+        m2AfterCheckFileCache = System.currentTimeMillis();
         if (hasCache) {
-            mAfterDownload = mAfterFileCache;
+            m3AfterDownload = m2AfterCheckFileCache;
         }
     }
 
-    public void afterDownload() {
-        mAfterDownload = System.currentTimeMillis();
+    public void s3_afterDownload() {
+        m3AfterDownload = System.currentTimeMillis();
     }
 
-    public void afterDecode() {
-        mAfterDecode = System.currentTimeMillis();
+    public void s4_afterDecode(long imageFileSize) {
+        mImageFileSize = imageFileSize;
+        m4AfterDecode = System.currentTimeMillis();
     }
 
-    public void showBegin() {
-        mShowBegin = System.currentTimeMillis();
+    public void s5_beforeShow() {
+        m5ShowStart = System.currentTimeMillis();
     }
 
-    public void afterCreateBitmapDrawable() {
-        mAfterCreateBitmapDrawable = System.currentTimeMillis();
+    public void s6_afterShow(long s) {
+        mBitmapDrawableSize = s;
+        m6ShowComplete = System.currentTimeMillis();
     }
 
-    public void showComplete(int s) {
-        mShowComplete = System.currentTimeMillis();
-        mSize = s;
+    /**
+     * @return
+     */
+    @SuppressWarnings({"unused"})
+    public long getBitmapDrawableSize() {
+        return mBitmapDrawableSize;
     }
 
-    public int getMemoryCacheTime() {
-        return (int) (mAfterMemoryCache - mStart);
-    }
-
-    public int getWaitForLoadTime() {
-        return (int) (mBeginLoad - mAfterMemoryCache);
-    }
-
-    public int getFileCacheTime() {
-        return (int) (mAfterFileCache - mBeginLoad);
-    }
-
-    public int getDownloadTime() {
-        return (int) (mAfterDownload - mAfterFileCache);
-    }
-
+    /**
+     * Decode from file cache
+     *
+     * @return
+     */
     public int getDecodeTime() {
-        return (int) (mAfterDecode - mAfterDownload);
+        return (int) (m4AfterDecode - m3AfterDownload);
     }
 
-    public int getCreateBitmapDrawableTime() {
-        return (int) (mAfterCreateBitmapDrawable - mAfterDecode);
+    /**
+     * Download from remote server
+     *
+     * @return
+     */
+    public int getDownloadTime() {
+        return (int) (m3AfterDownload - m2AfterCheckFileCache);
     }
 
-    public int getWaitForPostMessage() {
-        return (int) (mShowBegin - mAfterCreateBitmapDrawable);
+    /**
+     * check if has file cache
+     *
+     * @return
+     */
+    public int getCheckFileCacheTime() {
+        return (int) (m2AfterCheckFileCache - m1BeginLoad);
     }
 
-    public int getDisplayTime() {
-        return (int) (mShowComplete - mShowBegin);
+    @SuppressWarnings({"unused"})
+    public long getImageFileSize() {
+        return mImageFileSize;
+    }
+
+    /**
+     * KillBytes / s
+     *
+     * @return -1 means did not do download
+     */
+    public int getDownLoadSpeed() {
+        if (getDownloadTime() * mImageFileSize == 0) {
+            return -1;
+        }
+        return (int) ((mImageFileSize >> 10) * 1000 / getDownloadTime());
+    }
+
+    public String getStatisticsInfo() {
+        return String.format("mc=%d, fc=%d, wait_to_load=%d, check_file_cache=%d, download=%d/%dKB/s, decode=%d, wait_ui=%s, all=%d, size=%d/%d",
+                mHitMemoryCache ? 1 : 0,
+                mHitFileCache ? 1 : 0,
+                getWaitForLoadTime(),
+                getCheckFileCacheTime(),
+                getDownloadTime(),
+                getDownLoadSpeed(),
+                getDecodeTime(),
+                getWaitToPostMessage(),
+                getTotalLoadTime(),
+                mBitmapDrawableSize,
+                mImageFileSize
+        );
     }
 
     public int getTotalLoadTime() {
-        return (int) (mShowComplete - mBeginLoad);
+        return (int) (m6ShowComplete - m0Start);
     }
 
-    public boolean hitMemoryCache() {
-        return mHitMemoryCache;
+    public int getWaitForLoadTime() {
+        return (int) (m1BeginLoad - m0Start);
+    }
+
+    public int getWaitToPostMessage() {
+        return (int) (m5ShowStart - m4AfterDecode);
     }
 
     public boolean hitFileCache() {
         return mHitFileCache;
     }
 
-    public int getSize() {
-        return mSize;
-    }
-
-    public String getInfo() {
-        return String.format("mc=%d, w=%d, fc=%d, dl=%d, de=%d, crt=%d, w2=%s, dis=%d, all=%d, size=%d",
-                getMemoryCacheTime(),
-                getWaitForLoadTime(),
-                getFileCacheTime(),
-                getDownloadTime(),
-                getDecodeTime(),
-                getCreateBitmapDrawableTime(),
-                getWaitForPostMessage(),
-                getDisplayTime(),
-                getTotalLoadTime(),
-                getSize()
-        );
+    public boolean hitMemoryCache() {
+        return mHitMemoryCache;
     }
 }

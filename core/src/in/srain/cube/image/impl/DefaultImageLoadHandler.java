@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import in.srain.cube.image.CubeImageView;
 import in.srain.cube.image.ImageTask;
 import in.srain.cube.image.drawable.RoundedDrawable;
-import in.srain.cube.image.drawable.TextDrawable;
 import in.srain.cube.image.iface.ImageLoadHandler;
 import in.srain.cube.util.CLog;
 import in.srain.cube.util.CubeDebug;
