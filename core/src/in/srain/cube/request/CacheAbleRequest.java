@@ -71,7 +71,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
     protected T doRequestSync() {
         T data = RequestCacheManager.getInstance().requestCacheSync(this);
         if (data == null) {
-            data = SimpleRequestManager.requestSync(this);
+            data = RequestManager.getInstance().getRequestProxy().requestSync(this);
         }
         return data;
     }
@@ -155,7 +155,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
     }
 
     protected void doQueryFromServer() {
-        SimpleRequestManager.sendRequest(this);
+        RequestManager.getInstance().getRequestProxy().sendRequest(this);
     }
 
     protected boolean cacheRequestResult() {

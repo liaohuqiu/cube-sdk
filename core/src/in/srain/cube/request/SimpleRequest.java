@@ -22,12 +22,12 @@ public class SimpleRequest<T> extends RequestBase<T> implements IRequest<T> {
 
     @Override
     protected void doSendRequest() {
-        SimpleRequestManager.sendRequest(this);
+        RequestManager.getInstance().getRequestProxy().sendRequest(this);
     }
 
     @Override
     protected T doRequestSync() {
-        return SimpleRequestManager.requestSync(this);
+        return RequestManager.getInstance().getRequestProxy().requestSync(this);
     }
 
     @Override
