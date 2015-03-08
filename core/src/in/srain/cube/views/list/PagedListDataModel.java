@@ -51,6 +51,10 @@ public abstract class PagedListDataModel<T> {
         }
     }
 
+    protected void setRequestFail() {
+        mListPageInfo.unlock();
+    }
+
     protected void setRequestResult(List<T> list, boolean hasMore) {
         mListPageInfo.updateListInfo(list, hasMore);
         if (null != mPagedListDataHandler) {
