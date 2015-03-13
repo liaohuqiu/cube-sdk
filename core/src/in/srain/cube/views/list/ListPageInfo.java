@@ -23,6 +23,9 @@ public class ListPageInfo<T> {
     }
 
     private void addMore(List<T> dataList) {
+        if (dataList == null) {
+            return;
+        }
         if (mStart == 0 || mDataList == null) {
             mDataList = new ArrayList<T>();
         }
@@ -79,6 +82,11 @@ public class ListPageInfo<T> {
         return mDataList == null || mDataList.size() == 0;
     }
 
+    /**
+     * try to move to next page
+     *
+     * @return
+     */
     public boolean nextPage() {
         if (hasMore()) {
             mStart += mNumPerPage;
@@ -96,6 +104,30 @@ public class ListPageInfo<T> {
             return 0;
         }
         return mDataList.size();
+    }
+
+    /**
+     * the first item in list
+     *
+     * @return
+     */
+    public T firstItem() {
+        if (mDataList == null || mDataList.size() == 0) {
+            return null;
+        }
+        return mDataList.get(0);
+    }
+
+    /**
+     * the last item in list
+     *
+     * @return
+     */
+    public T lastItem() {
+        if (mDataList == null || mDataList.size() == 0) {
+            return null;
+        }
+        return mDataList.get(mDataList.size() - 1);
     }
 
     public boolean hasMore() {

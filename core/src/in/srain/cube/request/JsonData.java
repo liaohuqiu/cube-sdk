@@ -12,6 +12,8 @@ public final class JsonData {
 
     private Object mJson;
     private static final String EMPTY_STRING = "";
+    private static final JSONArray EMPTY_JSON_ARRAY = new JSONArray();
+    private static final JSONObject EMPTY_JSON_OBJECT = new JSONObject();
 
     public static JsonData newMap() {
         return create(new HashMap<String, Object>());
@@ -145,7 +147,7 @@ public final class JsonData {
         if (mJson instanceof JSONObject) {
             return (JSONObject) mJson;
         }
-        return new JSONObject();
+        return EMPTY_JSON_OBJECT;
     }
 
     private Object valueForPut(Object value) {
@@ -234,7 +236,7 @@ public final class JsonData {
         if (mJson instanceof JSONArray) {
             return (JSONArray) mJson;
         }
-        return new JSONArray();
+        return EMPTY_JSON_ARRAY;
     }
 
     public int length() {

@@ -182,6 +182,8 @@ public class CubeImageView extends ImageView {
     private void tryLoadImage() {
 
         if (TextUtils.isEmpty(mUrl)) {
+            setImageDrawable(null);
+            mImageTask = null;
             return;
         }
 
