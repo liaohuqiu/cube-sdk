@@ -170,6 +170,11 @@ public class CubeImageView extends ImageView {
         mSpecifiedWidth = specifiedWidth;
         mSpecifiedHeight = specifiedHeight;
         mImageReuseInfo = imageReuseInfo;
+        if (TextUtils.isEmpty(mUrl)) {
+            setImageDrawable(null);
+            mImageTask = null;
+            return;
+        }
         tryLoadImage();
     }
 
@@ -182,8 +187,6 @@ public class CubeImageView extends ImageView {
     private void tryLoadImage() {
 
         if (TextUtils.isEmpty(mUrl)) {
-            setImageDrawable(null);
-            mImageTask = null;
             return;
         }
 
