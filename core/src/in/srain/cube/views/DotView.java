@@ -102,9 +102,12 @@ public class DotView extends LinearLayout implements PagerIndicator {
     };
 
     public final void setSelected(int index) {
-        if (index >= getChildCount() || index < 0 || mCurrent == index)
+        if (index >= getChildCount() || index < 0 || mCurrent == index) {
             return;
-        ((LittleDot) getChildAt(mCurrent)).setColor(mUnSelectedColor);
+        }
+        if (mCurrent < getChildCount() && mCurrent >= 0) {
+            ((LittleDot) getChildAt(mCurrent)).setColor(mUnSelectedColor);
+        }
         ((LittleDot) getChildAt(index)).setColor(mSelectedColor);
         mCurrent = index;
     }

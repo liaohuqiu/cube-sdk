@@ -14,7 +14,7 @@ Demo 项目移到了这里: https://github.com/liaohuqiu/android-cube-app
 
 #### 依赖源
 
-最新版版本号: `1.0.44`, 发布到了: `https://oss.sonatype.org/content/repositories/snapshots`
+最新版版本号: `1.0.44.18-SNAPSHOT`, 发布到了: `https://oss.sonatype.org/content/repositories/snapshots`
 
 *   在gradle中:
 
@@ -39,7 +39,7 @@ maven {
 </repository>
 ```
 
-稳定版: `1.0.42`, 发布到了: `https://oss.sonatype.org/content/repositories/releases`
+稳定版: `1.0.44`, 发布到了: `https://oss.sonatype.org/content/repositories/releases`
 
 在gradle中:
 
@@ -61,7 +61,7 @@ mavenCentral()
     <type>aar</type>
     <!-- or apklib format, if you want -->
     <!-- <type>apklib</type> -->
-    <version>1.0.44</version>
+    <version>1.0.44.18-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -74,20 +74,20 @@ mavenCentral()
     <type>aar</type>
     <!-- or apklib format, if you want -->
     <!-- <type>apklib</type> -->
-    <version>1.0.42</version>
+    <version>1.0.44</version>
 </dependency>
 ```
 
 *   gradle / Android Studio, 最新版
 
 ```
-compile 'in.srain.cube:cube-sdk:1.0.44@aar'
+compile 'in.srain.cube:cube-sdk:1.0.44.18-SNAPSHOT@aar'
 ```
 
 *   gradle / Android Studio, 稳定版
 
 ```
-compile 'in.srain.cube:cube-sdk:1.0.42@aar'
+compile 'in.srain.cube:cube-sdk:1.0.44@aar'
 ```
 
 ##### eclipse

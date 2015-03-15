@@ -10,10 +10,10 @@ import java.util.*;
 @SuppressWarnings("rawtypes")
 public final class JsonData {
 
-    private Object mJson;
     private static final String EMPTY_STRING = "";
     private static final JSONArray EMPTY_JSON_ARRAY = new JSONArray();
     private static final JSONObject EMPTY_JSON_OBJECT = new JSONObject();
+    private Object mJson;
 
     public static JsonData newMap() {
         return create(new HashMap<String, Object>());
@@ -281,5 +281,47 @@ public final class JsonData {
             }
         }
         return arrayList;
+    }
+
+    public <T> ArrayList<T> asList(JsonConverter<T> converter) {
+        ArrayList<T> arrayList = new ArrayList<T>();
+        if (mJson instanceof JSONArray) {
+            final JSONArray array = (JSONArray) mJson;
+            for (int i = 0; i < array.length(); i++) {
+                arrayList.add(converter.convert(JsonData.create(array.opt(i))));
+            }
+        } else if (mJson instanceof JSONObject) {
+            final JSONObject json = (JSONObject) mJson;
+
+            Iterator it = json.keys();
+            while (it.hasNext()) {
+                String key = (String) it.next();
+                arrayList.add(converter.convert(JsonData.create(json.opt(key))));
+            }
+        }
+        return arrayList;
+    }
+
+    public <T> ArrayList<T> asList() {
+        ArrayList<T> arrayList = new ArrayList<T>();
+        if (mJson instanceof JSONArray) {
+            final JSONArray array = (JSONArray) mJson;
+            for (int i = 0; i < array.length(); i++) {
+                arrayList.add((T) array.opt(i));
+            }
+        } else if (mJson instanceof JSONObject) {
+            final JSONObject json = (JSONObject) mJson;
+
+            Iterator it = json.keys();
+            while (it.hasNext()) {
+                String key = (String) it.next();
+                arrayList.add((T) json.opt(key));
+            }
+        }
+        return arrayList;
+    }
+
+    public interface JsonConverter<T> {
+        public T convert(JsonData item);
     }
 }

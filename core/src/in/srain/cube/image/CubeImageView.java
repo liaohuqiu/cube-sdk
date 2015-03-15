@@ -233,11 +233,6 @@ public class CubeImageView extends ImageView {
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-    }
-
-    @Override
     public String toString() {
         if (mStr == null) {
             mStr = "[CubeImageView@" + Integer.toHexString(hashCode()) + ']';

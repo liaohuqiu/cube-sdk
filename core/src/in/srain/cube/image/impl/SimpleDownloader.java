@@ -43,6 +43,7 @@ public class SimpleDownloader implements ImageDownloader {
         try {
             final URL url = new URL(urlString);
             urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setReadTimeout(0);
             int len = urlConnection.getContentLength();
             int total = 0;
             in = new BufferedInputStream(urlConnection.getInputStream(), IO_BUFFER_SIZE);

@@ -17,7 +17,7 @@ http://cube-sdk.liaohuqiu.net
 
 #### Repository
 
-The latest version: `1.0.44`, has been published to: https://oss.sonatype.org/content/repositories/snapshots, in gradle:
+The latest version: `1.0.44.18-SNAPSHOT`, has been published to: https://oss.sonatype.org/content/repositories/snapshots, in gradle:
 
 *   gradle
 
@@ -42,7 +42,7 @@ The latest version: `1.0.44`, has been published to: https://oss.sonatype.org/co
     </repository>
     ```
 
-The stable version: `1.0.42`, https://oss.sonatype.org/content/repositories/releases, in gradle:
+The stable version: `1.0.44`, https://oss.sonatype.org/content/repositories/releases, in gradle:
 
 
 *   gradle
@@ -62,7 +62,7 @@ The stable version: `1.0.42`, https://oss.sonatype.org/content/repositories/rele
     <type>aar</type>
     <!-- or apklib format, if you want -->
     <!-- <type>apklib</type> -->
-    <version>1.0.44</version>
+    <version>1.0.44.18-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -75,20 +75,20 @@ The stable version: `1.0.42`, https://oss.sonatype.org/content/repositories/rele
     <type>aar</type>
     <!-- or apklib format, if you want -->
     <!-- <type>apklib</type> -->
-    <version>1.0.42</version>
+    <version>1.0.44</version>
 </dependency>
 ```
 
 *   gradle, latest version:
 
 ```
-compile 'in.srain.cube:cube-sdk:1.0.44@aar'
+compile 'in.srain.cube:cube-sdk:1.0.44.18-SNAPSHOT@aar'
 ```
 
 *   gradle, stable version:
 
 ```
-compile 'in.srain.cube:cube-sdk:1.0.42@aar'
+compile 'in.srain.cube:cube-sdk:1.0.44@aar'
 ```
 
 ###### Eclipse
