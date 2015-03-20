@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="cube_photo_no_camera">Sorry, it seems that you do not have a camera in your PHONE.</string>
+    <string name="cube_photo_can_not_use_camera">Sorry, you camera is not avariable now.</string>
+    <string name="cube_photo_no_enough_space">Sorry, no enough space to store photo.</string>
+    <string name="cube_photo_can_not_open_album">Can not open album.</string>
+    <string-array name="cube_photo_pick_options">
+        <item>Take photo</item>
+        <item>Chose from album</item>
+        <item>Cancel</item>
+    </string-array>
+</resources>
