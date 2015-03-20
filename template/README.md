@@ -94,3 +94,5 @@ compile 'in.srain.cube:cube-sdk:{cube_sdk_stable_version}@aar'
 ###### Eclipse
 
 Load the content into you eclipse, it's a library project. Then use it in your application project.
+
+SDK version >= 19

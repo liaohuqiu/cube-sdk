@@ -14,7 +14,7 @@ Demo 项目移到了这里: https://github.com/liaohuqiu/android-cube-app
 
 #### 依赖源
 
-最新版版本号: `1.0.44.19-SNAPSHOT`, 发布到了: `https://oss.sonatype.org/content/repositories/snapshots`
+最新版版本号: `1.0.44.21-SNAPSHOT`, 发布到了: `https://oss.sonatype.org/content/repositories/snapshots`
 
 *   在gradle中:
 
@@ -61,7 +61,7 @@ mavenCentral()
     <type>aar</type>
     <!-- or apklib format, if you want -->
     <!-- <type>apklib</type> -->
-    <version>1.0.44.19-SNAPSHOT</version>
+    <version>1.0.44.21-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -81,7 +81,7 @@ mavenCentral()
 *   gradle / Android Studio, 最新版
 
 ```
-compile 'in.srain.cube:cube-sdk:1.0.44.19-SNAPSHOT@aar'
+compile 'in.srain.cube:cube-sdk:1.0.44.21-SNAPSHOT@aar'
 ```
 
 *   gradle / Android Studio, 稳定版
@@ -91,6 +91,8 @@ compile 'in.srain.cube:cube-sdk:1.0.44@aar'
 ```
 
 ##### eclipse
+
+本地编译 SDK 需要 >= 19
 
 项目在Eclipse中也是可以加载编译的，但强烈建议使用Intellij IDEA 或者 Android Stuido。
 

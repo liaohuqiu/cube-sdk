@@ -92,6 +92,8 @@ compile 'in.srain.cube:cube-sdk:{cube_sdk_stable_version}@aar'
 
 ##### eclipse
 
+本地编译 SDK 需要 >= 19
+
 项目在Eclipse中也是可以加载编译的，但强烈建议使用Intellij IDEA 或者 Android Stuido。
 
 直接将core文件夹下的内容作为一个类库加载，然后在项目中引用。

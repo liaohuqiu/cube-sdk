@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 /**
@@ -29,20 +30,80 @@ import android.util.Log;
  */
 public class NetworkStatusManager {
 
+
+    /**
+     * 未知网络类别
+     */
+    public static final int NETWORK_CLASS_UNKNOWN = 0;
+    public static final String NETWORK_CLASS_UNKNOWN_NAME = "UNKNOWN";
+    /**
+     * 2G网络
+     */
+    public static final int NETWORK_CLASS_2G = 1;
+    public static final String NETWORK_CLASS_2G_NAME = "2G";
+    /**
+     * 3G网络
+     */
+    public static final int NETWORK_CLASS_3G = 2;
+    public static final String NETWORK_CLASS_3G_NAME = "3G";
+    /**
+     * 4G网络
+     */
+    public static final int NETWORK_CLASS_4G = 3;
+    public static final String NETWORK_CLASS_4G_NAME = "4G";
+    /**
+     * WIFI网络
+     */
+    public static final int NETWORK_CLASS_WIFI = 999;
+    public static final String NETWORK_CLASS_WIFI_NAME = "WIFI";
     private static final String TAG = "NetworkStatusManager";
     private static final boolean DBG = true;
-
+    private static NetworkStatusManager sInstance;
     private Context mContext;
     private State mState;
     private boolean mListening;
     private String mReason;
     private boolean mIsFailOver;
-
     private NetworkInfo mNetworkInfo;
-
     private boolean mIsWifi = false;
+    /**
+     * In case of a Disconnect, the connectivity manager may have already established, or may be attempting to establish, connectivity with another network. If so, {@code mOtherNetworkInfo} will be non-null.
+     */
+    private NetworkInfo mOtherNetworkInfo;
+    private ConnectivityBroadcastReceiver mReceiver;
 
-    private static NetworkStatusManager sInstance;
+    private NetworkStatusManager() {
+        mState = State.UNKNOWN;
+        mReceiver = new ConnectivityBroadcastReceiver();
+    }
+
+    /**
+     * {@link TelephonyManager#getNetworkClass}
+     */
+    private static int getMobileNetworkClass(int networkType) {
+        switch (networkType) {
+            case TelephonyManager.NETWORK_TYPE_GPRS:
+            case TelephonyManager.NETWORK_TYPE_EDGE:
+            case TelephonyManager.NETWORK_TYPE_CDMA:
+            case TelephonyManager.NETWORK_TYPE_1xRTT:
+            case TelephonyManager.NETWORK_TYPE_IDEN:
+                return NETWORK_CLASS_2G;
+            case TelephonyManager.NETWORK_TYPE_UMTS:
+            case TelephonyManager.NETWORK_TYPE_EVDO_0:
+            case TelephonyManager.NETWORK_TYPE_EVDO_A:
+            case TelephonyManager.NETWORK_TYPE_HSDPA:
+            case TelephonyManager.NETWORK_TYPE_HSUPA:
+            case TelephonyManager.NETWORK_TYPE_HSPA:
+            case TelephonyManager.NETWORK_TYPE_EVDO_B:
+            case TelephonyManager.NETWORK_TYPE_EHRPD:
+            case TelephonyManager.NETWORK_TYPE_HSPAP:
+                return NETWORK_CLASS_3G;
+            case TelephonyManager.NETWORK_TYPE_LTE:
+                return NETWORK_CLASS_4G;
+            default:
+                return NETWORK_CLASS_UNKNOWN;
+        }
+    }
 
     public static void init(Context context) {
         sInstance = new NetworkStatusManager();
@@ -53,48 +114,6 @@ public class NetworkStatusManager {
     public static NetworkStatusManager getInstance() {
         return sInstance;
     }
-
-    /**
-     * In case of a Disconnect, the connectivity manager may have already established, or may be attempting to establish, connectivity with another network. If so, {@code mOtherNetworkInfo} will be non-null.
-     */
-    private NetworkInfo mOtherNetworkInfo;
-
-    private ConnectivityBroadcastReceiver mReceiver;
-
-    private class ConnectivityBroadcastReceiver extends BroadcastReceiver {
-        @SuppressWarnings("deprecation")
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-
-            if (!action.equals(ConnectivityManager.CONNECTIVITY_ACTION) || mListening == false) {
-                Log.w(TAG, "onReceived() called with " + mState.toString() + " and " + intent);
-                return;
-            }
-
-            boolean noConnectivity = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
-
-            if (noConnectivity) {
-                mState = State.NOT_CONNECTED;
-            } else {
-                mState = State.CONNECTED;
-            }
-
-            mNetworkInfo = (NetworkInfo) intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
-            mOtherNetworkInfo = (NetworkInfo) intent.getParcelableExtra(ConnectivityManager.EXTRA_OTHER_NETWORK_INFO);
-
-            mReason = intent.getStringExtra(ConnectivityManager.EXTRA_REASON);
-            mIsFailOver = intent.getBooleanExtra(ConnectivityManager.EXTRA_IS_FAILOVER, false);
-            if (DBG) {
-                Log.d(TAG, "onReceive(): mNetworkInfo=" + mNetworkInfo + " mOtherNetworkInfo = " + (mOtherNetworkInfo == null ? "[none]" : mOtherNetworkInfo + " noConn=" + noConnectivity)
-                        + " mState=" + mState.toString());
-            }
-
-            mIsWifi = checkIsWifi(mContext);
-        }
-    }
-
-    ;
 
     public static boolean checkIsWifi(Context context) {
         ConnectivityManager connectivity = (ConnectivityManager) (context.getSystemService(Context.CONNECTIVITY_SERVICE));
@@ -107,25 +126,27 @@ public class NetworkStatusManager {
         return false;
     }
 
-    public enum State {
-        UNKNOWN,
+    /**
+     * 2G/3G/4G/WIFI
+     *
+     * @return
+     */
+    public int getNetworkType() {
 
-        /**
-         * This state is returned if there is connectivity to any network *
-         */
-        CONNECTED,
-        /**
-         * This state is returned if there is no connectivity to any network. This is set to true under two circumstances:
-         * <ul>
-         * <li>When connectivity is lost to one network, and there is no other available network to attempt to switch to.</li>
-         * <li>When connectivity is lost to one network, and the attempt to switch to another network fails.</li>
-         */
-        NOT_CONNECTED
-    }
+        NetworkInfo activeNetworkInfo = getNetworkInfo();
 
-    private NetworkStatusManager() {
-        mState = State.UNKNOWN;
-        mReceiver = new ConnectivityBroadcastReceiver();
+        if (activeNetworkInfo != null) {
+            // WIFI
+            if (activeNetworkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+                return NETWORK_CLASS_WIFI;
+            }
+            // MOBILE
+            else if (activeNetworkInfo.getType() == ConnectivityManager.TYPE_MOBILE) {
+                return getMobileNetworkClass(activeNetworkInfo.getSubtype());
+            }
+        }
+
+        return NETWORK_CLASS_UNKNOWN;
     }
 
     /**
@@ -197,5 +218,70 @@ public class NetworkStatusManager {
 
     public boolean isWifi() {
         return mIsWifi;
+    }
+
+    public String getNetworkTypeName() {
+        switch (getNetworkType()) {
+            case NETWORK_CLASS_WIFI:
+                return NETWORK_CLASS_WIFI_NAME;
+            case NETWORK_CLASS_2G:
+                return NETWORK_CLASS_2G_NAME;
+            case NETWORK_CLASS_3G:
+                return NETWORK_CLASS_3G_NAME;
+            case NETWORK_CLASS_4G:
+                return NETWORK_CLASS_4G_NAME;
+            case NETWORK_CLASS_UNKNOWN:
+                return NETWORK_CLASS_UNKNOWN_NAME;
+        }
+        return NETWORK_CLASS_UNKNOWN_NAME;
+    }
+
+    public enum State {
+        UNKNOWN,
+
+        /**
+         * This state is returned if there is connectivity to any network *
+         */
+        CONNECTED,
+        /**
+         * This state is returned if there is no connectivity to any network. This is set to true under two circumstances:
+         * <ul>
+         * <li>When connectivity is lost to one network, and there is no other available network to attempt to switch to.</li>
+         * <li>When connectivity is lost to one network, and the attempt to switch to another network fails.</li>
+         */
+        NOT_CONNECTED
+    }
+
+    private class ConnectivityBroadcastReceiver extends BroadcastReceiver {
+        @SuppressWarnings("deprecation")
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+
+            if (!action.equals(ConnectivityManager.CONNECTIVITY_ACTION) || mListening == false) {
+                Log.w(TAG, "onReceived() called with " + mState.toString() + " and " + intent);
+                return;
+            }
+
+            boolean noConnectivity = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
+
+            if (noConnectivity) {
+                mState = State.NOT_CONNECTED;
+            } else {
+                mState = State.CONNECTED;
+            }
+
+            mNetworkInfo = (NetworkInfo) intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
+            mOtherNetworkInfo = (NetworkInfo) intent.getParcelableExtra(ConnectivityManager.EXTRA_OTHER_NETWORK_INFO);
+
+            mReason = intent.getStringExtra(ConnectivityManager.EXTRA_REASON);
+            mIsFailOver = intent.getBooleanExtra(ConnectivityManager.EXTRA_IS_FAILOVER, false);
+            if (DBG) {
+                Log.d(TAG, "onReceive(): mNetworkInfo=" + mNetworkInfo + " mOtherNetworkInfo = " + (mOtherNetworkInfo == null ? "[none]" : mOtherNetworkInfo + " noConn=" + noConnectivity)
+                        + " mState=" + mState.toString());
+            }
+
+            mIsWifi = checkIsWifi(mContext);
+        }
     }
 }

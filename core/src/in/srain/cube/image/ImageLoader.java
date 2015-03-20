@@ -55,6 +55,7 @@ public class ImageLoader implements LifeCycleComponent {
     protected Context mContext;
 
     protected Resources mResources;
+    protected boolean mHasBeenAddedToComponentManager = false;
 
     public static final int TASK_ORDER_FIRST_IN_FIRST_OUT = 1;
     public static final int TASK_ORDER_LAST_IN_FIRST_OUT = 2;
@@ -161,6 +162,9 @@ public class ImageLoader implements LifeCycleComponent {
      * @param imageView
      */
     public void addImageTask(ImageTask imageTask, CubeImageView imageView) {
+        if (!mHasBeenAddedToComponentManager) {
+            CLog.w(LOG_TAG, "ImageLoader has not been add to a Component Manager.", this);
+        }
         LoadImageTask runningTask = mLoadWorkList.get(imageTask.getIdentityKey());
         if (runningTask != null) {
             if (imageView != null) {
@@ -504,7 +508,9 @@ public class ImageLoader implements LifeCycleComponent {
      * try to attach to {@link in.srain.cube.app.lifecycle.IComponentContainer}
      */
     public ImageLoader tryToAttachToContainer(Object object, boolean throwEx) {
-        LifeCycleComponentManager.tryAddComponentToContainer(this, object, throwEx);
+        if (LifeCycleComponentManager.tryAddComponentToContainer(this, object, throwEx)) {
+            mHasBeenAddedToComponentManager = true;
+        }
         return this;
     }
 
@@ -516,7 +522,9 @@ public class ImageLoader implements LifeCycleComponent {
      */
     public ImageLoader attachToCubeFragment(CubeFragment fragment) {
         if (fragment != null) {
-            LifeCycleComponentManager.tryAddComponentToContainer(this, fragment);
+            if (LifeCycleComponentManager.tryAddComponentToContainer(this, fragment, true)) {
+                mHasBeenAddedToComponentManager = true;
+            }
         }
         return this;
     }
