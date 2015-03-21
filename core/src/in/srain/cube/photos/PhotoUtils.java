@@ -1,4 +1,4 @@
-package in.srain.cube.selectPhoto;
+package in.srain.cube.photos;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -26,7 +26,7 @@ public class PhotoUtils {
     }
 
     public static void toCamera(Activity activity, File outputFile, int requestCode) {
-        if (isCameraUseAble(activity)) {
+        if (!isCameraUseAble(activity)) {
             Toast.makeText(activity, R.string.cube_photo_no_camera, Toast.LENGTH_LONG).show();
             return;
         }

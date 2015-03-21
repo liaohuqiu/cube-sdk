@@ -1,4 +1,4 @@
-package in.srain.cube.selectPhoto;
+package in.srain.cube.photos;
 
 public class CropOption {
     public int outputX = 0;

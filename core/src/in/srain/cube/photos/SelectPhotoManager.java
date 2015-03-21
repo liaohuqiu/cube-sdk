@@ -1,4 +1,4 @@
-package in.srain.cube.selectPhoto;
+package in.srain.cube.photos;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -9,8 +9,10 @@ import android.text.TextUtils;
 import android.widget.Toast;
 import in.srain.cube.R;
 import in.srain.cube.cache.DiskFileUtils;
+import in.srain.cube.diskcache.FileUtils;
 
 import java.io.File;
+import java.io.IOException;
 
 public final class SelectPhotoManager {
 
@@ -52,6 +54,11 @@ public final class SelectPhotoManager {
 
         DiskFileUtils.CacheDirInfo info = DiskFileUtils.getDiskCacheDir(activity, TEMP_PATH_NAME, 1024 * 1024 * 30);
         File path = info.path;
+        try {
+            FileUtils.deleteDirectoryQuickly(path);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         if (!path.exists() && !path.mkdirs()) {
             Toast.makeText(activity, R.string.cube_photo_can_not_use_camera, Toast.LENGTH_SHORT).show();
             return;
