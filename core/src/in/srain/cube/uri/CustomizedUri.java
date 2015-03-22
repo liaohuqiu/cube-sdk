@@ -48,6 +48,8 @@ public class CustomizedUri {
             throw new RuntimeException("url is null");
         }
 
+        url = url.trim();
+
         if (url.startsWith(customizedSchema)) {
             CustomizedUri uri = new CustomizedUri(url, customizedSchema);
             uri.mIsCustomized = true;
