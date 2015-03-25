@@ -32,7 +32,7 @@ public class SimpleRequest<T> extends RequestBase<T> implements IRequest<T> {
 
     @Override
     protected void prepareRequest() {
-        RequestManager.getInstance().getRequestProxy().sendRequest(this);
+        RequestManager.getInstance().getRequestProxy().prepareRequest(this);
     }
 
     @Override
