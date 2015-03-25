@@ -71,7 +71,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
     protected T doRequestSync() {
         T data = RequestCacheManager.getInstance().requestCacheSync(this);
         if (data == null) {
-            data = RequestManager.getInstance().getRequestProxy().requestSync(this);
+            data = RequestManager.getInstance().getRequestProxy(this).requestSync(this);
         }
         return data;
     }
@@ -81,7 +81,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
      */
     @Override
     protected void prepareRequest() {
-        RequestManager.getInstance().getRequestProxy().prepareRequest(this);
+        RequestManager.getInstance().getRequestProxy(this).prepareRequest(this);
     }
 
     // ===========================================================
@@ -128,7 +128,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
 
     @Override
     public void onRequestFail(FailData failData) {
-        RequestManager.getInstance().getRequestProxy().onRequestFail(this, failData);
+        RequestManager.getInstance().getRequestProxy(this).onRequestFail(this, failData);
         if (DEBUG) {
             CLog.d(LOG_TAG, "%s, onRequestFail", getCacheKey());
         }
@@ -156,7 +156,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
     }
 
     protected void doQueryFromServer() {
-        RequestManager.getInstance().getRequestProxy().sendRequest(this);
+        RequestManager.getInstance().getRequestProxy(this).sendRequest(this);
     }
 
     protected boolean cacheRequestResult() {
@@ -248,7 +248,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
 
     @Override
     public T processOriginDataFromServer(JsonData rawData) {
-        rawData = RequestManager.getInstance().getRequestProxy().processOriginDataFromServer(this, rawData);
+        rawData = RequestManager.getInstance().getRequestProxy(this).processOriginDataFromServer(this, rawData);
         return mHandler.processOriginData(rawData);
     }
 

@@ -89,8 +89,8 @@ public class DefaultRequestProxy implements IRequestProxy {
     }
 
     @Override
-    public <T> T processOriginDataFromServer(RequestBase request, JsonData data) {
-        return null;
+    public JsonData processOriginDataFromServer(RequestBase request, JsonData data) {
+        return data;
     }
 
     private static class DoRequestTask<T> extends SimpleTask {

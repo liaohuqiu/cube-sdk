@@ -44,15 +44,15 @@ public abstract class ListViewDataAdapterBase<ItemDataType> extends BaseAdapter 
         mLazyCreator = LazyViewHolderCreator.create(enclosingInstance, cls, args);
     }
 
-    private ViewHolderBase<ItemDataType> createViewHolder() {
+    private ViewHolderBase<ItemDataType> createViewHolder(int position) {
         if (mViewHolderCreator == null && mLazyCreator == null) {
             throw new RuntimeException("view holder creator is null");
         }
         if (mViewHolderCreator != null) {
-            return mViewHolderCreator.createViewHolder();
+            return mViewHolderCreator.createViewHolder(position);
         }
         if (mLazyCreator != null) {
-            return mLazyCreator.createViewHolder();
+            return mLazyCreator.createViewHolder(position);
         }
         return null;
     }
@@ -71,7 +71,7 @@ public abstract class ListViewDataAdapterBase<ItemDataType> extends BaseAdapter 
         ViewHolderBase<ItemDataType> holderBase = null;
         if (mForceCreateView || convertView == null || (!(convertView.getTag() instanceof ViewHolderBase<?>))) {
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-            holderBase = createViewHolder();
+            holderBase = createViewHolder(position);
             if (holderBase != null) {
                 convertView = holderBase.createView(inflater);
                 if (convertView != null) {

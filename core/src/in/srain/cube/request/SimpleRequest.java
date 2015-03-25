@@ -22,17 +22,17 @@ public class SimpleRequest<T> extends RequestBase<T> implements IRequest<T> {
 
     @Override
     protected void doSendRequest() {
-        RequestManager.getInstance().getRequestProxy().sendRequest(this);
+        RequestManager.getInstance().getRequestProxy(this).sendRequest(this);
     }
 
     @Override
     protected T doRequestSync() {
-        return RequestManager.getInstance().getRequestProxy().requestSync(this);
+        return RequestManager.getInstance().getRequestProxy(this).requestSync(this);
     }
 
     @Override
     protected void prepareRequest() {
-        RequestManager.getInstance().getRequestProxy().prepareRequest(this);
+        RequestManager.getInstance().getRequestProxy(this).prepareRequest(this);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class SimpleRequest<T> extends RequestBase<T> implements IRequest<T> {
 
     @Override
     public void onRequestFail(FailData failData) {
-        RequestManager.getInstance().getRequestProxy().onRequestFail(this, failData);
+        RequestManager.getInstance().getRequestProxy(this).onRequestFail(this, failData);
         if (null != mRequestHandler) {
             mRequestHandler.onRequestFail(failData);
         }
@@ -52,7 +52,7 @@ public class SimpleRequest<T> extends RequestBase<T> implements IRequest<T> {
 
     @Override
     public T processOriginDataFromServer(JsonData rawData) {
-        rawData = RequestManager.getInstance().getRequestProxy().processOriginDataFromServer(this, rawData);
+        rawData = RequestManager.getInstance().getRequestProxy(this).processOriginDataFromServer(this, rawData);
         if (null != mRequestHandler) {
             return mRequestHandler.processOriginData(rawData);
         }

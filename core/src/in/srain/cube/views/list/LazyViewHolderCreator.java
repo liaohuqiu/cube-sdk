@@ -63,7 +63,7 @@ public class LazyViewHolderCreator<T> implements ViewHolderCreator<T> {
     }
 
     @Override
-    public ViewHolderBase<T> createViewHolder() {
+    public ViewHolderBase<T> createViewHolder(int position) {
         Object object = null;
         try {
             boolean isAccessible = mConstructor.isAccessible();

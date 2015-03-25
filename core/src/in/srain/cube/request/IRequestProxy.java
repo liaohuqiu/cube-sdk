@@ -10,5 +10,5 @@ public interface IRequestProxy {
 
     public void onRequestFail(RequestBase request, FailData failData);
 
-    public <T> T processOriginDataFromServer(RequestBase request, final JsonData data);
+    public JsonData processOriginDataFromServer(RequestBase request, final JsonData data);
 }
