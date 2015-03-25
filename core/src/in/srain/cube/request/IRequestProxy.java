@@ -1,11 +1,14 @@
 package in.srain.cube.request;
 
-/**
- * Created by srain on 3/8/15.
- */
 public interface IRequestProxy {
 
     <T> T requestSync(IRequest<T> request);
 
     <T> void sendRequest(IRequest<T> request);
+
+    public void prepareRequest(RequestBase request);
+
+    public void onRequestFail(RequestBase request, FailData failData);
+
+    public <T> T processOriginDataFromServer(RequestBase request, final JsonData data);
 }

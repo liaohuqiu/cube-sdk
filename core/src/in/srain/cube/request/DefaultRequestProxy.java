@@ -78,6 +78,21 @@ public class DefaultRequestProxy implements IRequestProxy {
         mSimpleExecutor.execute(doRequestTask);
     }
 
+    @Override
+    public void prepareRequest(RequestBase request) {
+
+    }
+
+    @Override
+    public void onRequestFail(RequestBase request, FailData failData) {
+
+    }
+
+    @Override
+    public <T> T processOriginDataFromServer(RequestBase request, JsonData data) {
+        return null;
+    }
+
     private static class DoRequestTask<T> extends SimpleTask {
 
         private T mData;

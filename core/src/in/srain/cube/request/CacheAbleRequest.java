@@ -81,7 +81,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
      */
     @Override
     protected void prepareRequest() {
-
+        RequestManager.getInstance().getRequestProxy().prepareRequest(this);
     }
 
     // ===========================================================
@@ -128,6 +128,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
 
     @Override
     public void onRequestFail(FailData failData) {
+        RequestManager.getInstance().getRequestProxy().onRequestFail(this, failData);
         if (DEBUG) {
             CLog.d(LOG_TAG, "%s, onRequestFail", getCacheKey());
         }
@@ -247,6 +248,7 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
 
     @Override
     public T processOriginDataFromServer(JsonData rawData) {
+        rawData = RequestManager.getInstance().getRequestProxy().processOriginDataFromServer(this, rawData);
         return mHandler.processOriginData(rawData);
     }
 

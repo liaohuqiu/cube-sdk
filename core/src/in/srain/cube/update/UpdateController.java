@@ -20,8 +20,6 @@ import java.io.File;
 
 public class UpdateController implements DownLoadListener {
 
-    private static final String LOG_TAG = "cube-update";
-
     private static final int NOTIFY_ID = 10000;
 
     private static final String MSG_ERROR_URL = "错误的下载地址";
@@ -55,6 +53,10 @@ public class UpdateController implements DownLoadListener {
         return sInstance;
     }
 
+    /**
+     * @param context
+     * @param icon
+     */
     public void init(Context context, int icon) {
 
         if (context == null) {
@@ -134,6 +136,10 @@ public class UpdateController implements DownLoadListener {
     }
 
     public void beginDownLoad(String url) {
+        beginDownLoad(url, false);
+    }
+
+    public void beginDownLoad(String url, boolean forceReDownload) {
 
         String dir = DiskFileUtils.wantFilesPath(mContext, true);
         String fileName = url.substring(url.lastIndexOf("/") + 1);
@@ -141,6 +147,9 @@ public class UpdateController implements DownLoadListener {
 
         mDownloadTask = new DownloadTask(this, url, mApkPath);
         notifyDownLoadStart();
+        if (forceReDownload) {
+            deleteApkFile();
+        }
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(mActionCancel);
@@ -170,6 +179,7 @@ public class UpdateController implements DownLoadListener {
         }
         switch (result) {
             case DownloadTask.RESULT_OK:
+                mNotifyManager.cancelAll();
                 notifyDownloadFinish();
                 // openFile();
                 break;

@@ -32,6 +32,7 @@ public class SimpleRequest<T> extends RequestBase<T> implements IRequest<T> {
 
     @Override
     protected void prepareRequest() {
+        RequestManager.getInstance().getRequestProxy().sendRequest(this);
     }
 
     @Override
@@ -43,6 +44,7 @@ public class SimpleRequest<T> extends RequestBase<T> implements IRequest<T> {
 
     @Override
     public void onRequestFail(FailData failData) {
+        RequestManager.getInstance().getRequestProxy().onRequestFail(this, failData);
         if (null != mRequestHandler) {
             mRequestHandler.onRequestFail(failData);
         }
@@ -50,6 +52,7 @@ public class SimpleRequest<T> extends RequestBase<T> implements IRequest<T> {
 
     @Override
     public T processOriginDataFromServer(JsonData rawData) {
+        rawData = RequestManager.getInstance().getRequestProxy().processOriginDataFromServer(this, rawData);
         if (null != mRequestHandler) {
             return mRequestHandler.processOriginData(rawData);
         }
