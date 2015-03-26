@@ -367,7 +367,7 @@ public final class LruActionTracer implements Runnable {
                 message.recycle();
 
                 if (SimpleDiskLruCache.DEBUG) {
-                    CLog.d(SimpleDiskLruCache.LOG_TAG, "doAction: %s,\tkey: %s",
+                    CLog.d(SimpleDiskLruCache.LOG_TAG, "doAction: %s, key: %s",
                             sACTION_LIST[action], cacheEntry != null ? cacheEntry.getKey() : null);
                 }
 
