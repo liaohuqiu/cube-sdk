@@ -49,6 +49,10 @@ public class Query<T> implements ICacheAble<T> {
         mCacheManager.requestCache(this);
     }
 
+    public T querySync() {
+        return mCacheManager.requestCacheSync(this);
+    }
+
     @Override
     public long getCacheTime() {
         return mCacheTime;
@@ -123,7 +127,9 @@ public class Query<T> implements ICacheAble<T> {
                 case FROM_CREATED:
                     break;
             }
-            mHandler.onQueryFinish(RequestType.USE_CACHE_NOT_EXPIRED, cacheData, true);
+            if (mHandler != null) {
+                mHandler.onQueryFinish(RequestType.USE_CACHE_NOT_EXPIRED, cacheData, true);
+            }
         }
     }
 
