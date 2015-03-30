@@ -71,6 +71,10 @@ public class ImageTask {
 
     private boolean mHasRecycled = false;
 
+
+
+    private int mPriority = 0;
+
     protected void clearForRecycle() {
         mHasRecycled = true;
         mFlag = 0;
@@ -532,5 +536,13 @@ public class ImageTask {
             }
             return mImageViewRef.get();
         }
+    }
+
+    public int getmPriority() {
+        return mPriority;
+    }
+
+    public void setmPriority(int mPriority) {
+        this.mPriority = mPriority;
     }
 }
