@@ -131,6 +131,29 @@ public class ImageLoader implements LifeCycleComponent {
         return imageTask;
     }
 
+    public ImageTask createImageTask(ImageBaseInfo baseInfo) {
+        ImageTask imageTask = ImageTask.obtain();
+        if (imageTask == null) {
+            imageTask = new ImageTask();
+        }
+
+        imageTask.setmPriority(baseInfo.priority);
+        imageTask.renew().setOriginUrl(baseInfo.url).setRequestSize(baseInfo.requestWidth, baseInfo.requestWidth).setReuseInfo(null);
+        return imageTask;
+    }
+
+
+    public ImageTask createImageTask(ImageBaseInfo baseInfo, ImageReuseInfo imageReuseInfo) {
+        ImageTask imageTask = ImageTask.obtain();
+        if (imageTask == null) {
+            imageTask = new ImageTask();
+        }
+
+        imageTask.setmPriority(baseInfo.priority);
+        imageTask.renew().setOriginUrl(baseInfo.url).setRequestSize(baseInfo.requestWidth, baseInfo.requestWidth).setReuseInfo(imageReuseInfo);
+        return imageTask;
+    }
+
     /**
      * Detach the ImageView from the ImageTask.
      *
@@ -256,7 +279,7 @@ public class ImageLoader implements LifeCycleComponent {
      *
      * @author http://www.liaohuqiu.net
      */
-    private static class LoadImageTask extends SimpleTask {
+    public static class LoadImageTask extends SimpleTask {
 
         private ImageTask mImageTask;
         private BitmapDrawable mDrawable;

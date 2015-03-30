@@ -35,6 +35,7 @@ public class CubeImageView extends ImageView {
     private ImageTask mImageTask;
     private boolean mClearWhenDetached = true;
     private String mStr;
+    private int mPriority = 0;
 
     public CubeImageView(Context context) {
         super(context);
@@ -164,6 +165,41 @@ public class CubeImageView extends ImageView {
         loadImage(imageLoader, url, specifiedWidth, specifiedHeight, null);
     }
 
+    public void loadImage(ImageLoader imageLoader, ImageBaseInfo baseInfo) {
+        loadImage(imageLoader, baseInfo, null);
+    }
+
+    public void loadImage(ImageLoader imageLoader, ImageBaseInfo baseInfo,  ImageReuseInfo imageReuseInfo) {
+        mImageLoader = imageLoader;
+        mUrl = baseInfo.url;
+        mSpecifiedWidth = baseInfo.requestWidth;
+        mSpecifiedHeight = baseInfo.requestWidth;
+        mImageReuseInfo = imageReuseInfo;
+        mPriority = baseInfo.priority;
+        if (TextUtils.isEmpty(mUrl)) {
+            setImageDrawable(null);
+            mImageTask = null;
+            return;
+        }
+        tryLoadImage();
+    }
+
+    public void loadImage(ImageLoader imageLoader, String url, int specifiedWidth, int specifiedHeight, ImageReuseInfo imageReuseInfo, int priority) {
+        mImageLoader = imageLoader;
+        mUrl = url;
+        mSpecifiedWidth = specifiedWidth;
+        mSpecifiedHeight = specifiedHeight;
+        mImageReuseInfo = imageReuseInfo;
+        mPriority = priority;
+        if (TextUtils.isEmpty(mUrl)) {
+            setImageDrawable(null);
+            mImageTask = null;
+            return;
+        }
+        tryLoadImage();
+    }
+
+
     public void loadImage(ImageLoader imageLoader, String url, int specifiedWidth, int specifiedHeight, ImageReuseInfo imageReuseInfo) {
         mImageLoader = imageLoader;
         mUrl = url;
@@ -223,7 +259,9 @@ public class CubeImageView extends ImageView {
         }
 
         // 2. Let the ImageView hold this ImageTask. When ImageView is reused next time, check it in step 1.
-        ImageTask imageTask = mImageLoader.createImageTask(mUrl, width, height, mImageReuseInfo);
+        ImageBaseInfo baseInfo = new ImageBaseInfo(mUrl, width, height, mPriority );
+        ImageTask imageTask = mImageLoader.createImageTask(baseInfo, mImageReuseInfo);
+        //.createImageTask(mUrl, width, height, mImageReuseInfo);
         mImageTask = imageTask;
 
         // 3. Query cache, if hit, return at once.
