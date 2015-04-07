@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="cube_photo_no_camera">抱歉，我们发现您的手机貌似没有摄像头</string>
+    <string name="cube_photo_can_not_use_camera">抱歉，暂时无法使用相机</string>
+    <string name="cube_photo_no_enough_space">抱歉，存储空间不足</string>
+    <string name="cube_photo_can_not_open_album">无法打开相册</string>
+    <string-array name="cube_photo_pick_options">
+        <item>拍照</item>
+        <item>从相册选取</item>
+        <item>取消</item>
+    </string-array>
+</resources>
