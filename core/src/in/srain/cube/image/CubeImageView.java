@@ -2,7 +2,6 @@ package in.srain.cube.image;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
@@ -26,16 +25,12 @@ import in.srain.cube.image.drawable.RecyclingBitmapDrawable;
  */
 public class CubeImageView extends ImageView {
 
-    private String mUrl = "";
-    private int mSpecifiedWidth = 0;
-    private int mSpecifiedHeight = 0;
     private ImageLoader mImageLoader;
 
-    private ImageReuseInfo mImageReuseInfo;
     private ImageTask mImageTask;
     private boolean mClearWhenDetached = true;
     private String mStr;
-    private int mPriority = 0;
+    private ImageLoadRequest mRequest;
 
     public CubeImageView(Context context) {
         super(context);
@@ -165,52 +160,26 @@ public class CubeImageView extends ImageView {
         loadImage(imageLoader, url, specifiedWidth, specifiedHeight, null);
     }
 
-    public void loadImage(ImageLoader imageLoader, ImageBaseInfo baseInfo) {
-        loadImage(imageLoader, baseInfo, null);
-    }
-
-    public void loadImage(ImageLoader imageLoader, ImageBaseInfo baseInfo,  ImageReuseInfo imageReuseInfo) {
+    public void loadImage(ImageLoader imageLoader, ImageLoadRequest request) {
         mImageLoader = imageLoader;
-        mUrl = baseInfo.url;
-        mSpecifiedWidth = baseInfo.requestWidth;
-        mSpecifiedHeight = baseInfo.requestWidth;
-        mImageReuseInfo = imageReuseInfo;
-        mPriority = baseInfo.priority;
-        if (TextUtils.isEmpty(mUrl)) {
+        if (request == null || TextUtils.isEmpty(request.getUrl())) {
             setImageDrawable(null);
             mImageTask = null;
             return;
         }
+        mRequest = request;
+
         tryLoadImage();
     }
-
-    public void loadImage(ImageLoader imageLoader, String url, int specifiedWidth, int specifiedHeight, ImageReuseInfo imageReuseInfo, int priority) {
-        mImageLoader = imageLoader;
-        mUrl = url;
-        mSpecifiedWidth = specifiedWidth;
-        mSpecifiedHeight = specifiedHeight;
-        mImageReuseInfo = imageReuseInfo;
-        mPriority = priority;
-        if (TextUtils.isEmpty(mUrl)) {
-            setImageDrawable(null);
-            mImageTask = null;
-            return;
-        }
-        tryLoadImage();
-    }
-
 
     public void loadImage(ImageLoader imageLoader, String url, int specifiedWidth, int specifiedHeight, ImageReuseInfo imageReuseInfo) {
         mImageLoader = imageLoader;
-        mUrl = url;
-        mSpecifiedWidth = specifiedWidth;
-        mSpecifiedHeight = specifiedHeight;
-        mImageReuseInfo = imageReuseInfo;
-        if (TextUtils.isEmpty(mUrl)) {
+        if (TextUtils.isEmpty(url)) {
             setImageDrawable(null);
             mImageTask = null;
             return;
         }
+        mRequest = new ImageLoadRequest(url, specifiedWidth, specifiedHeight, 0, imageReuseInfo);
         tryLoadImage();
     }
 
@@ -222,12 +191,13 @@ public class CubeImageView extends ImageView {
 
     private void tryLoadImage() {
 
-        if (TextUtils.isEmpty(mUrl)) {
+        if (mRequest == null || TextUtils.isEmpty(mRequest.getUrl())) {
             return;
         }
 
         int width = getWidth();
         int height = getHeight();
+        final String mUrl = mRequest.getUrl();
 
         ViewGroup.LayoutParams lyp = getLayoutParams();
         boolean isFullyWrapContent = lyp != null && lyp.height == LayoutParams.WRAP_CONTENT && lyp.width == LayoutParams.WRAP_CONTENT;
@@ -237,13 +207,7 @@ public class CubeImageView extends ImageView {
             return;
         }
 
-        if (mSpecifiedWidth != 0) {
-            width = mSpecifiedWidth;
-        }
-
-        if (mSpecifiedHeight != 0) {
-            height = mSpecifiedHeight;
-        }
+        mRequest.setLayoutSize(width, height);
 
         // 1. Check the previous ImageTask related to this ImageView
         if (null != mImageTask) {
@@ -259,8 +223,7 @@ public class CubeImageView extends ImageView {
         }
 
         // 2. Let the ImageView hold this ImageTask. When ImageView is reused next time, check it in step 1.
-        ImageBaseInfo baseInfo = new ImageBaseInfo(mUrl, width, height, mPriority );
-        ImageTask imageTask = mImageLoader.createImageTask(baseInfo, mImageReuseInfo);
+        ImageTask imageTask = mImageLoader.createImageTask(mRequest);
         //.createImageTask(mUrl, width, height, mImageReuseInfo);
         mImageTask = imageTask;
 

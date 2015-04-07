@@ -168,7 +168,7 @@ public class ImageProvider {
         FileInputStream inputStream = null;
 
         String fileCacheKey = imageTask.getFileCacheKey();
-        ImageReuseInfo reuseInfo = imageTask.getImageReuseInfo();
+        ImageReuseInfo reuseInfo = imageTask.getRequest().getImageReuseInfo();
 
         if (DEBUG) {
             Log.d(TAG, String.format(MSG_FETCH_BEGIN, imageTask));

@@ -106,7 +106,8 @@ public class ImageLoader implements LifeCycleComponent {
     public void preLoadImages(String[] urls) {
         int len = urls.length;
         for (int i = 0; i < len; i++) {
-            final ImageTask imageTask = createImageTask(urls[i], 0, 0, null);
+            ImageLoadRequest request = new ImageLoadRequest(urls[i]);
+            final ImageTask imageTask = createImageTask(request);
             imageTask.setIsPreLoad();
             addImageTask(imageTask, null);
         }
@@ -122,35 +123,24 @@ public class ImageLoader implements LifeCycleComponent {
      * @param imageReuseInfo
      * @return
      */
+    @Deprecated
     public ImageTask createImageTask(String url, int requestWidth, int requestHeight, ImageReuseInfo imageReuseInfo) {
         ImageTask imageTask = ImageTask.obtain();
         if (imageTask == null) {
             imageTask = new ImageTask();
         }
-        imageTask.renew().setOriginUrl(url).setRequestSize(requestWidth, requestHeight).setReuseInfo(imageReuseInfo);
+        ImageLoadRequest imageLoadRequest = new ImageLoadRequest(url, requestWidth, requestHeight, -1, imageReuseInfo);
+        imageTask.renewForRequest(imageLoadRequest);
         return imageTask;
     }
 
-    public ImageTask createImageTask(ImageBaseInfo baseInfo) {
+    public ImageTask createImageTask(ImageLoadRequest request) {
         ImageTask imageTask = ImageTask.obtain();
         if (imageTask == null) {
             imageTask = new ImageTask();
         }
 
-        imageTask.setmPriority(baseInfo.priority);
-        imageTask.renew().setOriginUrl(baseInfo.url).setRequestSize(baseInfo.requestWidth, baseInfo.requestWidth).setReuseInfo(null);
-        return imageTask;
-    }
-
-
-    public ImageTask createImageTask(ImageBaseInfo baseInfo, ImageReuseInfo imageReuseInfo) {
-        ImageTask imageTask = ImageTask.obtain();
-        if (imageTask == null) {
-            imageTask = new ImageTask();
-        }
-
-        imageTask.setmPriority(baseInfo.priority);
-        imageTask.renew().setOriginUrl(baseInfo.url).setRequestSize(baseInfo.requestWidth, baseInfo.requestWidth).setReuseInfo(imageReuseInfo);
+        imageTask.renewForRequest(request);
         return imageTask;
     }
 
