@@ -62,7 +62,7 @@ public class ImageTask {
 
     protected Point mRequestSize = new Point();
     protected Point mBitmapOriginSize = new Point();
-    protected ImageReuseInfo mReuseInfo;
+    protected ImageLoadRequest mRequest;
 
     protected ImageViewHolder mFirstImageViewHolder;
     protected ImageTaskStatistics mImageTaskStatistics;
@@ -70,10 +70,6 @@ public class ImageTask {
     ImageTask next;
 
     private boolean mHasRecycled = false;
-
-
-
-    private int mPriority = 0;
 
     protected void clearForRecycle() {
         mHasRecycled = true;
@@ -86,7 +82,7 @@ public class ImageTask {
         mRequestSize.set(0, 0);
         mBitmapOriginSize.set(0, 0);
 
-        mReuseInfo = null;
+        mRequest = null;
         mFirstImageViewHolder = null;
         mImageTaskStatistics = null;
     }
@@ -135,7 +131,7 @@ public class ImageTask {
         }
     }
 
-    public ImageTask renew() {
+    public ImageTask renewForRequest(ImageLoadRequest request) {
         if (CubeDebug.DEBUG_IMAGE) {
             int lastId = mId;
             mId = ++sId;
@@ -147,6 +143,9 @@ public class ImageTask {
         if (ImagePerformanceStatistics.sample(mId)) {
             mImageTaskStatistics = new ImageTaskStatistics();
         }
+        mOriginUrl = request.getUrl();
+        mRequestSize.set(request.getRequestWidth(), request.getRequestHeight());
+        mRequest = request;
         return this;
     }
 
@@ -157,11 +156,6 @@ public class ImageTask {
 
     public ImageTask setRequestSize(int requestWidth, int requestHeight) {
         mRequestSize.set(requestWidth, requestHeight);
-        return this;
-    }
-
-    public ImageTask setReuseInfo(ImageReuseInfo imageReuseInfo) {
-        mReuseInfo = imageReuseInfo;
         return this;
     }
 
@@ -196,10 +190,10 @@ public class ImageTask {
      * @return
      */
     protected String generateIdentityKey() {
-        if (mReuseInfo == null) {
+        if (mRequest.getImageReuseInfo() == null) {
             return joinSizeInfoToKey(getIdentityUrl(), mRequestSize.x, mRequestSize.y);
         } else {
-            return joinSizeTagToKey(getIdentityUrl(), mReuseInfo.getIdentitySize());
+            return joinSizeTagToKey(getIdentityUrl(), mRequest.getImageReuseInfo().getIdentitySize());
         }
     }
 
@@ -490,10 +484,6 @@ public class ImageTask {
         return Encrypt.md5(joinSizeTagToKey(getIdentityUrl(), sizeKey));
     }
 
-    public ImageReuseInfo getImageReuseInfo() {
-        return mReuseInfo;
-    }
-
     @Override
     public boolean equals(Object object) {
         if (object != null && object instanceof ImageTask) {
@@ -538,11 +528,7 @@ public class ImageTask {
         }
     }
 
-    public int getmPriority() {
-        return mPriority;
-    }
-
-    public void setmPriority(int mPriority) {
-        this.mPriority = mPriority;
+    public ImageLoadRequest getRequest() {
+        return mRequest;
     }
 }
