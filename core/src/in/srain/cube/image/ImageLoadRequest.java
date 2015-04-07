@@ -26,7 +26,7 @@ public class ImageLoadRequest {
         mUrl = url;
     }
 
-    public ImageLoadRequest(String url, int priority){
+    public ImageLoadRequest(String url, int priority) {
         mUrl = url;
         mPriority = priority;
     }
