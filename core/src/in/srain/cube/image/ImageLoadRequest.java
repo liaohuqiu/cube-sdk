@@ -26,6 +26,11 @@ public class ImageLoadRequest {
         mUrl = url;
     }
 
+    public ImageLoadRequest(String url, int priority){
+        mUrl = url;
+        mPriority = priority;
+    }
+
     public int getRequestWidth() {
         if (mSpecifiedWidth != 0) {
             return mSpecifiedWidth;
