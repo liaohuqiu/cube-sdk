@@ -9,5 +9,5 @@ public interface LoadMoreUIHandler {
 
     public void onLoadFinish(LoadMoreContainer container, boolean empty, boolean hasMore);
 
-    public void onWaitToLoadMore(LoadMoreContainer container);
+   public void onWaitToLoadMore(LoadMoreContainer container,boolean isError);
 }
