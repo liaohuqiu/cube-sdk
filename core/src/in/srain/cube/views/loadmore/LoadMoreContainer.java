@@ -24,4 +24,12 @@ public interface LoadMoreContainer {
      * @param hasMore
      */
     public void loadMoreFinish(boolean emptyResult, boolean hasMore);
+
+    /**
+     * When something unexpected happened while loading the data
+     *
+     * @param errorCode
+     * @param errorMessage
+     */
+    public void loadMoreError(int errorCode, String errorMessage);
 }
