@@ -174,6 +174,13 @@ public abstract class LoadMoreContainerBase extends LinearLayout implements Load
         }
     }
 
+    @Override
+    public void loadMoreError(int errorCode, String errorMessage) {
+        if (mLoadMoreUIHandler != null) {
+            mLoadMoreUIHandler.onLoadError(this, errorCode, errorMessage);
+        }
+    }
+
     protected abstract void addFooterView(View view);
 
     protected abstract void removeFooterView(View view);
