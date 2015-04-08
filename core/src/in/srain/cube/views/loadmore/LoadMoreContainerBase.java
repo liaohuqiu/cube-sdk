@@ -16,13 +16,15 @@ public abstract class LoadMoreContainerBase extends LinearLayout implements Load
     private LoadMoreHandler mLoadMoreHandler;
 
     private boolean mIsLoading;
-    private boolean mHasMore = true;
+    private boolean mHasMore = false;
     private boolean mAutoLoadMore = true;
-    private boolean mShowLoadingForFirstPage = true;
+    private boolean mLoadError = false;
+
+    private boolean mListEmpty = true;
+    private boolean mShowLoadingForFirstPage = false;
     private View mFooterView;
 
     private AbsListView mAbsListView;
-    private boolean mListEmpty = true;
 
     public LoadMoreContainerBase(Context context) {
         super(context);
@@ -83,14 +85,19 @@ public abstract class LoadMoreContainerBase extends LinearLayout implements Load
         });
     }
 
-    private void performLoadMore() {
-        if (mIsLoading || !mHasMore) {
+    private void tryToPerformLoadMore() {
+        if (mIsLoading) {
+            return;
+        }
+
+        // no more content and also not load for first page
+        if (!mHasMore && !(mListEmpty && mShowLoadingForFirstPage)) {
             return;
         }
 
         mIsLoading = true;
 
-        if (mLoadMoreUIHandler != null && (!mListEmpty || mShowLoadingForFirstPage)) {
+        if (mLoadMoreUIHandler != null) {
             mLoadMoreUIHandler.onLoading(this);
         }
         if (null != mLoadMoreHandler) {
@@ -99,8 +106,12 @@ public abstract class LoadMoreContainerBase extends LinearLayout implements Load
     }
 
     private void onReachBottom() {
+        // if has error, just leave what it should be
+        if (mLoadError) {
+            return;
+        }
         if (mAutoLoadMore) {
-            performLoadMore();
+            tryToPerformLoadMore();
         } else {
             if (mHasMore) {
                 mLoadMoreUIHandler.onWaitToLoadMore(this);
@@ -140,7 +151,7 @@ public abstract class LoadMoreContainerBase extends LinearLayout implements Load
         mFooterView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                performLoadMore();
+                tryToPerformLoadMore();
             }
         });
 
@@ -165,6 +176,7 @@ public abstract class LoadMoreContainerBase extends LinearLayout implements Load
      */
     @Override
     public void loadMoreFinish(boolean emptyResult, boolean hasMore) {
+        mLoadError = false;
         mListEmpty = emptyResult;
         mIsLoading = false;
         mHasMore = hasMore;
@@ -176,6 +188,8 @@ public abstract class LoadMoreContainerBase extends LinearLayout implements Load
 
     @Override
     public void loadMoreError(int errorCode, String errorMessage) {
+        mIsLoading = false;
+        mLoadError = true;
         if (mLoadMoreUIHandler != null) {
             mLoadMoreUIHandler.onLoadError(this, errorCode, errorMessage);
         }

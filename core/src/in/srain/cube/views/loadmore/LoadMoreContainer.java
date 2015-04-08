@@ -18,7 +18,7 @@ public interface LoadMoreContainer {
     public void setLoadMoreHandler(LoadMoreHandler handler);
 
     /**
-     * page has loaded
+     * When data has loaded
      *
      * @param emptyResult
      * @param hasMore
