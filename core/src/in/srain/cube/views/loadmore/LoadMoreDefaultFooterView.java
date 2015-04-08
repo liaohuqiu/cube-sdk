@@ -57,6 +57,6 @@ public class LoadMoreDefaultFooterView extends RelativeLayout implements LoadMor
 
     @Override
     public void onLoadError(LoadMoreContainer container, int errorCode, String errorMessage) {
-        mTextView.setText(R.string.cube_views_load_more_click_to_load_more);
+        mTextView.setText(R.string.cube_views_load_more_error);
     }
 }
