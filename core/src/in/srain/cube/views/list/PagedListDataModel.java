@@ -26,7 +26,7 @@ public abstract class PagedListDataModel<T> {
 
     public void queryNextPage() {
         checkPageInfo();
-        if (mListPageInfo.nextPage()) {
+        if (mListPageInfo.prepareForNextPage()) {
             doQueryDataInner();
         }
     }
@@ -52,7 +52,7 @@ public abstract class PagedListDataModel<T> {
     }
 
     protected void setRequestFail() {
-        mListPageInfo.unlock();
+        mListPageInfo.rollbackOnFail();
     }
 
     protected void setRequestResult(List<T> list, boolean hasMore) {

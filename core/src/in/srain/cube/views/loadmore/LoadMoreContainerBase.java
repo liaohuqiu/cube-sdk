@@ -106,10 +106,6 @@ public abstract class LoadMoreContainerBase extends LinearLayout implements Load
     }
 
     private void onReachBottom() {
-        // if has error, just leave what it should be
-        if (mLoadError) {
-            return;
-        }
         if (mAutoLoadMore) {
             tryToPerformLoadMore();
         } else {

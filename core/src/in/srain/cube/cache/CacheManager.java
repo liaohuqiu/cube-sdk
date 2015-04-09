@@ -235,13 +235,15 @@ public class CacheManager {
             }
         }
 
-        // try to read from assert cache file
+        // try to read from assets cache file
         if (mRawData == null) {
             String assertInitDataPath = cacheAble.getAssertInitDataPath();
             if (assertInitDataPath != null && assertInitDataPath.length() > 0) {
                 String cacheContent = DiskFileUtils.readAssert(mContext, assertInitDataPath);
-                mRawData = CacheMetaData.createInvalidated(cacheContent);
-                putDataToMemoryCache(cacheKey, mRawData);
+                if (!TextUtils.isEmpty(cacheContent)) {
+                    mRawData = CacheMetaData.createInvalidated(cacheContent);
+                    putDataToMemoryCache(cacheKey, mRawData);
+                }
             }
         }
 

@@ -7,6 +7,7 @@ public class ListPageInfo<T> {
 
     private int mNumPerPage = 0;
     private int mStart = 0;
+    private int mLastStart = 0;
     private boolean mHasMore;
     private boolean mIsBusy = false;
 
@@ -38,8 +39,9 @@ public class ListPageInfo<T> {
         mIsBusy = false;
     }
 
-    public void unlock() {
+    public void rollbackOnFail() {
         mIsBusy = false;
+        mStart = mLastStart;
     }
 
     public boolean tryEnterLock() {
@@ -87,8 +89,9 @@ public class ListPageInfo<T> {
      *
      * @return
      */
-    public boolean nextPage() {
+    public boolean prepareForNextPage() {
         if (hasMore()) {
+            mLastStart = mStart;
             mStart += mNumPerPage;
             return true;
         }
