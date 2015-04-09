@@ -58,8 +58,8 @@ public class ImageLoadRequest {
 
     public int getRequestHeight() {
         if (mRequestHeight != 0) {
-            return mSpecifiedHeight;
+            return mRequestHeight;
         }
-        return mRequestHeight;
+        return mSpecifiedHeight;
     }
 }
