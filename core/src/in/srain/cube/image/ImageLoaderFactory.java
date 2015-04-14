@@ -6,8 +6,6 @@ import in.srain.cube.cache.DiskFileUtils;
 import in.srain.cube.image.iface.*;
 import in.srain.cube.image.impl.*;
 
-import javax.naming.spi.NamingManager;
-
 /**
  * Create an {@link ImageLoader}.
  * Here defines two {@link ImageLoader}, one is the default, the other one is the stable.
