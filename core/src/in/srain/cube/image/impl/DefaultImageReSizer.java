@@ -13,7 +13,7 @@ public class DefaultImageReSizer implements ImageReSizer {
 
     private static DefaultImageReSizer sInstance;
 
-    public static DefaultImageReSizer getInstance() {
+    public static synchronized DefaultImageReSizer getInstance() {
         if (sInstance == null) {
             sInstance = new DefaultImageReSizer();
         }

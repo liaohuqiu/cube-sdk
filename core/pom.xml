@@ -13,7 +13,7 @@
     <artifactId>cube-sdk</artifactId>
     <packaging>aar</packaging>
     <name>Cube SDK</name>
-    <version>1.0.44.32-SNAPSHOT</version>
+    <version>1.0.44.33-SNAPSHOT</version>
 
     <dependencies>
         <dependency>

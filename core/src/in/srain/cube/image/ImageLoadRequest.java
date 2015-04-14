@@ -1,18 +1,24 @@
 package in.srain.cube.image;
 
-/**
- * Created by xufu.lg on 2015/3/30.
- */
 public class ImageLoadRequest {
 
     public String mUrl;
 
-    private int mRequestWidth;
-    private int mRequestHeight;
+    private int mViewWidth;
+    private int mViewHeight;
     private int mSpecifiedWidth;
     private int mSpecifiedHeight;
+
     private int mPriority;
     private ImageReuseInfo mImageReuseInfo;
+
+    private static final int AUTO_DECIDE_LOAD_SIZE = 0x01;
+    private int mFlag = AUTO_DECIDE_LOAD_SIZE;
+
+    public static ImageLoadRequest create(String url) {
+        ImageLoadRequest request = new ImageLoadRequest(url);
+        return request;
+    }
 
     public ImageLoadRequest(String url, int specifiedWidth, int specifiedHeight, int priority, ImageReuseInfo reuseInfo) {
         mUrl = url;
@@ -35,12 +41,12 @@ public class ImageLoadRequest {
         if (mSpecifiedWidth != 0) {
             return mSpecifiedWidth;
         }
-        return mRequestWidth;
+        return mViewWidth;
     }
 
     public ImageLoadRequest setLayoutSize(int w, int h) {
-        mRequestWidth = w;
-        mRequestHeight = h;
+        mViewWidth = w;
+        mViewHeight = h;
         return this;
     }
 
@@ -57,9 +63,22 @@ public class ImageLoadRequest {
     }
 
     public int getRequestHeight() {
-        if (mRequestHeight != 0) {
-            return mRequestHeight;
+        if (mSpecifiedHeight != 0) {
+            return mSpecifiedHeight;
         }
-        return mSpecifiedHeight;
+        return mViewHeight;
+    }
+
+    public ImageLoadRequest setAutoDecideLoadSize(boolean autoDecideSize) {
+        if (autoDecideSize) {
+            mFlag |= AUTO_DECIDE_LOAD_SIZE;
+        } else {
+            mFlag &= ~AUTO_DECIDE_LOAD_SIZE;
+        }
+        return this;
+    }
+
+    public boolean autoDecideLoadSize() {
+        return (mFlag & AUTO_DECIDE_LOAD_SIZE) != 0;
     }
 }

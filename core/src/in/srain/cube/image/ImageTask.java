@@ -177,9 +177,12 @@ public class ImageTask {
      * {@link #mIdentityUrl}
      *
      * @return
+     * @deprecated Do not overwrite this method, use {@link in.srain.cube.image.iface.NameGenerator} instead.
+     * should be used.
      */
+    @Deprecated
     protected String generateIdentityUrl(String originUrl) {
-        return originUrl;
+        return ImageLoaderFactory.getNameGenerator().generateIdentityUrlFor(mRequest);
     }
 
     /**
@@ -191,7 +194,7 @@ public class ImageTask {
      */
     protected String generateIdentityKey() {
         if (mRequest.getImageReuseInfo() == null) {
-            return joinSizeInfoToKey(getIdentityUrl(), mRequestSize.x, mRequestSize.y);
+            return getIdentityUrl();
         } else {
             return joinSizeTagToKey(getIdentityUrl(), mRequest.getImageReuseInfo().getIdentitySize());
         }
@@ -210,13 +213,14 @@ public class ImageTask {
     }
 
     /**
-     * Check the given url is loading.
+     * Check the given {@link in.srain.cube.image.ImageLoadRequest} is loading.
      *
-     * @param url
+     * @param request
      * @return Identify the given url, if same to {@link #mIdentityUrl} return true.
      */
-    public boolean isLoadingThisUrl(String url) {
-        return getIdentityUrl().equals(generateIdentityUrl(url));
+    public boolean isLoadingThisUrl(ImageLoadRequest request) {
+        String url2 = ImageLoaderFactory.getNameGenerator().generateIdentityUrlFor(request);
+        return getIdentityUrl().equals(url2);
     }
 
     /**

@@ -4,10 +4,9 @@ import android.content.Context;
 import android.text.TextUtils;
 import in.srain.cube.cache.DiskFileUtils;
 import in.srain.cube.image.iface.*;
-import in.srain.cube.image.impl.DefaultImageLoadHandler;
-import in.srain.cube.image.impl.DefaultImageReSizer;
-import in.srain.cube.image.impl.DefaultImageTaskExecutor;
-import in.srain.cube.image.impl.DefaultMemoryCache;
+import in.srain.cube.image.impl.*;
+
+import javax.naming.spi.NamingManager;
 
 /**
  * Create an {@link ImageLoader}.
@@ -30,6 +29,7 @@ public class ImageLoaderFactory {
     private static ImageLoadHandler sDefaultImageLoadHandler;
     private static ImageMemoryCache sDefaultImageMemoryCache;
     private static ImageDownloader sImageDownloader;
+    private static NameGenerator sNameGenerator;
 
     public static int getDefaultMemoryCacheSizeInKB() {
         float percent = 0.2f;
@@ -223,5 +223,16 @@ public class ImageLoaderFactory {
             sDefaultImageMemoryCache = new DefaultMemoryCache(getDefaultMemoryCacheSizeInKB());
         }
         return sDefaultImageMemoryCache;
+    }
+
+    public static void setNameGenerator(NameGenerator nameGenerator) {
+        sNameGenerator = nameGenerator;
+    }
+
+    public static NameGenerator getNameGenerator() {
+        if (sNameGenerator == null) {
+            return DefaultNameGenerator.getInstance();
+        }
+        return sNameGenerator;
     }
 }

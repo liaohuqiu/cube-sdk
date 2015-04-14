@@ -213,7 +213,7 @@ public class CubeImageView extends ImageView {
         if (null != mImageTask) {
 
             // duplicated ImageTask, return directly.
-            if (mImageTask.isLoadingThisUrl(mUrl)) {
+            if (mImageTask.isLoadingThisUrl(mRequest)) {
                 return;
             }
             // ImageView is reused, detach it from the related ImageViews of the previous ImageTask.
