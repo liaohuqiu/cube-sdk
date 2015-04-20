@@ -16,6 +16,7 @@
 
 package in.srain.cube.diskcache.lru;
 
+import android.util.Log;
 import in.srain.cube.diskcache.CacheEntry;
 import in.srain.cube.diskcache.DiskCache;
 import in.srain.cube.diskcache.FileUtils;
@@ -278,7 +279,7 @@ public final class LruActionTracer implements Runnable {
      * Creates a new journal that omits redundant information. This replaces the
      * current journal if it exists.
      */
-    private synchronized void rebuildJournal() throws IOException {
+    private void rebuildJournal() throws IOException {
         if (mJournalWriter != null) {
             mJournalWriter.close();
         }
@@ -412,6 +413,7 @@ public final class LruActionTracer implements Runnable {
             if (mIsRunning) {
                 while (!mActionQueue.isEmpty()) {
                     try {
+                        CLog.d(SimpleDiskLruCache.LOG_TAG, "waitJobDone.mActionQueue.size" + mActionQueue.size());
                         mLock.wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
