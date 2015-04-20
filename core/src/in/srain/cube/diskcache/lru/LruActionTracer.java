@@ -413,7 +413,6 @@ public final class LruActionTracer implements Runnable {
             if (mIsRunning) {
                 while (!mActionQueue.isEmpty()) {
                     try {
-                        CLog.d(SimpleDiskLruCache.LOG_TAG, "waitJobDone.mActionQueue.size" + mActionQueue.size());
                         mLock.wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
