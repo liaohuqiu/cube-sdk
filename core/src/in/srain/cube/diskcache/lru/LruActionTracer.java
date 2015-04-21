@@ -405,8 +405,9 @@ public final class LruActionTracer implements Runnable {
                     e.printStackTrace();
                 }
             }
+            mLock.notify();
         }
-        mLock.notify();
+
     }
 
     private void waitJobDone() {
