@@ -216,7 +216,9 @@ public class CacheAbleRequest<T> extends RequestBase<T> implements ICacheAbleReq
                 }
                 cacheKey = cacheKey.replace("/", "-");
             } catch (URISyntaxException e) {
-                e.printStackTrace();
+                if (CubeDebug.DEBUG_REQUEST) {
+                    e.printStackTrace();
+                }
             }
             if (TextUtils.isEmpty(cacheKey)) {
                 throw new RuntimeException("Cache key is null");

@@ -88,7 +88,9 @@ public class ImageDiskCacheProvider extends DiskCacheProvider {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            if (CubeDebug.DEBUG_IMAGE) {
+                e.printStackTrace();
+            }
         }
         return null;
     }
