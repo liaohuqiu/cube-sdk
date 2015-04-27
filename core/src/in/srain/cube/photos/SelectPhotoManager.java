@@ -19,12 +19,19 @@ public final class SelectPhotoManager {
     private static final int REQUEST_CODE_CAMERA = 1;
     private static final int REQUEST_CODE_ALBUM = 2;
     private static final int REQUEST_CODE_CROP = 3;
-    private static final int ACTION_TAKE_PHOTO = 0;
-    private static final int ACTION_ALBUM = 1;
-    private static final int ACTION_CANCEL = 2;
+    public static final int ACTION_TAKE_PHOTO = 0;
+    public static final int ACTION_ALBUM = 1;
+    public static final int ACTION_CANCEL = 2;
     private static SelectPhotoManager sInstance;
 
     private static String TEMP_PATH_NAME = "cube-tmp-photo";
+
+    public interface SelectClickHandler {
+        /**
+         * @param action can be one of {{@link #ACTION_TAKE_PHOTO} {@link #ACTION_ALBUM} {@link #ACTION_CANCEL}}
+         */
+        public void onClick(int action);
+    }
 
     private PhotoReadyHandler mPhotoReadyHandler;
     private File mTempDir;
@@ -50,7 +57,11 @@ public final class SelectPhotoManager {
         mPhotoReadyHandler = handler;
     }
 
-    public void start(final Activity activity) {
+    public void start(Activity activity) {
+        start(activity, null);
+    }
+
+    public void start(final Activity activity, final SelectClickHandler handler) {
 
         DiskFileUtils.CacheDirInfo info = DiskFileUtils.getDiskCacheDir(activity, TEMP_PATH_NAME, 1024 * 1024 * 30);
         File path = info.path;
@@ -74,6 +85,9 @@ public final class SelectPhotoManager {
             @Override
             public void onClick(DialogInterface dialog, int i) {
                 final int action = i;
+                if (handler != null) {
+                    handler.onClick(action);
+                }
                 switch (action) {
                     case ACTION_TAKE_PHOTO:
                         PhotoUtils.toCamera(activity, mTempFile, REQUEST_CODE_CAMERA);

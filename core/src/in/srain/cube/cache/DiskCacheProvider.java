@@ -59,7 +59,9 @@ public class DiskCacheProvider {
             cacheEntry.setString(str);
             cacheEntry.commit();
         } catch (IOException e) {
-            e.printStackTrace();
+            if (DEBUG) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -70,7 +72,9 @@ public class DiskCacheProvider {
                 return cacheEntry.getString();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            if (DEBUG) {
+                e.printStackTrace();
+            }
         }
         return null;
     }
@@ -165,7 +169,9 @@ public class DiskCacheProvider {
             try {
                 doWork();
             } catch (IOException e) {
-                e.printStackTrace();
+                if (DEBUG) {
+                    e.printStackTrace();
+                }
             }
         }
 
