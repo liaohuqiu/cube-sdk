@@ -358,50 +358,58 @@ public final class LruActionTracer implements Runnable {
         }
     }
 
-    private void doJob() throws IOException {
+    private void doJob() {
         synchronized (mLock) {
             while (!mActionQueue.isEmpty()) {
-
-                ActionMessage message = mActionQueue.poll();
-                final CacheEntry cacheEntry = message.mCacheEntry;
-                final byte action = message.mAction;
-                message.recycle();
-
-                if (SimpleDiskLruCache.DEBUG) {
-                    CLog.d(SimpleDiskLruCache.LOG_TAG, "doAction: %s, key: %s",
-                            sACTION_LIST[action], cacheEntry != null ? cacheEntry.getKey() : null);
-                }
-
-                switch (action) {
-                    case ACTION_READ:
-                        writeActionLog(action, cacheEntry);
-                        break;
-
-                    case ACTION_DIRTY:
-                        writeActionLog(action, cacheEntry);
-                        break;
-
-                    case ACTION_CLEAN:
-                        writeActionLog(action, cacheEntry);
-                        break;
-
-                    case ACTION_DELETE:
-                        writeActionLog(action, cacheEntry);
-                        break;
-
-                    case ACTION_PENDING_DELETE:
-                        writeActionLog(action, cacheEntry);
-                        if (mLruEntries.containsKey(cacheEntry.getKey())) {
-                            continue;
-                        }
-                        cacheEntry.delete();
-                        break;
-                    case ACTION_FLUSH:
-                        mJournalWriter.flush();
-                        break;
+                try {
+                    ActionMessage message = mActionQueue.poll();
+                    doUntil(message);
+                    // if every thread get a IOexception, and mLock.notify would not call. so in sometimes this will cause mLock's deadlock
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
             mLock.notify();
+        }
+    }
+
+    private void doUntil(ActionMessage message) throws IOException {
+        final CacheEntry cacheEntry = message.mCacheEntry;
+        final byte action = message.mAction;
+        message.recycle();
+
+        if (SimpleDiskLruCache.DEBUG) {
+            CLog.d(SimpleDiskLruCache.LOG_TAG, "doAction: %s, key: %s",
+                    sACTION_LIST[action], cacheEntry != null ? cacheEntry.getKey() : null);
+        }
+
+        switch (action) {
+            case ACTION_READ:
+                writeActionLog(action, cacheEntry);
+                break;
+
+            case ACTION_DIRTY:
+                writeActionLog(action, cacheEntry);
+                break;
+
+            case ACTION_CLEAN:
+                writeActionLog(action, cacheEntry);
+                break;
+
+            case ACTION_DELETE:
+                writeActionLog(action, cacheEntry);
+                break;
+
+            case ACTION_PENDING_DELETE:
+                writeActionLog(action, cacheEntry);
+                if (mLruEntries.containsKey(cacheEntry.getKey())) {
+                    return;
+                }
+                cacheEntry.delete();
+                break;
+            case ACTION_FLUSH:
+                mJournalWriter.flush();
+                break;
         }
     }
 
@@ -409,6 +417,8 @@ public final class LruActionTracer implements Runnable {
         if (SimpleDiskLruCache.DEBUG) {
             CLog.d(SimpleDiskLruCache.LOG_TAG, "waitJobDone");
         }
+
+        // remove synchronized method , exclude this code block for dead lock digging
         synchronized (mLock) {
             if (mIsRunning) {
                 while (!mActionQueue.isEmpty()) {
@@ -455,37 +465,30 @@ public final class LruActionTracer implements Runnable {
 
     @Override
     public void run() {
-        try {
-            doJob();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        doJob();
         mIsRunning = false;
     }
 
     /**
      * remove files from list, delete files
-     *
-     * @throws java.io.IOException
      */
-    private void trimToSize() throws IOException {
-        synchronized (this) {
-            if (mSize > mCapacity) {
-                if (SimpleDiskLruCache.DEBUG) {
-                    CLog.d(SimpleDiskLruCache.LOG_TAG, "should trim, current is: %s", mSize);
-                }
-            }
-            while (mSize > mCapacity) {
-                Map.Entry<String, CacheEntry> toEvict = mLruEntries.entrySet().iterator().next();
-                String key = toEvict.getKey();
-                CacheEntry cacheEntry = toEvict.getValue();
-                mLruEntries.remove(key);
+    private synchronized void trimToSize() {
 
-                mSize -= cacheEntry.getSize();
-                addActionLog(ACTION_PENDING_DELETE, cacheEntry);
-                if (SimpleDiskLruCache.DEBUG) {
-                    CLog.d(SimpleDiskLruCache.LOG_TAG, "pending remove: %s, size: %s, after remove total: %s", key, cacheEntry.getSize(), mSize);
-                }
+        if (mSize > mCapacity) {
+            if (SimpleDiskLruCache.DEBUG) {
+                CLog.d(SimpleDiskLruCache.LOG_TAG, "should trim, current is: %s", mSize);
+            }
+        }
+        while (mSize > mCapacity) {
+            Map.Entry<String, CacheEntry> toEvict = mLruEntries.entrySet().iterator().next();
+            String key = toEvict.getKey();
+            CacheEntry cacheEntry = toEvict.getValue();
+            mLruEntries.remove(key);
+
+            mSize -= cacheEntry.getSize();
+            addActionLog(ACTION_PENDING_DELETE, cacheEntry);
+            if (SimpleDiskLruCache.DEBUG) {
+                CLog.d(SimpleDiskLruCache.LOG_TAG, "pending remove: %s, size: %s, after remove total: %s", key, cacheEntry.getSize(), mSize);
             }
         }
     }

@@ -240,7 +240,9 @@ public class ImageProvider {
                 }
             } catch (IOException e) {
                 CLog.e(TAG, "%s decode bitmap fail, may be out of memory. %s, %s", imageTask, fileCacheKey, imageReSizer.getRemoteUrl(imageTask));
-                e.printStackTrace();
+                if (CubeDebug.DEBUG_IMAGE) {
+                    e.printStackTrace();
+                }
             }
         } else {
             CLog.e(TAG, "%s fetch bitmap fail. %s, %s", imageTask, fileCacheKey, imageReSizer.getRemoteUrl(imageTask));

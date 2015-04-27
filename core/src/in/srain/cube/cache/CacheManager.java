@@ -122,7 +122,9 @@ public class CacheManager {
         try {
             mFileCache.getDiskCache().delete(key);
         } catch (IOException e) {
-            e.printStackTrace();
+            if (DEBUG) {
+                e.printStackTrace();
+            }
         }
         mMemoryCache.remove(key);
     }
@@ -162,7 +164,9 @@ public class CacheManager {
             try {
                 mFileCache.getDiskCache().clear();
             } catch (IOException e) {
-                e.printStackTrace();
+                if (DEBUG) {
+                    e.printStackTrace();
+                }
             }
         }
     }
