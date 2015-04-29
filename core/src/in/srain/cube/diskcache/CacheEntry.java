@@ -101,7 +101,7 @@ public class CacheEntry {
     public OutputStream newOutputStream() throws IOException {
         synchronized (mDiskCache) {
             if (mIsUnderEdit) {
-                throw new IllegalStateException();
+                throw new IOException("This file has been under edit");
             }
             mIsUnderEdit = true;
             File tempFile = getTempFile();
