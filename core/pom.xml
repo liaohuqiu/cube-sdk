@@ -13,13 +13,13 @@
     <artifactId>cube-sdk</artifactId>
     <packaging>aar</packaging>
     <name>Cube SDK</name>
-    <version>1.0.44.39-SNAPSHOT</version>
+    <version>1.0.44.40-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
             <groupId>android</groupId>
             <artifactId>android</artifactId>
-            <version>5.0.1_r2</version>
+            <version>4.4.2_r4</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
