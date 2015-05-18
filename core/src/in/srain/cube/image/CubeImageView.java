@@ -108,12 +108,7 @@ public class CubeImageView extends ImageView {
 
         super.setImageDrawable(drawable);
         // Call super to set new Drawable
-        if(drawable == null){
-            mImageLoader.getImageLoadHandler().onLoadError(mImageTask, this, 0x07 );
-        } else {
             super.setImageDrawable(drawable);
-        }
-
         // Notify new Drawable that it is being displayed
         notifyDrawable(drawable, true);
 
@@ -168,25 +163,19 @@ public class CubeImageView extends ImageView {
 
     public void loadImage(ImageLoader imageLoader, ImageLoadRequest request) {
         mImageLoader = imageLoader;
+        mRequest = request;
         if (request == null || TextUtils.isEmpty(request.getUrl())) {
-            setImageDrawable(null);
+            mImageLoader.getImageLoadHandler().onLoadError(mImageTask, this, 0x07);
             mImageTask = null;
-            mRequest = request;
             return;
         }
-        mRequest = request;
-
         tryLoadImage();
     }
 
     public void loadImage(ImageLoader imageLoader, String url, int specifiedWidth, int specifiedHeight, ImageReuseInfo imageReuseInfo) {
         mImageLoader = imageLoader;
-        if (TextUtils.isEmpty(url)) {
-            setImageDrawable(null);
-            mImageTask = null;
-            return;
-        }
         mRequest = new ImageLoadRequest(url, specifiedWidth, specifiedHeight, 0, imageReuseInfo);
+        loadImage(imageLoader, mRequest);
         tryLoadImage();
     }
 
