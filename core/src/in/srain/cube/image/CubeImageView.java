@@ -107,13 +107,12 @@ public class CubeImageView extends ImageView {
         final Drawable previousDrawable = getDrawable();
 
         super.setImageDrawable(drawable);
-        // Call super to set new Drawable
-            super.setImageDrawable(drawable);
+
         // Notify new Drawable that it is being displayed
         notifyDrawable(drawable, true);
 
         // Notify old Drawable so it is no longer being displayed
-       notifyDrawable(previousDrawable, false);
+        notifyDrawable(previousDrawable, false);
     }
 
     @Override
@@ -162,10 +161,11 @@ public class CubeImageView extends ImageView {
     }
 
     public void loadImage(ImageLoader imageLoader, ImageLoadRequest request) {
-        mImageLoader = imageLoader;
         mRequest = request;
+        mImageLoader = imageLoader;
+
         if (request == null || TextUtils.isEmpty(request.getUrl())) {
-            mImageLoader.getImageLoadHandler().onLoadError(mImageTask, this, 0x07);
+            mImageLoader.getImageLoadHandler().onLoadError(mImageTask, this, ImageTask.ERROR_EMPTY_URL);
             mImageTask = null;
             return;
         }
@@ -173,10 +173,8 @@ public class CubeImageView extends ImageView {
     }
 
     public void loadImage(ImageLoader imageLoader, String url, int specifiedWidth, int specifiedHeight, ImageReuseInfo imageReuseInfo) {
-        mImageLoader = imageLoader;
         mRequest = new ImageLoadRequest(url, specifiedWidth, specifiedHeight, 0, imageReuseInfo);
         loadImage(imageLoader, mRequest);
-        tryLoadImage();
     }
 
     @Override
@@ -193,7 +191,6 @@ public class CubeImageView extends ImageView {
 
         int width = getWidth();
         int height = getHeight();
-        final String mUrl = mRequest.getUrl();
 
         ViewGroup.LayoutParams lyp = getLayoutParams();
         boolean isFullyWrapContent = lyp != null && lyp.height == LayoutParams.WRAP_CONTENT && lyp.width == LayoutParams.WRAP_CONTENT;

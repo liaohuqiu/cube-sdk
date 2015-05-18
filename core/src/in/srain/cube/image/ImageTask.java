@@ -33,6 +33,7 @@ public class ImageTask {
     // error code, max 0x07
     public final static int ERROR_NETWORK = 0x01;
     public final static int ERROR_BAD_FORMAT = 0x02;
+    public final static int ERROR_EMPTY_URL = 0x03;
 
     /**
      * bits:
