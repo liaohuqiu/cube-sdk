@@ -38,6 +38,8 @@ import java.util.ArrayList;
 public class GridViewWithHeaderAndFooter extends GridView {
 
     public static boolean DEBUG = false;
+    private OnItemClickListener mOnItemClickListener;
+    private OnItemLongClickListener mOnItemLongClickListener;
 
     /**
      * A class that represents a fixed view in a list, for example a header at the top
@@ -62,10 +64,13 @@ public class GridViewWithHeaderAndFooter extends GridView {
     private int mNumColumns = AUTO_FIT;
     private View mViewForMeasureRowHeight = null;
     private int mRowHeight = -1;
-    private static final String LOG_TAG = "grid-view-with-header-and-footer";
+    //log tag can be at most 23 characters
+    private static final String LOG_TAG = "GridViewHeaderAndFooter";
 
     private ArrayList<FixedViewInfo> mHeaderViewInfos = new ArrayList<FixedViewInfo>();
     private ArrayList<FixedViewInfo> mFooterViewInfos = new ArrayList<FixedViewInfo>();
+    private ListAdapter mOriginalAdapter;
+    private ItemClickHandler mItemClickHandler;
 
     private void initHeaderGridView() {
     }
@@ -309,42 +314,40 @@ public class GridViewWithHeaderAndFooter extends GridView {
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    public int getVerticalSpacing(){
+    public int getVerticalSpacing() {
         int value = 0;
 
         try {
             int currentapiVersion = android.os.Build.VERSION.SDK_INT;
-            if (currentapiVersion < Build.VERSION_CODES.JELLY_BEAN){
+            if (currentapiVersion < Build.VERSION_CODES.JELLY_BEAN) {
                 Field field = GridView.class.getDeclaredField("mVerticalSpacing");
                 field.setAccessible(true);
                 value = field.getInt(this);
-            } else{
+            } else {
                 value = super.getVerticalSpacing();
             }
 
-        }catch (Exception ex){
-
+        } catch (Exception ignore) {
         }
 
         return value;
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    public int getHorizontalSpacing(){
+    public int getHorizontalSpacing() {
         int value = 0;
 
         try {
             int currentapiVersion = android.os.Build.VERSION.SDK_INT;
-            if (currentapiVersion < Build.VERSION_CODES.JELLY_BEAN){
+            if (currentapiVersion < Build.VERSION_CODES.JELLY_BEAN) {
                 Field field = GridView.class.getDeclaredField("mHorizontalSpacing");
                 field.setAccessible(true);
                 value = field.getInt(this);
-            } else{
+            } else {
                 value = super.getHorizontalSpacing();
             }
 
-        }catch (Exception ex){
-
+        } catch (Exception ignore) {
         }
 
         return value;
@@ -400,6 +403,7 @@ public class GridViewWithHeaderAndFooter extends GridView {
 
     @Override
     public void setAdapter(ListAdapter adapter) {
+        mOriginalAdapter = adapter;
         if (mHeaderViewInfos.size() > 0 || mFooterViewInfos.size() > 0) {
             HeaderViewGridAdapter headerViewGridAdapter = new HeaderViewGridAdapter(mHeaderViewInfos, mFooterViewInfos, adapter);
             int numColumns = getNumColumnsCompatible();
@@ -411,6 +415,15 @@ public class GridViewWithHeaderAndFooter extends GridView {
         } else {
             super.setAdapter(adapter);
         }
+    }
+
+    /**
+     * Return original adapter for convenience.
+     *
+     * @return
+     */
+    public ListAdapter getOriginalAdapter() {
+        return mOriginalAdapter;
     }
 
     /**
@@ -519,9 +532,15 @@ public class GridViewWithHeaderAndFooter extends GridView {
             return mFooterViewInfos.size();
         }
 
+        /**
+         * @return true if this adapter doesn't contain any data.  This is used to determine
+         * whether the empty view should be displayed.  A typical implementation will return
+         * getCount() == 0 but since getCount() includes the headers and footers, specialized
+         * adapters might want a different behavior.
+         */
         @Override
         public boolean isEmpty() {
-            return (mAdapter == null || mAdapter.isEmpty()) && getHeadersCount() == 0 && getFootersCount() == 0;
+            return (mAdapter == null || mAdapter.isEmpty());
         }
 
         private boolean areAllListInfosSelectable(ArrayList<FixedViewInfo> infos) {
@@ -574,16 +593,11 @@ public class GridViewWithHeaderAndFooter extends GridView {
 
         @Override
         public boolean areAllItemsEnabled() {
-            if (mAdapter != null) {
-                return mAreAllFixedViewsSelectable && mAdapter.areAllItemsEnabled();
-            } else {
-                return true;
-            }
+            return mAdapter == null || mAreAllFixedViewsSelectable && mAdapter.areAllItemsEnabled();
         }
 
         private int getAdapterAndPlaceHolderCount() {
-            final int adapterCount = (int) (Math.ceil(1f * mAdapter.getCount() / mNumColumns) * mNumColumns);
-            return adapterCount;
+            return (int) (Math.ceil(1f * mAdapter.getCount() / mNumColumns) * mNumColumns);
         }
 
         @Override
@@ -660,10 +674,7 @@ public class GridViewWithHeaderAndFooter extends GridView {
 
         @Override
         public boolean hasStableIds() {
-            if (mAdapter != null) {
-                return mAdapter.hasStableIds();
-            }
-            return false;
+            return mAdapter != null && mAdapter.hasStableIds();
         }
 
         @Override
@@ -696,8 +707,7 @@ public class GridViewWithHeaderAndFooter extends GridView {
                 adapterCount = getAdapterAndPlaceHolderCount();
                 if (adjPosition < adapterCount) {
                     if (adjPosition < mAdapter.getCount()) {
-                        View view = mAdapter.getView(adjPosition, convertView, parent);
-                        return view;
+                        return mAdapter.getView(adjPosition, convertView, parent);
                     } else {
                         if (convertView == null) {
                             convertView = new View(parent.getContext());
@@ -830,6 +840,49 @@ public class GridViewWithHeaderAndFooter extends GridView {
 
         public void notifyDataSetChanged() {
             mDataSetObservable.notifyChanged();
+        }
+    }
+
+    @Override
+    public void setOnItemClickListener(OnItemClickListener l) {
+        mOnItemClickListener = l;
+        super.setOnItemClickListener(getItemClickHandler());
+    }
+
+    @Override
+    public void setOnItemLongClickListener(OnItemLongClickListener listener) {
+        mOnItemLongClickListener = listener;
+        super.setOnItemLongClickListener(getItemClickHandler());
+    }
+
+    private ItemClickHandler getItemClickHandler() {
+        if (mItemClickHandler == null) {
+            mItemClickHandler = new ItemClickHandler();
+        }
+        return mItemClickHandler;
+    }
+
+    private class ItemClickHandler implements android.widget.AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            if (mOnItemClickListener != null) {
+                int resPos = position - getHeaderViewCount() * getNumColumnsCompatible();
+                if (resPos >= 0) {
+                    mOnItemClickListener.onItemClick(parent, view, resPos, id);
+                }
+            }
+        }
+
+        @Override
+        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            if (mOnItemLongClickListener != null) {
+                int resPos = position - getHeaderViewCount() * getNumColumnsCompatible();
+                if (resPos >= 0) {
+                    mOnItemLongClickListener.onItemLongClick(parent, view, resPos, id);
+                }
+            }
+            return true;
         }
     }
 }
