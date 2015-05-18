@@ -105,14 +105,20 @@ public class CubeImageView extends ImageView {
 
         // Keep hold of previous Drawable
         final Drawable previousDrawable = getDrawable();
-        // Call super to set new Drawable
+
         super.setImageDrawable(drawable);
+        // Call super to set new Drawable
+        if(drawable == null){
+            mImageLoader.getImageLoadHandler().onLoadError(mImageTask, this, 0x07 );
+        } else {
+            super.setImageDrawable(drawable);
+        }
 
         // Notify new Drawable that it is being displayed
         notifyDrawable(drawable, true);
 
         // Notify old Drawable so it is no longer being displayed
-        notifyDrawable(previousDrawable, false);
+       notifyDrawable(previousDrawable, false);
     }
 
     @Override
@@ -165,6 +171,7 @@ public class CubeImageView extends ImageView {
         if (request == null || TextUtils.isEmpty(request.getUrl())) {
             setImageDrawable(null);
             mImageTask = null;
+            mRequest = request;
             return;
         }
         mRequest = request;
