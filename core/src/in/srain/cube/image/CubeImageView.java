@@ -107,18 +107,12 @@ public class CubeImageView extends ImageView {
         final Drawable previousDrawable = getDrawable();
 
         super.setImageDrawable(drawable);
-        // Call super to set new Drawable
-        if(drawable == null){
-            mImageLoader.getImageLoadHandler().onLoadError(mImageTask, this, 0x07 );
-        } else {
-            super.setImageDrawable(drawable);
-        }
 
         // Notify new Drawable that it is being displayed
         notifyDrawable(drawable, true);
 
         // Notify old Drawable so it is no longer being displayed
-       notifyDrawable(previousDrawable, false);
+        notifyDrawable(previousDrawable, false);
     }
 
     @Override
@@ -167,27 +161,20 @@ public class CubeImageView extends ImageView {
     }
 
     public void loadImage(ImageLoader imageLoader, ImageLoadRequest request) {
+        mRequest = request;
         mImageLoader = imageLoader;
+
         if (request == null || TextUtils.isEmpty(request.getUrl())) {
-            setImageDrawable(null);
+            mImageLoader.getImageLoadHandler().onLoadError(mImageTask, this, ImageTask.ERROR_EMPTY_URL);
             mImageTask = null;
-            mRequest = request;
             return;
         }
-        mRequest = request;
-
         tryLoadImage();
     }
 
     public void loadImage(ImageLoader imageLoader, String url, int specifiedWidth, int specifiedHeight, ImageReuseInfo imageReuseInfo) {
-        mImageLoader = imageLoader;
-        if (TextUtils.isEmpty(url)) {
-            setImageDrawable(null);
-            mImageTask = null;
-            return;
-        }
         mRequest = new ImageLoadRequest(url, specifiedWidth, specifiedHeight, 0, imageReuseInfo);
-        tryLoadImage();
+        loadImage(imageLoader, mRequest);
     }
 
     @Override
@@ -204,7 +191,6 @@ public class CubeImageView extends ImageView {
 
         int width = getWidth();
         int height = getHeight();
-        final String mUrl = mRequest.getUrl();
 
         ViewGroup.LayoutParams lyp = getLayoutParams();
         boolean isFullyWrapContent = lyp != null && lyp.height == LayoutParams.WRAP_CONTENT && lyp.width == LayoutParams.WRAP_CONTENT;
