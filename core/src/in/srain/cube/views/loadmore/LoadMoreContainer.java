@@ -9,8 +9,6 @@ public interface LoadMoreContainer {
 
     public void setAutoLoadMore(boolean autoLoadMore);
 
-    public void setOnScrollListener(AbsListView.OnScrollListener l);
-
     public void setLoadMoreView(View view);
 
     public void setLoadMoreUIHandler(LoadMoreUIHandler handler);

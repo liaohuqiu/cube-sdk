@@ -25,7 +25,29 @@
         <dependency>
             <groupId>com.android.support</groupId>
             <artifactId>support-v4</artifactId>
-            <version>19.0.1</version>
+            <version>21.0.2</version>
+            <type>aar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.android.support</groupId>
+            <artifactId>recyclerview-v7</artifactId>
+            <version>21.0.2</version>
+            <type>aar</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.android.support</groupId>
+                    <artifactId>support-v4</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.android.support</groupId>
+                    <artifactId>support-annotations</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.android.support</groupId>
+            <artifactId>support-annotations</artifactId>
+            <version>21.0.2</version>
         </dependency>
         <dependency>
             <groupId>in.srain.cube</groupId>
