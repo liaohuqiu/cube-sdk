@@ -19,10 +19,37 @@ public class CubeRecyclerViewAdapter<ItemDataType> extends RecyclerView.Adapter<
 
     private final int TYPE_OFFSET_HEADER = 10000;
     private final int TYPE_OFFSET_FOOTER = 20000;
+
+    // 2015-05-21
+    private final int TAG_KEY_FOR_INDEX = 521 << 24;
+
     protected SparseArray<ViewHolderCreator<ItemDataType>> mLazyCreators = new SparseArray<ViewHolderCreator<ItemDataType>>();
+
     private List<ItemDataType> mList;
+
     private List<StaticViewHolder> mHeaderViews = new ArrayList<StaticViewHolder>();
+
     private List<StaticViewHolder> mFooterViews = new ArrayList<StaticViewHolder>();
+
+    private OnItemClickListener mOnItemClickListener;
+
+    private View.OnClickListener mOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Object obj = v.getTag(TAG_KEY_FOR_INDEX);
+            if (obj == null) {
+                return;
+            }
+            int position = (Integer) obj;
+            if (mOnItemClickListener != null) {
+                mOnItemClickListener.onClick(v, position);
+            }
+        }
+    };
+
+    public void setOnItemClickListener(OnItemClickListener handler) {
+        mOnItemClickListener = handler;
+    }
 
     public void setViewHolderClass(int viewType, final Object enclosingInstance, final Class<?> cls, final Object... args) {
         ViewHolderCreator<ItemDataType> lazyCreator = LazyViewHolderCreator.create(enclosingInstance, cls, args);
@@ -46,6 +73,9 @@ public class CubeRecyclerViewAdapter<ItemDataType> extends RecyclerView.Adapter<
 
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View v = cubeViewHolder.createView(inflater);
+        if (v != null && mOnItemClickListener != null) {
+            v.setOnClickListener(mOnClickListener);
+        }
         InnerViewHolder viewHolder = new InnerViewHolder<ItemDataType>(v);
         viewHolder.mCubeViewHolder = cubeViewHolder;
         return viewHolder;
@@ -54,6 +84,9 @@ public class CubeRecyclerViewAdapter<ItemDataType> extends RecyclerView.Adapter<
     @Override
     public void onBindViewHolder(InnerViewHolder holder, int position) {
         if (holder != null && holder.mCubeViewHolder != null) {
+            if (holder.itemView != null) {
+                holder.itemView.setTag(TAG_KEY_FOR_INDEX, position);
+            }
             holder.mCubeViewHolder.showData(position, getDataItem(position));
         }
     }
@@ -120,11 +153,15 @@ public class CubeRecyclerViewAdapter<ItemDataType> extends RecyclerView.Adapter<
         return mFooterViews.size();
     }
 
-    private ItemDataType getDataItem(int position) {
+    public ItemDataType getDataItem(int position) {
         if (mList == null || position < 0 || position >= mList.size()) {
             return null;
         }
         return mList.get(position);
+    }
+
+    public interface OnItemClickListener {
+        public void onClick(View view, int position);
     }
 
     static class InnerViewHolder<TT> extends RecyclerView.ViewHolder {
