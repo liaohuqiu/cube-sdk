@@ -59,8 +59,12 @@ public abstract class CubeFragmentActivity extends FragmentActivity {
             if (fragment == null) {
                 fragment = (CubeFragment) cls.newInstance();
             }
-            if (mCurrentFragment != null && mCurrentFragment != fragment) {
-                mCurrentFragment.onLeave();
+            if (mCurrentFragment != null) {
+            	if(mCurrentFragment != fragment){
+            		mCurrentFragment.onLeave();
+            	}else{
+            		return;
+            	}
             }
             fragment.onEnter(param.data);
 
