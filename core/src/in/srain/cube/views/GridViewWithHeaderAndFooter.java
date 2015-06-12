@@ -25,6 +25,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+import in.srain.cube.util.CLog;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

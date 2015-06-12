@@ -13,22 +13,91 @@ public class CustomizedUri {
 
     private static final String KEY = "CUBE_URL";
     private static final String[] PUB_SCHEMA_LIST = new String[]{"http://", "https://"};
-
+    private final static int TAG_MASK_IS_CUSTOMIZED = 0x1;
+    private final static int TAG_MASK_IS_HTTP = 0x1 << 1;
     private JsonData mQueryData = JsonData.newMap();
-
     private String mSchemaPre = null;
     private String mPath = null;
     private String mQuery = null;
     private String mOriginUrl = null;
+    private int mTag = 0;
 
-    private boolean mIsCustomized;
+    private CustomizedUri(String url, String schemaPre) {
+        mSchemaPre = schemaPre;
+        mOriginUrl = url;
+
+        // process segment
+        int pos_seg = url.indexOf('#');
+        if (pos_seg > 0) {
+            url = url.substring(0, pos_seg);
+        }
+
+        // process query
+        int pos_sp = url.indexOf('?');
+        if (pos_sp > 0) {
+            mQuery = url.substring(pos_sp + 1);
+            url = url.substring(0, pos_sp);
+        }
+        mPath = url.substring(schemaPre.length());
+
+        if (!TextUtils.isEmpty(mQuery)) {
+            parseQuery();
+        }
+    }
+
+    public static CustomizedUri parse(String url, String customizedSchema) {
+        if (TextUtils.isEmpty(url)) {
+            throw new RuntimeException("url is null");
+        }
+
+        url = url.trim();
+
+        if (url.startsWith(customizedSchema)) {
+            CustomizedUri uri = new CustomizedUri(url, customizedSchema);
+            uri.mTag |= TAG_MASK_IS_CUSTOMIZED;
+            return uri;
+        } else {
+            for (int i = 0; i < PUB_SCHEMA_LIST.length; i++) {
+                String schema = PUB_SCHEMA_LIST[i];
+                if (url.startsWith(schema)) {
+                    CustomizedUri uri = new CustomizedUri(url, schema);
+                    uri.mTag |= TAG_MASK_IS_HTTP;
+                    return uri;
+                }
+            }
+        }
+        return null;
+    }
+
+    private static String decode(String content, String encoding) {
+        try {
+            return URLDecoder.decode(content, encoding != null ? encoding : "ISO-8859-1");
+        } catch (UnsupportedEncodingException var3) {
+            throw new IllegalArgumentException(var3);
+        }
+    }
+
+    public static CustomizedUri fromIntent(Intent intent, String schema) {
+        if (intent == null) {
+            return null;
+        }
+        String url = intent.getStringExtra(KEY);
+        if (TextUtils.isEmpty(url)) {
+            return null;
+        }
+        return parse(url, schema);
+    }
 
     public String getPath() {
         return mPath;
     }
 
     public boolean isCustomized() {
-        return mIsCustomized;
+        return (mTag & TAG_MASK_IS_CUSTOMIZED) > 0;
+    }
+
+    public boolean isHttpSchema() {
+        return (mTag & TAG_MASK_IS_HTTP) > 0;
     }
 
     public String getQueryString() {
@@ -43,41 +112,19 @@ public class CustomizedUri {
         return mOriginUrl;
     }
 
-    public static CustomizedUri parse(String url, String customizedSchema) {
-        if (TextUtils.isEmpty(url)) {
-            throw new RuntimeException("url is null");
-        }
-
-        url = url.trim();
-
-        if (url.startsWith(customizedSchema)) {
-            CustomizedUri uri = new CustomizedUri(url, customizedSchema);
-            uri.mIsCustomized = true;
-            return uri;
-        } else {
-            for (int i = 0; i < PUB_SCHEMA_LIST.length; i++) {
-                String schema = PUB_SCHEMA_LIST[i];
-                if (url.startsWith(schema)) {
-                    return new CustomizedUri(url, schema);
-                }
-            }
-        }
-        return null;
-    }
-
     public void writeToBundle(Intent intent) {
         intent.putExtra(KEY, buildUrl());
-    }
-
-    private static String decode(String content, String encoding) {
-        try {
-            return URLDecoder.decode(content, encoding != null ? encoding : "ISO-8859-1");
-        } catch (UnsupportedEncodingException var3) {
-            throw new IllegalArgumentException(var3);
+        if (mQueryData != null && mQueryData.length() > 0) {
+            Iterator<String> names = mQueryData.keys();
+            while (names.hasNext()) {
+                String name = names.next();
+                String value = mQueryData.optString(name);
+                intent.putExtra(name, value);
+            }
         }
     }
 
-    private String buildUrl() {
+    public String buildUrl() {
         StringBuilder sb = new StringBuilder();
         sb.append(mSchemaPre).append(mPath);
 
@@ -102,40 +149,6 @@ public class CustomizedUri {
             }
         }
         return sb.toString();
-    }
-
-    public static CustomizedUri fromIntent(Intent intent, String schema) {
-        if (intent == null) {
-            return null;
-        }
-        String url = intent.getStringExtra(KEY);
-        if (TextUtils.isEmpty(url)) {
-            return null;
-        }
-        return parse(url, schema);
-    }
-
-    private CustomizedUri(String url, String schemaPre) {
-        mSchemaPre = schemaPre;
-        mOriginUrl = url;
-
-        // process segment
-        int pos_seg = url.indexOf('#');
-        if (pos_seg > 0) {
-            url = url.substring(0, pos_seg);
-        }
-
-        // process query
-        int pos_sp = url.indexOf('?');
-        if (pos_sp > 0) {
-            mQuery = url.substring(pos_sp + 1);
-            url = url.substring(0, pos_sp);
-        }
-        mPath = url.substring(schemaPre.length());
-
-        if (!TextUtils.isEmpty(mQuery)) {
-            parseQuery();
-        }
     }
 
     private void parseQuery() {

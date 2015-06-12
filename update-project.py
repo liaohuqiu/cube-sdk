@@ -1,6 +1,6 @@
 import os
 vars = {
-        'cube_sdk_version': '1.0.45.1-SNAPSHOT',
+        'cube_sdk_version': '1.0.45.3.2-SNAPSHOT',
         'cube_sdk_stable_version': '1.0.44'
         }
 

@@ -419,6 +419,7 @@ public final class LruActionTracer implements Runnable {
         }
 
         // remove synchronized method , exclude this code block for dead lock digging
+        /*
         synchronized (mLock) {
             if (mIsRunning) {
                 while (!mActionQueue.isEmpty()) {
@@ -430,6 +431,7 @@ public final class LruActionTracer implements Runnable {
                 }
             }
         }
+        */
         if (SimpleDiskLruCache.DEBUG) {
             CLog.d(SimpleDiskLruCache.LOG_TAG, "job is done");
         }

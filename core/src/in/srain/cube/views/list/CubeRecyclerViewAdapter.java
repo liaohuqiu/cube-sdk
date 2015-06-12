@@ -15,7 +15,7 @@ import java.util.List;
  *
  * @param <ItemDataType>
  */
-public class CubeRecyclerViewAdapter<ItemDataType> extends RecyclerView.Adapter<CubeRecyclerViewAdapter.InnerViewHolder> {
+public abstract class CubeRecyclerViewAdapter<ItemDataType> extends RecyclerView.Adapter<CubeRecyclerViewAdapter.InnerViewHolder> {
 
     private final int TYPE_OFFSET_HEADER = 10000;
     private final int TYPE_OFFSET_FOOTER = 20000;
@@ -66,7 +66,7 @@ public class CubeRecyclerViewAdapter<ItemDataType> extends RecyclerView.Adapter<
             return mFooterViews.get(viewType - TYPE_OFFSET_FOOTER);
         }
         if (viewType >= TYPE_OFFSET_HEADER) {
-            return mFooterViews.get(viewType - TYPE_OFFSET_HEADER);
+            return mHeaderViews.get(viewType - TYPE_OFFSET_HEADER);
         }
         ViewHolderCreator<ItemDataType> creator = mLazyCreators.get(viewType);
         ViewHolderBase<ItemDataType> cubeViewHolder = creator.createViewHolder(-1);
@@ -84,6 +84,7 @@ public class CubeRecyclerViewAdapter<ItemDataType> extends RecyclerView.Adapter<
     @Override
     public void onBindViewHolder(InnerViewHolder holder, int position) {
         if (holder != null && holder.mCubeViewHolder != null) {
+            position = positionForDataItem(position);
             if (holder.itemView != null) {
                 holder.itemView.setTag(TAG_KEY_FOR_INDEX, position);
             }
@@ -93,6 +94,34 @@ public class CubeRecyclerViewAdapter<ItemDataType> extends RecyclerView.Adapter<
 
     @Override
     public int getItemViewType(int position) {
+        int type = doGetItemViewType(position);
+        return type;
+    }
+
+    @Override
+    public int getItemCount() {
+        return getDataItemCount() + getHeaderViewCount() + getFooterViewCount();
+    }
+
+    private int positionForDataItem(int position) {
+        final int headerViewCount = getHeaderViewCount();
+        final int dataTotal = getDataItemCount();
+
+        if (headerViewCount > 0) {
+            if (position < headerViewCount) {
+                return -1;
+            }
+        }
+
+        position = position - headerViewCount;
+        if (position < dataTotal) {
+            return position;
+        } else {
+            return -1;
+        }
+    }
+
+    private int doGetItemViewType(int position) {
 
         final int headerViewCount = getHeaderViewCount();
         final int footerViewCount = getFooterViewCount();
@@ -107,7 +136,7 @@ public class CubeRecyclerViewAdapter<ItemDataType> extends RecyclerView.Adapter<
         position = position - headerViewCount;
         final int dataPosition = position;
         if (position < dataTotal) {
-            return super.getItemViewType(position);
+            return getDataItemViewType(position);
         } else {
             position = position - dataTotal;
             if (position < footerViewCount) {
@@ -121,10 +150,7 @@ public class CubeRecyclerViewAdapter<ItemDataType> extends RecyclerView.Adapter<
         }
     }
 
-    @Override
-    public int getItemCount() {
-        return getDataItemCount() + getHeaderViewCount() + getFooterViewCount();
-    }
+    protected abstract int getDataItemViewType(int position);
 
     public int getDataItemCount() {
         if (mList == null) {
@@ -134,10 +160,22 @@ public class CubeRecyclerViewAdapter<ItemDataType> extends RecyclerView.Adapter<
     }
 
     public void addHeaderView(View view) {
+        for (int i = 0; i < mHeaderViews.size(); i++) {
+            StaticViewHolder holder = mHeaderViews.get(i);
+            if (holder.itemView == view) {
+                return;
+            }
+        }
         mHeaderViews.add(new StaticViewHolder(view));
     }
 
     public void addFooterView(View view) {
+        for (int i = 0; i < mFooterViews.size(); i++) {
+            StaticViewHolder holder = mFooterViews.get(i);
+            if (holder.itemView == view) {
+                return;
+            }
+        }
         mFooterViews.add(new StaticViewHolder(view));
     }
 
