@@ -3,13 +3,13 @@ package in.srain.cube.views.loadmore;
 import android.view.View;
 import android.widget.AbsListView;
 
-public interface LoadMoreContainer {
+public interface LoadMoreContainer<L> {
 
     public void setShowLoadingForFirstPage(boolean showLoading);
 
     public void setAutoLoadMore(boolean autoLoadMore);
 
-    public void setOnScrollListener(AbsListView.OnScrollListener l);
+    public void setOnScrollListener(L l);
 
     public void setLoadMoreView(View view);
 
