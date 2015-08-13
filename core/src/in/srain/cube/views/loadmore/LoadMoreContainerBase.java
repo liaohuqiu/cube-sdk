@@ -9,7 +9,7 @@ import android.widget.LinearLayout;
 /**
  * @author huqiu.lhq
  */
-public abstract class LoadMoreContainerBase extends LinearLayout implements LoadMoreContainer {
+public abstract class LoadMoreContainerBase extends LinearLayout implements LoadMoreContainer<AbsListView.OnScrollListener> {
 
     private AbsListView.OnScrollListener mOnScrollListener;
     private LoadMoreUIHandler mLoadMoreUIHandler;
