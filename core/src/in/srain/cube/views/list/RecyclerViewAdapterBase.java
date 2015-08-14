@@ -18,7 +18,7 @@ public abstract class RecyclerViewAdapterBase <V extends ViewHolder> extends Rec
 
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == TYPE_ITEM) {
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
             return getView(inflater, viewType);
