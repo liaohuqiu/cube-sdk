@@ -1,7 +1,7 @@
 package in.srain.cube.views.list;
 
-import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 /**
  * @author audiebant
  */
-public abstract class RecyclerViewAdapterBase <V extends ViewHolder> extends RecyclerView.Adapter<ViewHolder> {
+public abstract class RecyclerViewAdapterBase <V extends ViewHolder>extends RecyclerView.Adapter<ViewHolder> {
 
     private View mFooterView;
 
@@ -33,7 +33,7 @@ public abstract class RecyclerViewAdapterBase <V extends ViewHolder> extends Rec
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         if (getItemViewType(position) == TYPE_ITEM)
-              bindView((V)holder, position);
+            bindView((V)holder, position);
     }
 
 
@@ -70,6 +70,7 @@ public abstract class RecyclerViewAdapterBase <V extends ViewHolder> extends Rec
     protected abstract V getView(LayoutInflater inflater, int viewType);
 
     protected abstract void bindView(V holder, int position);
+
 
     static class FooterViewHolder extends RecyclerView.ViewHolder {
         public FooterViewHolder(View v) {
