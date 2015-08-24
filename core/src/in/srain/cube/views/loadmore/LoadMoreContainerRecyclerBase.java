@@ -1,17 +1,27 @@
 package in.srain.cube.views.loadmore;
 
 import android.content.Context;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.AbsListView;
 import android.widget.LinearLayout;
 
 /**
  * @author huqiu.lhq
  */
-public abstract class LoadMoreContainerBase extends LinearLayout implements LoadMoreContainer<AbsListView.OnScrollListener> {
+public abstract class LoadMoreContainerRecyclerBase extends LinearLayout implements LoadMoreContainer<RecyclerView.OnScrollListener> {
 
-    private AbsListView.OnScrollListener mOnScrollListener;
+    public enum LAYOUT_MANAGER_TYPE {
+        LINEAR,
+        GRID,
+        STAGGERED_GRID
+    }
+
+    private RecyclerView.OnScrollListener mOnScrollListener;
+
     private LoadMoreUIHandler mLoadMoreUIHandler;
     private LoadMoreHandler mLoadMoreHandler;
 
@@ -24,20 +34,20 @@ public abstract class LoadMoreContainerBase extends LinearLayout implements Load
     private boolean mShowLoadingForFirstPage = false;
     private View mFooterView;
 
-    private AbsListView mAbsListView;
+    private RecyclerView mRecyclerView;
 
-    public LoadMoreContainerBase(Context context) {
+    public LoadMoreContainerRecyclerBase(Context context) {
         super(context);
     }
 
-    public LoadMoreContainerBase(Context context, AttributeSet attrs) {
+    public LoadMoreContainerRecyclerBase(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        mAbsListView = retrieveAbsListView();
+        mRecyclerView = retrieveRecyclerView();
         init();
     }
 
@@ -62,34 +72,63 @@ public abstract class LoadMoreContainerBase extends LinearLayout implements Load
             addFooterView(mFooterView);
         }
 
-        mAbsListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 
-            private boolean mIsEnd = false;
+            private int lastVisibleItemPosition;
+            private int[] lastPositions;
+            private LAYOUT_MANAGER_TYPE layoutManagerType;
 
             @Override
-            public void onScrollStateChanged(AbsListView view, int scrollState) {
-
+            public void onScrollStateChanged(RecyclerView view, int newState) {
                 if (null != mOnScrollListener) {
-                    mOnScrollListener.onScrollStateChanged(view, scrollState);
+                    mOnScrollListener.onScrollStateChanged(view, newState);
                 }
-                if (scrollState == SCROLL_STATE_IDLE) {
-                    if (mIsEnd) {
+            }
+
+            @Override
+            public void onScrolled(RecyclerView view, int dx, int dy) {
+                if (null != mOnScrollListener) {
+                    mOnScrollListener.onScrolled(view, dx, dy);
+                }
+                RecyclerView.LayoutManager layoutManager = view.getLayoutManager();
+                if (null != layoutManager) {
+                    if (layoutManager instanceof LinearLayoutManager) {
+                        layoutManagerType = LAYOUT_MANAGER_TYPE.LINEAR;
+                    } else if (layoutManager instanceof GridLayoutManager) {
+                        layoutManagerType = LAYOUT_MANAGER_TYPE.GRID;
+                    } else if (layoutManager instanceof StaggeredGridLayoutManager) {
+                        layoutManagerType = LAYOUT_MANAGER_TYPE.STAGGERED_GRID;
+                    } else {
+                        throw new ClassCastException(
+                                "Unsupported LayoutManager used. Valid ones are LinearLayoutManager, GridLayoutManager and StaggeredGridLayoutManager");
+                    }
+
+                    switch (layoutManagerType) {
+                        case LINEAR:
+                            lastVisibleItemPosition = ((LinearLayoutManager) layoutManager)
+                                    .findLastVisibleItemPosition();
+                            break;
+                        case GRID:
+                            lastVisibleItemPosition = ((GridLayoutManager) layoutManager)
+                                    .findLastVisibleItemPosition();
+                            break;
+                        case STAGGERED_GRID:
+                            StaggeredGridLayoutManager staggeredGridLayoutManager
+                                    = (StaggeredGridLayoutManager) layoutManager;
+                            lastPositions = new int[staggeredGridLayoutManager.getSpanCount()];
+                            staggeredGridLayoutManager.findLastVisibleItemPositions(lastPositions);
+                            lastVisibleItemPosition = findMax(lastPositions);
+                            break;
+                    }
+
+                    int visibleItemCount = layoutManager.getChildCount();
+                    int totalItemCount = layoutManager.getItemCount();
+                    if ((visibleItemCount > 0 && (lastVisibleItemPosition) >= totalItemCount - 1)) {
                         onReachBottom();
                     }
                 }
             }
 
-            @Override
-            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                if (null != mOnScrollListener) {
-                    mOnScrollListener.onScroll(view, firstVisibleItem, visibleItemCount, totalItemCount);
-                }
-                if (firstVisibleItem + visibleItemCount >= totalItemCount - 1) {
-                    mIsEnd = true;
-                } else {
-                    mIsEnd = false;
-                }
-            }
         });
     }
 
@@ -138,14 +177,14 @@ public abstract class LoadMoreContainerBase extends LinearLayout implements Load
     }
 
     @Override
-    public void setOnScrollListener(AbsListView.OnScrollListener l) {
+    public void setOnScrollListener(RecyclerView.OnScrollListener l) {
         mOnScrollListener = l;
     }
 
     @Override
     public void setLoadMoreView(View view) {
         // has not been initialized
-        if (mAbsListView == null) {
+        if (mRecyclerView == null) {
             mFooterView = view;
             return;
         }
@@ -203,9 +242,21 @@ public abstract class LoadMoreContainerBase extends LinearLayout implements Load
         }
     }
 
+    private int findMax(int[] lastPositions) {
+        int max = lastPositions[0];
+        for (int value : lastPositions) {
+            if (value > max) {
+                max = value;
+            }
+        }
+        return max;
+    }
+
+
     protected abstract void addFooterView(View view);
 
     protected abstract void removeFooterView(View view);
 
-    protected abstract AbsListView retrieveAbsListView();
+    protected abstract RecyclerView retrieveRecyclerView();
+
 }
