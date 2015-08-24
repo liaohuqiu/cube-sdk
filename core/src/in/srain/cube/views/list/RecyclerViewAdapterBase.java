@@ -48,7 +48,7 @@ public abstract class RecyclerViewAdapterBase <V extends ViewHolder>extends Recy
 
     @Override
     public int getItemCount() {
-        return getDataItemSize();
+        return getDataItemSize()+getFooterViewSize();
     }
 
     private int getFooterViewSize() {
