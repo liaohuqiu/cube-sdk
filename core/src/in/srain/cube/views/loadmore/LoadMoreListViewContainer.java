@@ -9,7 +9,7 @@ import android.widget.ListView;
 /**
  * @author huqiu.lhq
  */
-public class LoadMoreListViewContainer extends LoadMoreContainerBase {
+public class LoadMoreListViewContainer extends LoadMoreAbsListViewContainerBase {
 
     private ListView mListView;
 

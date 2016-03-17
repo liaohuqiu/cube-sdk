@@ -9,7 +9,7 @@ import in.srain.cube.views.GridViewWithHeaderAndFooter;
 /**
  * @author huqiu.lhq
  */
-public class LoadMoreGridViewContainer extends LoadMoreContainerBase {
+public class LoadMoreGridViewContainer extends LoadMoreAbsListViewContainerBase {
 
     private GridViewWithHeaderAndFooter mGridView;
 
