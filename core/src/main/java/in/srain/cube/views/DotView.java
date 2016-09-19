@@ -13,20 +13,22 @@ import in.srain.cube.views.banner.PagerIndicator;
 
 public class DotView extends LinearLayout implements PagerIndicator {
 
-    public interface OnDotClickHandler {
-        public void onDotClick(int index);
-    }
-
     private int mLittleDotSize = -2;
     private int mDotSpan = 36;
     private float mDotRadius = 6f;
-
     private int mCurrent = 0;
     private int mTotal = 0;
-
     private int mSelectedColor = 0xFF377BEE;
     private int mUnSelectedColor = 0xFFC5CEDB;
     private OnDotClickHandler mOnDotClickHandler;
+    private OnClickListener mDotClickHandler = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (v instanceof LittleDot && null != mOnDotClickHandler) {
+                mOnDotClickHandler.onDotClick(((LittleDot) v).getIndex());
+            }
+        }
+    };
 
     public DotView(Context context) {
         super(context);
@@ -92,15 +94,6 @@ public class DotView extends LinearLayout implements PagerIndicator {
         mOnDotClickHandler = handler;
     }
 
-    private OnClickListener mDotClickHandler = new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            if (v instanceof LittleDot && null != mOnDotClickHandler) {
-                mOnDotClickHandler.onDotClick(((LittleDot) v).getIndex());
-            }
-        }
-    };
-
     public final void setSelected(int index) {
         if (index >= getChildCount() || index < 0 || mCurrent == index) {
             return;
@@ -110,6 +103,32 @@ public class DotView extends LinearLayout implements PagerIndicator {
         }
         ((LittleDot) getChildAt(index)).setColor(mSelectedColor);
         mCurrent = index;
+    }
+
+    public void setSelectedColor(int color) {
+        if (mSelectedColor != color) {
+            mSelectedColor = color;
+            invalidate();
+        }
+    }
+
+    public void setColor(int selectedColor, int unSelectedColor) {
+        if (mSelectedColor != selectedColor || mUnSelectedColor != unSelectedColor) {
+            mSelectedColor = selectedColor;
+            mUnSelectedColor = unSelectedColor;
+            invalidate();
+        }
+    }
+
+    public void setUnSelectedColor(int color) {
+        if (mUnSelectedColor != color) {
+            mSelectedColor = color;
+            invalidate();
+        }
+    }
+
+    public interface OnDotClickHandler {
+        void onDotClick(int index);
     }
 
     private class LittleDot extends View {
@@ -141,28 +160,6 @@ public class DotView extends LinearLayout implements PagerIndicator {
             super.onDraw(canvas);
             mPaint.setColor(mColor);
             canvas.drawCircle(mLittleDotSize / 2, mDotRadius, mDotRadius, mPaint);
-        }
-    }
-
-    public void setSelectedColor(int color) {
-        if (mSelectedColor != color) {
-            mSelectedColor = color;
-            invalidate();
-        }
-    }
-
-    public void setColor(int selectedColor, int unSelectedColor) {
-        if (mSelectedColor != selectedColor || mUnSelectedColor != unSelectedColor) {
-            mSelectedColor = selectedColor;
-            mUnSelectedColor = unSelectedColor;
-            invalidate();
-        }
-    }
-
-    public void setUnSelectedColor(int color) {
-        if (mUnSelectedColor != color) {
-            mSelectedColor = color;
-            invalidate();
         }
     }
 }

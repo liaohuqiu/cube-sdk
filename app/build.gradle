@@ -1,0 +1,43 @@
+apply plugin: 'com.android.application'
+
+android {
+    buildToolsVersion rootProject.ext.buildToolsVersion
+    compileSdkVersion rootProject.ext.compileSdkVersion
+
+    defaultConfig {
+
+        applicationId "in.srain.cube.demo"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+
+    compile project(":core");
+
+    compile "com.android.support:support-v4:${SUPPORT_V4_VERSION}"
+    compile "com.android.support:appcompat-v7:${SUPPORT_APPCOMPAT_V7_VERSION}"
+    compile "com.android.support:design:${SUPPORT_DESIGN_VERSION}"
+    compile "com.android.support.constraint:constraint-layout:${CONSTRAINT_LAYOUT_VERSION}"
+
+    testCompile "junit:junit:${JUNIT_VERSION}"
+
+    androidTestCompile "com.android.support:support-annotations:${SUPPORT_ANNOTATIONS_VERSION}"
+    androidTestCompile "com.android.support.test.uiautomator:uiautomator-${UI_AUTOMATOR_VERION}"
+    androidTestCompile "com.android.support.test:runner:${TEST_RUNNER_VERSION}"
+    androidTestCompile "com.android.support.test:rules:${TEST_RULES_VERSION}"
+    androidTestCompile "org.hamcrest:hamcrest-library:${HAMCREST_LIBRARY_VERSION}"
+    androidTestCompile "com.android.support.test.espresso:espresso-core:${ESPRESSO_CORE_VERSION}"
+}

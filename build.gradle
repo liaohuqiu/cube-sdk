@@ -3,7 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.+'
+        classpath "com.android.tools.build:gradle:${ANDROID_GRADLE_PLUGIN_VERSION}"
     }
 }
 
@@ -18,4 +18,18 @@ allprojects {
             url 'https://oss.sonatype.org/content/repositories/snapshots'
         }
     }
+}
+if (JavaVersion.current().isJava8Compatible()) {
+    allprojects {
+        tasks.withType(Javadoc) {
+            options.addStringOption('Xdoclint:none', '-quiet')
+        }
+    }
+}
+
+project.ext {
+    buildToolsVersion = "${BUILD_TOOLS_VERSION}"
+    compileSdkVersion = COMPILE_SDK_VERSION.toInteger()
+    targetSdkVersion = TARGET_SDK_VERSION.toInteger()
+    minSdkVersion = MIN_SDK_VERSION.toInteger()
 }
