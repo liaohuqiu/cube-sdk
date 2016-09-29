@@ -2,6 +2,7 @@ package in.srain.cube.views.list;
 
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 /**
  * As described in
@@ -24,7 +25,7 @@ public abstract class ViewHolderBase<ItemDataType> {
     /**
      * create a view from resource Xml file, and hold the view that may be used in displaying data.
      */
-    public abstract View createView(LayoutInflater layoutInflater);
+    public abstract View createView(LayoutInflater layoutInflater, ViewGroup parent);
 
     /**
      * using the held views to display data

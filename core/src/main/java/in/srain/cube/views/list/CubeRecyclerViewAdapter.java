@@ -72,7 +72,7 @@ public abstract class CubeRecyclerViewAdapter<ItemDataType> extends RecyclerView
         ViewHolderBase<ItemDataType> cubeViewHolder = creator.createViewHolder(-1);
 
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View v = cubeViewHolder.createView(inflater);
+        View v = cubeViewHolder.createView(inflater, parent);
         if (v != null && mOnItemClickListener != null) {
             v.setOnClickListener(mOnClickListener);
         }

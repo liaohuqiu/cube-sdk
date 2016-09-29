@@ -6,12 +6,12 @@ import java.util.List;
 public class ListPageInfo<T> {
 
     private int mNumPerPage = 0;
-    private int mStart = 0;
-    private int mLastStart = 0;
     private boolean mHasMore;
     private boolean mIsBusy = false;
 
     private List<T> mDataList;
+    private int mStart = 0;
+    private int mLastStart = 0;
 
     public ListPageInfo(int numPerPage) {
         mNumPerPage = numPerPage;
@@ -27,10 +27,11 @@ public class ListPageInfo<T> {
         if (dataList == null) {
             return;
         }
-        if (mStart == 0 || mDataList == null) {
+        if (isFirstPage() || mDataList == null) {
             mDataList = new ArrayList<T>();
         }
         mDataList.addAll(dataList);
+        mStart = mDataList.size();
     }
 
     public void updateListInfo(List<T> dataList, boolean hasMore) {
@@ -92,7 +93,6 @@ public class ListPageInfo<T> {
     public boolean prepareForNextPage() {
         if (hasMore()) {
             mLastStart = mStart;
-            mStart += mNumPerPage;
             return true;
         }
         return false;
@@ -138,6 +138,6 @@ public class ListPageInfo<T> {
     }
 
     public boolean isFirstPage() {
-        return 0 == mStart;
+        return 0 == getStart();
     }
 }
