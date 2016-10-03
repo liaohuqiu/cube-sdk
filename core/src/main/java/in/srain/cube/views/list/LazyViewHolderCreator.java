@@ -7,13 +7,19 @@ public class LazyViewHolderCreator<T> implements ViewHolderCreator<T> {
 
     private final Constructor<?> mConstructor;
     private Object[] mInstanceObjects;
+    private int mMaxRecycledViews;
 
-    private LazyViewHolderCreator(Constructor<?> constructor, Object[] instanceObjects) {
+    private LazyViewHolderCreator(Constructor<?> constructor, Object[] instanceObjects, int maxRecycledViews) {
         mConstructor = constructor;
         mInstanceObjects = instanceObjects;
+        mMaxRecycledViews = maxRecycledViews;
     }
 
-    public static <ItemDataType> ViewHolderCreator<ItemDataType> create(final Object enclosingInstance, final Class<?> cls, final Object... args) {
+    public int getMaxRecycledViews() {
+        return mMaxRecycledViews;
+    }
+
+    public static <ItemDataType> LazyViewHolderCreator<ItemDataType> create(final Object enclosingInstance, final Class<?> cls, int maxRecycledViews, final Object... args) {
         if (cls == null) {
             throw new IllegalArgumentException("ViewHolderClass is null.");
         }
@@ -58,7 +64,7 @@ public class LazyViewHolderCreator<T> implements ViewHolderCreator<T> {
             throw new IllegalArgumentException("ViewHolderClass can not be initiated");
         }
 
-        ViewHolderCreator lazyCreator = new LazyViewHolderCreator(constructor, instanceObjects);
+        LazyViewHolderCreator lazyCreator = new LazyViewHolderCreator(constructor, instanceObjects, maxRecycledViews);
         return lazyCreator;
     }
 

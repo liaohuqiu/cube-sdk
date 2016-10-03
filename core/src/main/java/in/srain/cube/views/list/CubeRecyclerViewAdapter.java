@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import in.srain.cube.util.CLog;
+import in.srain.cube.util.CubeDebug;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +17,7 @@ import java.util.List;
  *
  * @param <ItemDataType>
  */
-public abstract class CubeRecyclerViewAdapter<ItemDataType> extends RecyclerView.Adapter<CubeRecyclerViewAdapter.InnerViewHolder> {
+public class CubeRecyclerViewAdapter<ItemDataType> extends RecyclerView.Adapter<CubeRecyclerViewAdapter.ViewHolderProxy> {
 
     private final int TYPE_OFFSET_HEADER = 10000;
     private final int TYPE_OFFSET_FOOTER = 20000;
@@ -23,13 +25,13 @@ public abstract class CubeRecyclerViewAdapter<ItemDataType> extends RecyclerView
     // 2015-05-21
     private final int TAG_KEY_FOR_INDEX = 521 << 24;
 
-    protected SparseArray<ViewHolderCreator<ItemDataType>> mLazyCreators = new SparseArray<ViewHolderCreator<ItemDataType>>();
+    protected SparseArray<LazyViewHolderCreator<ItemDataType>> mLazyCreators = new SparseArray<LazyViewHolderCreator<ItemDataType>>();
 
     private List<ItemDataType> mList;
 
-    private List<StaticViewHolder> mHeaderViews = new ArrayList<StaticViewHolder>();
+    private List<StaticViewHolderProxy> mHeaderViews = new ArrayList<StaticViewHolderProxy>();
 
-    private List<StaticViewHolder> mFooterViews = new ArrayList<StaticViewHolder>();
+    private List<StaticViewHolderProxy> mFooterViews = new ArrayList<StaticViewHolderProxy>();
 
     private OnItemClickListener mOnItemClickListener;
 
@@ -51,8 +53,8 @@ public abstract class CubeRecyclerViewAdapter<ItemDataType> extends RecyclerView
         mOnItemClickListener = handler;
     }
 
-    public void setViewHolderClass(int viewType, final Object enclosingInstance, final Class<?> cls, final Object... args) {
-        ViewHolderCreator<ItemDataType> lazyCreator = LazyViewHolderCreator.create(enclosingInstance, cls, args);
+    public void setViewHolderClass(int viewType, final Object enclosingInstance, final Class<?> cls, int maxRecycledViews, final Object... args) {
+        LazyViewHolderCreator<ItemDataType> lazyCreator = LazyViewHolderCreator.create(enclosingInstance, cls, maxRecycledViews, args);
         mLazyCreators.put(viewType, lazyCreator);
     }
 
@@ -60,29 +62,50 @@ public abstract class CubeRecyclerViewAdapter<ItemDataType> extends RecyclerView
         mList = list;
     }
 
+    public RecyclerView.RecycledViewPool createRecycledViewPool(ViewGroup parentView, RecyclerView.RecycledViewPool recycledViewPool) {
+        if (recycledViewPool == null) {
+            recycledViewPool = new RecyclerView.RecycledViewPool();
+        }
+        for (int i = 0, nsize = mLazyCreators.size(); i < nsize; i++) {
+            final int viewType = mLazyCreators.keyAt(i);
+            LazyViewHolderCreator<ItemDataType> lazyViewHolderCreator = mLazyCreators.valueAt(i);
+            final int maxRecycledViews = lazyViewHolderCreator.getMaxRecycledViews();
+            recycledViewPool.setMaxRecycledViews(viewType, maxRecycledViews);
+            for (int j = 0; j < maxRecycledViews; j++) {
+                RecyclerView.ViewHolder viewHolder = createViewHolder(parentView, viewType);
+                recycledViewPool.putRecycledView(viewHolder);
+            }
+        }
+        return recycledViewPool;
+    }
+
     @Override
-    public InnerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolderProxy onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType >= TYPE_OFFSET_FOOTER) {
             return mFooterViews.get(viewType - TYPE_OFFSET_FOOTER);
         }
         if (viewType >= TYPE_OFFSET_HEADER) {
             return mHeaderViews.get(viewType - TYPE_OFFSET_HEADER);
         }
-        ViewHolderCreator<ItemDataType> creator = mLazyCreators.get(viewType);
-        ViewHolderBase<ItemDataType> cubeViewHolder = creator.createViewHolder(-1);
+        final ViewHolderCreator<ItemDataType> creator = mLazyCreators.get(viewType);
+        final ViewHolderBase<ItemDataType> cubeViewHolder = creator.createViewHolder(-1);
 
-        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View v = cubeViewHolder.createView(inflater, parent);
+        final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        final View v = cubeViewHolder.createView(inflater, parent);
+
+        if (CubeDebug.DEBUG_LIST) {
+            CLog.d(ListViewDataAdapterBase.LOG_TAG, "CubeRecyclerViewAdapter::createView: %s %s", cubeViewHolder, viewType);
+        }
         if (v != null && mOnItemClickListener != null) {
             v.setOnClickListener(mOnClickListener);
         }
-        InnerViewHolder viewHolder = new InnerViewHolder<ItemDataType>(v);
+        final ViewHolderProxy viewHolder = new ViewHolderProxy<ItemDataType>(v);
         viewHolder.mCubeViewHolder = cubeViewHolder;
         return viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(InnerViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolderProxy holder, int position) {
         if (holder != null && holder.mCubeViewHolder != null) {
             position = positionForDataItem(position);
             if (holder.itemView != null) {
@@ -92,8 +115,14 @@ public abstract class CubeRecyclerViewAdapter<ItemDataType> extends RecyclerView
         }
     }
 
+    /**
+     * Please use getDataItemViewType to return the view type;
+     *
+     * @param position
+     * @return
+     */
     @Override
-    public int getItemViewType(int position) {
+    final public int getItemViewType(int position) {
         int type = doGetItemViewType(position);
         return type;
     }
@@ -101,6 +130,10 @@ public abstract class CubeRecyclerViewAdapter<ItemDataType> extends RecyclerView
     @Override
     public int getItemCount() {
         return getDataItemCount() + getHeaderViewCount() + getFooterViewCount();
+    }
+
+    public int innerPositionForDataItem(int position) {
+        return position + getHeaderViewCount();
     }
 
     private int positionForDataItem(int position) {
@@ -150,7 +183,9 @@ public abstract class CubeRecyclerViewAdapter<ItemDataType> extends RecyclerView
         }
     }
 
-    protected abstract int getDataItemViewType(int position);
+    protected int getDataItemViewType(int position) {
+        return 0;
+    }
 
     public int getDataItemCount() {
         if (mList == null) {
@@ -161,22 +196,22 @@ public abstract class CubeRecyclerViewAdapter<ItemDataType> extends RecyclerView
 
     public void addHeaderView(View view) {
         for (int i = 0; i < mHeaderViews.size(); i++) {
-            StaticViewHolder holder = mHeaderViews.get(i);
+            StaticViewHolderProxy holder = mHeaderViews.get(i);
             if (holder.itemView == view) {
                 return;
             }
         }
-        mHeaderViews.add(new StaticViewHolder(view));
+        mHeaderViews.add(new StaticViewHolderProxy(view));
     }
 
     public void addFooterView(View view) {
         for (int i = 0; i < mFooterViews.size(); i++) {
-            StaticViewHolder holder = mFooterViews.get(i);
+            StaticViewHolderProxy holder = mFooterViews.get(i);
             if (holder.itemView == view) {
                 return;
             }
         }
-        mFooterViews.add(new StaticViewHolder(view));
+        mFooterViews.add(new StaticViewHolderProxy(view));
     }
 
     public void removeFooterView(View view) {
@@ -199,21 +234,26 @@ public abstract class CubeRecyclerViewAdapter<ItemDataType> extends RecyclerView
     }
 
     public interface OnItemClickListener {
-        public void onClick(View view, int position);
+        void onClick(View view, int position);
     }
 
-    static class InnerViewHolder<TT> extends RecyclerView.ViewHolder {
+    static class ViewHolderProxy<TT> extends RecyclerView.ViewHolder {
 
         ViewHolderBase<TT> mCubeViewHolder;
 
-        public InnerViewHolder(View itemView) {
+        private ViewHolderProxy(View itemView, ViewHolderBase<TT> viewHolder) {
+            this(itemView);
+            mCubeViewHolder = viewHolder;
+        }
+
+        public ViewHolderProxy(View itemView) {
             super(itemView);
         }
     }
 
-    static class StaticViewHolder extends InnerViewHolder<Object> {
+    static class StaticViewHolderProxy extends ViewHolderProxy<Object> {
 
-        public StaticViewHolder(View itemView) {
+        public StaticViewHolderProxy(View itemView) {
             super(itemView);
         }
     }

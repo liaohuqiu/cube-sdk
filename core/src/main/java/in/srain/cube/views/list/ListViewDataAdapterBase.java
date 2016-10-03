@@ -15,7 +15,7 @@ import in.srain.cube.util.CubeDebug;
  */
 public abstract class ListViewDataAdapterBase<ItemDataType> extends BaseAdapter {
 
-    private static final String LOG_TAG = "cube-list";
+    public static final String LOG_TAG = "cube-list";
 
     protected ViewHolderCreator<ItemDataType> mViewHolderCreator;
     protected ViewHolderCreator<ItemDataType> mLazyCreator;
@@ -41,7 +41,7 @@ public abstract class ListViewDataAdapterBase<ItemDataType> extends BaseAdapter 
     }
 
     public void setViewHolderClass(final Object enclosingInstance, final Class<?> cls, final Object... args) {
-        mLazyCreator = LazyViewHolderCreator.create(enclosingInstance, cls, args);
+        mLazyCreator = LazyViewHolderCreator.create(enclosingInstance, cls, 0, args);
     }
 
     private ViewHolderBase<ItemDataType> createViewHolder(int position) {
